@@ -133,7 +133,15 @@ body.essay #content-inner.layout {
 }
 
 .essay-text {
+  /* 固定两行高：内容短也占满两行，卡片高度整齐；超长自动省略。
+     行高 1.9 → 两行 3.8em，改行高要同步改下面的 min/max-height。 */
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   max-width: 960px;
+  min-height: 3.8em;
+  max-height: 3.8em;
   color: var(--heo-fontcolor);
   font-size: 15px;
   line-height: 1.9;
@@ -158,13 +166,38 @@ body.essay #content-inner.layout {
   border-bottom-style: solid;
 }
 
-/* ---------- 图片 ---------- */
-.essay-imgs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  max-width: 960px;
+/* ---------- 图片：两图一屏 + 按钮翻页 ---------- */
+/* 一屏固定 2 张，多出来的用 translateX 翻过去（结构见 layout/essay.ejs）。
+   4 张 = 2 屏；3 张 = 2 屏（末屏单张留左格）；2 张 = 1 屏不出按钮。 */
+.essay-gallery {
+  position: relative;
+  /* 图片不跟正文行宽对齐，铺满整张卡片 */
+  max-width: 100%;
   margin-top: 14px;
+}
+
+.essay-gallery-viewport {
+  overflow: hidden;
+  border-radius: 8px;
+  /* 横向手势留给翻页，纵向仍归页面滚动 */
+  touch-action: pan-y;
+}
+
+.essay-gallery-track {
+  display: flex;
+  transition: transform .42s cubic-bezier(.4, 0, .2, 1);
+}
+
+.essay-gallery-page {
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+/* 只有 1 张图时撑满整行，不留半格空白 */
+.essay-gallery--single .essay-gallery-page {
+  grid-template-columns: 1fr;
 }
 
 .essay-img {
@@ -173,6 +206,10 @@ body.essay #content-inner.layout {
   border-radius: 8px;
   background: var(--heo-secondbg);
   line-height: 0;
+}
+
+.essay-gallery .essay-img {
+  height: 280px;
 }
 
 .essay-img img {
@@ -186,16 +223,75 @@ body.essay #content-inner.layout {
   transform: scale(1.04);
 }
 
-/* 2 张：各占一半，比例与参考站一致（参考站 168/440 ≈ 38%，这里 478/1352 ≈ 35%） */
-.essay-imgs--2 .essay-img {
-  flex: 0 0 calc(50% - 4px);
-  height: 280px;
+/* 翻页按钮：鼠标悬停整块时浮现，触屏设备常显 */
+.essay-gallery-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-top: -17px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(20, 22, 35, .55);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+  transition: opacity .25s, background-color .25s;
 }
 
-/* 4 张：一行四列 */
-.essay-imgs--4 .essay-img {
-  flex: 0 0 calc(25% - 6px);
-  height: 176px;
+.essay-gallery-nav--prev {
+  left: 10px;
+}
+
+.essay-gallery-nav--next {
+  right: 10px;
+}
+
+.essay-gallery-nav:hover {
+  background: rgba(20, 22, 35, .72);
+}
+
+.essay-gallery:hover .essay-gallery-nav,
+.essay-gallery-nav:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .essay-gallery-nav {
+    opacity: 1;
+  }
+}
+
+/* 圆点：靠右下角放，避开两张图的接缝和画面主体 */
+.essay-gallery-dots {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 11px;
+  background: rgba(20, 22, 35, .55);
+}
+
+.essay-gallery-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .65);
+  transition: width .25s, background-color .25s;
+}
+
+.essay-gallery-dots i.is-active {
+  width: 16px;
+  border-radius: 4px;
+  background: #fff;
 }
 
 /* ---------- 分隔线 + 底部信息条 ---------- */
@@ -373,17 +469,28 @@ body.essay #content-inner.layout {
   .essay-text {
     font-size: 14px;
     line-height: 1.8;
+    /* 行高变了，两行高度跟着变（1.8 × 2 = 3.6em） */
+    min-height: 3.6em;
+    max-height: 3.6em;
   }
 
-  /* 手机上一律两列并排，别再按固定 px 排 */
-  .essay-imgs--2 .essay-img {
-    flex: 0 0 calc(50% - 4px);
+  /* 手机上两图一屏，单张压到 130px，翻页按钮也收小一点 */
+  .essay-gallery .essay-img {
     height: 130px;
   }
 
-  .essay-imgs--4 .essay-img {
-    flex: 0 0 calc(50% - 4px);
-    height: 120px;
+  .essay-gallery-nav {
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+  }
+
+  .essay-gallery-nav--prev {
+    left: 6px;
+  }
+
+  .essay-gallery-nav--next {
+    right: 6px;
   }
 
   .essay-pill {

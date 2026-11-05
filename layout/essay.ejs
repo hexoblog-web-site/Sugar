@@ -107,12 +107,42 @@
       <% } %>
 
       <% if (imgs.length) { %>
-      <div class="essay-imgs essay-imgs--<%= imgs.length >= 4 ? 4 : 2 %>">
-        <% imgs.forEach(function (src) { %>
-        <a class="essay-img" href="<%- url_for(src) %>" target="_blank" rel="noopener">
-          <img src="<%- url_for(src) %>" alt="" loading="lazy">
-        </a>
-        <% }); %>
+      <%
+        /* 两图一屏：一屏放 2 张，多出来的收进下一页，用左右按钮翻。
+           4 张 = 2 屏；3 张 = 2 屏（末屏 1 张，留在左格，与首页第一张对齐）；
+           2 张 = 1 屏，不出按钮；1 张 = 单图撑满整行。 */
+        var perScreen = 2;
+        var screens = Math.ceil(imgs.length / perScreen);
+        var gcls = 'essay-gallery';
+        if (screens > 1) gcls += ' essay-gallery--multi';
+        if (imgs.length === 1) gcls += ' essay-gallery--single';
+      %>
+      <div class="<%= gcls %>" data-screens="<%= screens %>">
+        <div class="essay-gallery-viewport">
+          <div class="essay-gallery-track">
+            <% for (var sc = 0; sc < screens; sc++) { %>
+            <div class="essay-gallery-page">
+              <% imgs.slice(sc * perScreen, sc * perScreen + perScreen).forEach(function (src) { %>
+              <a class="essay-img" href="<%- url_for(src) %>" target="_blank" rel="noopener">
+                <img src="<%- url_for(src) %>" alt="" loading="lazy">
+              </a>
+              <% }); %>
+            </div>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (screens > 1) { %>
+        <button class="essay-gallery-nav essay-gallery-nav--prev" type="button" aria-label="上一张">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 320 512" aria-hidden="true"><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg>
+        </button>
+        <button class="essay-gallery-nav essay-gallery-nav--next" type="button" aria-label="下一张">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 320 512" aria-hidden="true"><path fill="currentColor" d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
+        </button>
+        <div class="essay-gallery-dots" aria-hidden="true">
+          <% for (var dc = 0; dc < screens; dc++) { %><i<%= dc === 0 ? ' class="is-active"' : '' %>></i><% } %>
+        </div>
+        <% } %>
       </div>
       <% } %>
 
