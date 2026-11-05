@@ -87,6 +87,7 @@
 @import url('archives.css');      /* archive.ejs        归档页           脚本: 无 */
 @import url('link.css');          /* links.ejs          友情链接页       脚本: partial/link.js */
 @import url('fcircle.css');     /* fcircle.ejs       朋友圈页          脚本: partial/fcircle.js */
+@import url('essay-page.css');  /* essay.ejs         即刻短文页        脚本: partial/essay-page.js */
 /* 列表样式切换（card / banner）：必须排在 post-card.css 与各断点文件之后才压得住 */
 @import url('post-list.css');    /* home/post-card      列表两种样式      脚本: 无 */
 

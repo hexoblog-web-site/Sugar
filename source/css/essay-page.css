@@ -1,0 +1,392 @@
+/* ==========================================================================
+   即刻短文页 —— 布局对标 blog.anheyu.com/essay
+   --------------------------------------------------------------------------
+   结构：.essay-page > .fc-banner 横幅 → .essay-list 单列卡片 → 加载更多 → 评论
+
+   与参考站唯一的差别在这里：参考站是 3 列网格（440px 一张），本页改成单列列表。
+   卡片的视觉数值全部照抄参考站实测：
+     白底 / radius 12px / padding 16px 16px 8px / 1px #E3E8F7 描边
+     阴影 0 8px 16px -4px #2c2d300c / 正文 #363636 / 胶囊 rgba(153,153,153,.17) 20px 圆角
+   这几个值正好等于主题变量（--heo-card-bg / --heo-card-border / --heo-shadow-border /
+   --heo-fontcolor），所以直接吃变量：亮色下 1:1，暗色下自动跟随，不用另写一套。
+   ========================================================================== */
+
+/* ---------- 页面容器：与朋友圈页同一套骨架 ---------- */
+body.essay #content-inner.layout {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+#content-inner > .essay-page {
+  display: block;
+  flex: 1 1 auto;
+  width: 100% !important;
+  min-width: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+  align-self: flex-start;
+}
+
+/* ---------- 列表 ---------- */
+.essay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.essay-item {
+  position: relative;
+  padding: 16px 20px 8px;
+  background: var(--heo-card-bg);
+  border: 1px solid var(--heo-card-border);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-border);
+  transition: border-color .3s, box-shadow .3s, transform .3s;
+}
+
+.essay-item:hover {
+  border-color: #163bf2;
+  box-shadow: 0 10px 20px -6px rgba(22, 59, 242, .16);
+  transform: translateY(-2px);
+}
+
+.essay-item.is-hidden {
+  display: none;
+}
+
+/* 加载更多时逐条淡入 */
+.essay-item.is-entering {
+  animation: essay-in .38s ease both;
+}
+
+@keyframes essay-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- 头像 / 作者 ---------- */
+.essay-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.essay-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  background: var(--heo-secondbg);
+}
+
+.essay-byline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.essay-author {
+  color: var(--heo-fontcolor);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.essay-date {
+  color: var(--heo-secondtext);
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: .02em;
+}
+
+/* ---------- 标题 / 正文 ---------- */
+.essay-title {
+  margin: 12px 0 8px;
+  max-width: 960px;
+  color: var(--heo-fontcolor);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: .01em;
+}
+
+.essay-text {
+  max-width: 960px;
+  color: var(--heo-fontcolor);
+  font-size: 15px;
+  line-height: 1.9;
+  word-break: break-word;
+}
+
+.essay-text p {
+  margin: 0 0 8px;
+}
+
+.essay-text p:last-child {
+  margin-bottom: 0;
+}
+
+.essay-text a {
+  color: #163bf2;
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(22, 59, 242, .45);
+}
+
+.essay-text a:hover {
+  border-bottom-style: solid;
+}
+
+/* ---------- 图片 ---------- */
+.essay-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 960px;
+  margin-top: 14px;
+}
+
+.essay-img {
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--heo-secondbg);
+  line-height: 0;
+}
+
+.essay-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+
+.essay-img:hover img {
+  transform: scale(1.04);
+}
+
+/* 2 张：各占一半，比例与参考站一致（参考站 168/440 ≈ 38%，这里 478/1352 ≈ 35%） */
+.essay-imgs--2 .essay-img {
+  flex: 0 0 calc(50% - 4px);
+  height: 280px;
+}
+
+/* 4 张：一行四列 */
+.essay-imgs--4 .essay-img {
+  flex: 0 0 calc(25% - 6px);
+  height: 176px;
+}
+
+/* ---------- 分隔线 + 底部信息条 ---------- */
+/* 主题在正文里把 hr 设成了 display:none，这里要显式改回块级，否则上下间距全没 */
+.essay-item .essay-hr {
+  display: block;
+  height: 1px;
+  margin: 16px 0;
+  border: 0;
+  background: var(--heo-card-border);
+  overflow: hidden;
+}
+
+.essay-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.essay-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* 胶囊：数值照抄参考站（rgba(153,153,153,.17) / 20px 圆角 / 11.2px 字 / 4px 8px 内衬） */
+.essay-pill {
+  display: flex;
+  align-items: center;
+  gap: 3.2px;
+  padding: 4px 8px;
+  color: var(--heo-fontcolor);
+  font-size: 11.2px;
+  line-height: 16px;
+  background: rgba(153, 153, 153, .17);
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.essay-pill svg {
+  flex-shrink: 0;
+  opacity: .85;
+}
+
+/* ---------- 点赞 ---------- */
+.essay-like {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  color: var(--heo-secondtext);
+  font-size: 12px;
+  line-height: 18px;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color .25s, background-color .25s, transform .25s;
+}
+
+.essay-like:hover {
+  color: #ff5252;
+  background: rgba(255, 82, 82, .08);
+}
+
+.essay-like:active {
+  transform: scale(.92);
+}
+
+.essay-like[aria-pressed="true"] {
+  color: #ff5252;
+}
+
+.essay-like[aria-pressed="true"] svg {
+  animation: essay-like-pop .32s ease;
+}
+
+@keyframes essay-like-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- 加载更多 ---------- */
+.essay-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.essay-more-wrap[hidden] {
+  display: none;
+}
+
+/* 按钮外观沿用朋友圈页的 .moments-more-btn，这里补一行文字让它更好认 */
+.essay-more-wrap .moments-more-btn {
+  width: auto;
+  min-width: 200px;
+  padding: 0 24px;
+  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.essay-more-text {
+  font-size: 13px;
+  line-height: 30px;
+}
+
+.essay-more-wrap .moments-more-btn.is-loading svg {
+  animation: essay-spin .6s linear infinite;
+}
+
+@keyframes essay-spin {
+  to { transform: rotate(180deg); }
+}
+
+/* ---------- 空状态 ---------- */
+.essay-empty {
+  margin-top: 16px;
+  padding: 48px 24px;
+  color: var(--heo-secondtext);
+  text-align: center;
+  background: var(--heo-card-bg);
+  border: 1px solid var(--heo-card-border);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-border);
+}
+
+.essay-empty p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.essay-empty-tip {
+  font-size: 12px !important;
+  opacity: .8;
+}
+
+.essay-empty code {
+  padding: 2px 6px;
+  font-size: 12px;
+  background: var(--heo-secondbg);
+  border-radius: 4px;
+}
+
+/* ---------- 评论分隔 ---------- */
+.essay-comment-hr {
+  display: block;
+  height: 1px;
+  margin: 24px 0;
+  border: 0;
+  background: var(--heo-card-border);
+}
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 768px) {
+  body.essay #content-inner.layout {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .essay-item {
+    padding: 14px 14px 6px;
+  }
+
+  .essay-title {
+    font-size: 16px;
+    margin: 10px 0 6px;
+  }
+
+  .essay-text {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  /* 手机上一律两列并排，别再按固定 px 排 */
+  .essay-imgs--2 .essay-img {
+    flex: 0 0 calc(50% - 4px);
+    height: 130px;
+  }
+
+  .essay-imgs--4 .essay-img {
+    flex: 0 0 calc(50% - 4px);
+    height: 120px;
+  }
+
+  .essay-pill {
+    font-size: 11px;
+  }
+}

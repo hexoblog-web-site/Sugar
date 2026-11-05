@@ -10,7 +10,7 @@
   /* 分类 / 标签索引页对标 blog.zhheo.com；关于页、友链页对标 blog.anheyu.com —— 都是整宽无侧栏 */
   var ptype = String(page.type || '').toLowerCase();
   var playout = String(page.layout || '').toLowerCase();
-  if (ptype === 'categories' || ptype === 'tags' || playout === 'about' || playout === 'links' || playout === 'fcircle' || ptype === 'link') mainCls += ' hide-aside';
+  if (ptype === 'categories' || ptype === 'tags' || playout === 'about' || playout === 'links' || playout === 'fcircle' || playout === 'essay' || ptype === 'link') mainCls += ' hide-aside';
   /* 归档页对标 blog.zhheo.com/archives/：主列 + 300px 侧栏的两栏布局 */
   if (is_archive()) mainCls += ' layout--category';
   /* 主色联动：不配置 = 开启；只有显式写 false 才关（逻辑见 scripts/liublog-config.js） */

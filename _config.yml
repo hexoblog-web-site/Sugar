@@ -229,7 +229,7 @@ navigation_bar_settings:
               url: /memos/
               icon: icon-chat-1-fill
         - name: 动态
-          url: /memos/
+          url: /essay/
 
     # ================= 右侧 =================
     - type: random_post
@@ -375,8 +375,8 @@ home:
 # 只取最近 10 条，每条停留 interval 毫秒后往上滚一条，鼠标移上去暂停。
 essay:
   enable: true
-  # 点左侧「即刻」图标、右侧箭头跳去哪；留空 = 不跳转（还没建 /essay/ 页面时先空着）
-  link: ''
+  # 点左侧「即刻」图标、右侧箭头跳去哪；留空 = 不跳转
+  link: /essay/
   # 条数上限：再多也只放这么多条（默认 10）
   count: 10
   # 每条停留多少毫秒后往上滚一条，鼠标移上去暂停
@@ -386,6 +386,28 @@ essay:
     - content: 这里写第一条即刻，随便说点什么
     - content: 每条停留 3 秒后自动往上滚，鼠标移上去会暂停
     - content: 没有 essay.yml 时就滚这三条，建了那份文件就滚你的
+
+  # ---- 即刻短文页（/essay/）----
+  # 上面几个字段管首页那条滚动条，下面这段只管 /essay/ 整页。
+  # 字段命名与 friends_lite 完全一致（tips / title / bottom_left / bottom_right /
+  # bottom_right_link / top_background / overlay），两个页面可以对着改。
+  # 列表数据来自 source/_data/vignette.yml，不在这里配。
+  page:
+    enable: true
+    # 横幅左上角小字 / 大标题 / 左下角描述 / 右下角按钮
+    tips: 随时随地，分享生活
+    title: 即刻短文
+    bottom_left: 记录那些没写成长文的碎碎念。
+    bottom_right: 关于我
+    bottom_right_link: /about/
+    # 横幅背景图；留空用主色渐变兜底
+    top_background: ''
+    # 图片上压的黑罩浓度，0 ~ 1
+    overlay: 0.4
+    # 每屏先露几条，「加载更多」每次再放几条
+    page_size: 8
+    # 头像兜底
+    error_img: /images/avatar.jpg
 
 # ==========================================================================
 # Friends Lite —— 朋友圈页设置（/fcircle/）
