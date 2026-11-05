@@ -1,0 +1,420 @@
+/* home-top.css
+ *
+ * 首页顶部通栏：幻灯片 + 右侧「新品框架」推荐墙，两块合起来铺满整页宽度，
+ * 侧栏（个人信息卡）因此下移到文章列表旁边。
+ *
+ * 对齐的是安知鱼首页右侧那块 topGroup（不是左侧带图标墙的大 banner）：
+ *   .home-top-full              通栏外壳，放在 .home-layout-row 外面
+ *   #home_top_row               高 340，两块等高
+ *     #home_swiper_slot         左，占满剩余宽度，里面放原有的轮播
+ *     #new_frame_group          右，600 宽（窄屏 46% 上限），整块 600×340
+ *       .new-frame-grid         3 列 × 2 行 = 6 张文章卡（遮罩下面那一层）
+ *       #new_frame_card         遮罩：新品框架封面图，盖住上面 6 张卡
+ *         .new-frame-card-info  左下角：小字「新品框架」+ 标题
+ *         .banner-button        右下角：玻璃胶囊按钮「更多推荐」
+ *
+ * 交互（对齐安知鱼 topGroup 的「遮罩 + 露底」）：
+ *   默认    只看得到遮罩图
+ *   悬停    遮罩淡出，露出 6 张卡；鼠标移开，遮罩回来
+ *   悬停按钮  遮罩不动（脚本加 .hold），否则按钮跟着一起淡掉，点不到也去不了更多页
+ *   触屏    点遮罩展开（.is-open），点页面空白处收回；点右下角按钮直接去更多页
+ *   键盘    Tab 进下面的卡片时自动淡出遮罩（:focus-within）
+ *
+ * 模板  layout/_partial/home/home-top.ejs
+ * 脚本  source/js/partial/home-top.js（只管触屏展开 / 收回）
+ * 配置  theme.home.home_top.new_frame
+ * 1200px 以下整块隐藏，轮播恢复整栏（与安知鱼同一个断点）。
+ */
+
+/* 通栏外壳：.layout 在首页是 column，这里只需撑满并别被压窄 */
+.home-top-full {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+#home_top_row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: 340px;
+  align-items: stretch;
+}
+
+#home_swiper_slot {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+#home_swiper_slot > #home_swiper {
+  width: 100%;
+}
+
+/* 没有配新品框架时，轮播自己占满一行 */
+#home_top_row.no-new-frame #home_swiper_slot {
+  flex: 1;
+}
+
+/* 关掉幻灯片、只留右框：右框居中，别让左边空出一条透明区 */
+#home_top_row.no-swiper {
+  justify-content: center;
+}
+
+#home_top_row.no-swiper #new_frame_group {
+  flex: 0 1 600px;
+  max-width: 100%;
+}
+
+/* ---------- 右侧推荐墙外壳 ----------
+ * 尺寸直接抄安知鱼 topGroup：右边那块固定 600 宽、340 高
+ *（安知鱼 home_top.css 里 #bannerGroup = 100% - 600px - 2rem，topGroup = 600px + 1.5rem）。
+ * 这里用 max-width 兜住窄屏，1200px 以下整块隐藏。 */
+#new_frame_group {
+  position: relative;
+  flex: 0 0 600px;
+  max-width: 46%;
+  min-width: 0;
+  height: 340px;
+  isolation: isolate;
+}
+
+/* 遮罩下面那一层：3 × 2 六张卡，格子铺满整块 */
+.new-frame-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.new-frame-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  box-shadow: var(--heo-shadow-border);
+  /* 遮罩还盖着的时候，这六张卡往下沉 8px、缩一丁点。
+     掀开时它们才落位 —— 否则遮罩一没，六张卡就「啪」地全亮。
+     只动位置、不动透明度：卡片本来就被遮罩盖着，再压暗只会在淡出的
+     那一瞬间跟半透明的字糊成一片灰。 */
+  transform: translateY(8px) scale(.985);
+  transition:
+    transform 1.4s cubic-bezier(.4, 0, .2, 1),
+    border-color .3s,
+    box-shadow .3s;
+}
+
+.new-frame-item:hover {
+  border: var(--style-border-hover);
+  box-shadow: var(--heo-shadow-main);
+}
+
+.new-frame-item-cover {
+  position: relative;
+  flex: 0 0 112px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: var(--heo-secondbg);
+}
+
+.new-frame-item-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+}
+
+.new-frame-item:hover .new-frame-item-cover img {
+  transform: scale(1.06);
+}
+
+/* 左上角那个「荐」角标，和安知鱼列表卡上的 recent-post-top-text 同一个位置 */
+.new-frame-item-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  padding: 2px 9px;
+  border-radius: 0 0 12px 0;
+  background: var(--heo-main);
+  color: var(--heo-white);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.new-frame-item-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px 9px;
+}
+
+.new-frame-item-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: .8rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+  transition: var(--t);
+}
+
+.new-frame-item:hover .new-frame-item-title {
+  color: var(--heo-main);
+}
+
+/* ---------- 遮罩：新品框架封面 ----------
+ * 兜底底色取的是这张图最浅的那一档浅绿，图还没下来时不会闪一块白。 */
+#new_frame_card {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  overflow: hidden;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  /* 底色照原站那张卡：左边浅绿，右边浅粉 */
+  background: linear-gradient(90deg, #e0f5f0, #fff5f7);
+  border: var(--style-border-always);
+  box-shadow: var(--heo-shadow-border);
+  cursor: pointer;
+  /* 这里写的是「遮罩盖回来」用多久；掀开那一侧在 :hover 规则里另写（3s）。
+     收回比掀开快一档，不然鼠标一走还挂着两秒半透明的底，像卡住了。 */
+  transition: opacity 1.6s cubic-bezier(.25, .1, .25, 1);
+}
+
+/* 遮罩上的 hello：内联 SVG，viewBox 已经收在字的外框上，
+   所以这里只管宽度，高度按比例自己算。 */
+#new_frame_card .new-frame-hello {
+  display: block;
+  /* 安知鱼那张卡上，这行字大概占卡片宽度的三分之二 */
+  width: 64%;
+  height: auto;
+  /* 往上提一点，给左下角的文字让位（字底大约落在卡片 60% 的高度） */
+  margin-bottom: 3.3rem;
+  /* 掀开时字跟着底色漂 3s（放大），但自己的透明度只花 1.1s 先撤掉：
+     字要是陪着底色漂满三秒，就一直有半透明的字压在下面卡片的标题上。
+     底色慢慢褪、字早早退场，中间那段只剩一层干净的浅色在化开。 */
+  transition:
+    transform 5s cubic-bezier(.4, 0, .2, 1),
+    opacity .55s ease-out;
+}
+
+/* 书写动画：dashoffset 100 → 0。pathLength="100" 让这两个数字直接就是百分比，
+   不用去量路径真实长度。
+   默认没有动画 —— 页面一打开先给一个完整的 hello，不玩「先空白再写」。
+   .is-writing 由脚本挂上（进入视口时、遮罩重新盖回来时各写一遍）。 */
+@keyframes nf-hello-draw {
+  from { stroke-dashoffset: 100; }
+  to { stroke-dashoffset: 0; }
+}
+
+#new_frame_card .new-frame-hello-line {
+  stroke-dashoffset: 0;
+}
+
+#new_frame_card .new-frame-hello.is-writing .new-frame-hello-line {
+  animation: nf-hello-draw 2.4s cubic-bezier(.302, .14, .665, 1) both;
+}
+
+/* 不想看动效的，直接停在完整那一帧 */
+@media (prefers-reduced-motion: reduce) {
+  #new_frame_card .new-frame-hello.is-writing .new-frame-hello-line {
+    animation: none;
+  }
+}
+
+/* 露底：三种触发方式共用同一组终态。
+   悬停只在真有指针的设备上生效，触屏靠下面的 .is-open。
+   :not(.hold) 是关键：指针压在右下角「更多推荐」上时（脚本加 .hold），
+   遮罩保持不动 —— 否则按钮跟着遮罩一起淡掉，点下去只会点到下面的文章卡。
+
+   节奏拆成三层，整段 5s：
+     0s     指针一进来就先撤字和文字块（.55s 内退完，比底色「看穿」早）
+     0-5s   浅色底慢慢化开
+     .3s    六张卡开始往上落位，4.6s 后到位
+   只做一层纯淡出的话，中间那几秒里半透明的字会一直压在下面卡片的标题上，
+   看着像重影；先撤内容、底色后散，中间只剩一层干净的浅色在褪。 */
+@media (hover: hover) {
+  #new_frame_group:hover:not(.hold) #new_frame_card {
+    opacity: 0;
+    pointer-events: none;
+    /* 掀开走满 5s。曲线起手就得动：用 (.4,0,.2,1) 的话头一秒几乎没变化，
+       看着像卡住了；这一档是「一直在慢慢褪」，只是越往后越慢。 */
+    transition: opacity 5s cubic-bezier(.3, .1, .3, 1);
+  }
+  #new_frame_group:hover:not(.hold) #new_frame_card .new-frame-hello {
+    transform: scale(1.06);
+    opacity: 0;
+  }
+  #new_frame_group:hover:not(.hold) #new_frame_card .new-frame-card-info,
+  #new_frame_group:hover:not(.hold) #new_frame_card .new-frame-card-action {
+    opacity: 0;
+  }
+}
+
+#new_frame_group.is-open #new_frame_card,
+.new-frame-grid:focus-within ~ #new_frame_card {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 5s cubic-bezier(.3, .1, .3, 1);
+}
+
+#new_frame_group.is-open #new_frame_card .new-frame-hello,
+.new-frame-grid:focus-within ~ #new_frame_card .new-frame-hello {
+  transform: scale(1.06);
+  opacity: 0;
+}
+
+#new_frame_group.is-open #new_frame_card .new-frame-card-info,
+#new_frame_group.is-open #new_frame_card .new-frame-card-action,
+.new-frame-grid:focus-within ~ #new_frame_card .new-frame-card-info,
+.new-frame-grid:focus-within ~ #new_frame_card .new-frame-card-action {
+  opacity: 0;
+}
+
+/* 六张卡跟着遮罩一起落位，比遮罩晚 .3s 起步、用 4.6s 走完：
+   先看到遮罩化开，再看到内容缓缓归位，两个动作错开就不会糊成一团。
+   delay 只写在「露出来」这一侧 —— 鼠标移开时立刻退回，不拖泥带水。 */
+@media (hover: hover) {
+  #new_frame_group:hover:not(.hold) .new-frame-item {
+    transform: translateY(0) scale(1);
+    /* 三个值对应上面的 transform / border-color / box-shadow：
+       只把位移拉长到 4.6s，再晚 .3s 起步，整段刚好收在 5s 上 */
+    transition-duration: 4.6s, .3s, .3s;
+    transition-delay: .3s, 0s, 0s;
+  }
+}
+
+#new_frame_group.is-open .new-frame-item,
+.new-frame-grid:focus-within .new-frame-item {
+  transform: translateY(0) scale(1);
+  transition-duration: 4.6s, .3s, .3s;
+  transition-delay: .3s, 0s, 0s;
+}
+
+/* 不想看动效的：省掉位移和延迟，别在原地慢慢蹭 */
+@media (prefers-reduced-motion: reduce) {
+  .new-frame-item {
+    transform: none;
+  }
+  #new_frame_group:hover:not(.hold) .new-frame-item,
+  #new_frame_group.is-open .new-frame-item,
+  .new-frame-grid:focus-within .new-frame-item {
+    transition-delay: 0s;
+  }
+}
+
+/* 左下角文字块。右边留出按钮的位置，标题到边就省略，不去压按钮。 */
+#new_frame_card .new-frame-card-info {
+  position: absolute;
+  left: 2rem;
+  right: 10rem;
+  bottom: 2rem;
+  z-index: 2;
+  pointer-events: none;
+  /* 和字一样先撤；否则遮罩底色褪到一半时，这行字还悬在文章卡上 */
+  transition: opacity .55s ease-out;
+}
+
+/* 字色是照着这张浅底图定的（深青 + 中灰），深浅色模式下都不用改：
+   图本身是浅色，白字反而看不清。 */
+#new_frame_card .new-frame-card-tips {
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgb(0 0 0 / 52%);
+}
+
+#new_frame_card .new-frame-card-title {
+  overflow: hidden;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #0b6f7d;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 右下角按钮（玻璃胶囊，对齐安知鱼那张卡） ---------- */
+#new_frame_card .new-frame-card-action {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 2rem;
+  z-index: 3;
+  transition: opacity .55s ease-out;
+}
+
+#new_frame_card .banner-button {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  height: 40px;
+  padding: 0 1.1rem 0 .45rem;
+  border: 1px solid rgb(0 0 0 / 6%);
+  border-radius: 20px;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 6%);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  color: #d7537e;
+  font-size: .9rem;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--t);
+}
+
+#new_frame_card .banner-button:hover {
+  background: var(--heo-white);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
+}
+
+/* 按钮左侧那个粉底白箭头的圆点 */
+#new_frame_card .banner-button-icon {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9ab8, #fb6a91);
+  color: var(--heo-white);
+}
+
+#new_frame_card .banner-button-icon i {
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media screen and (max-width:1200px) {
+  #home_top_row {
+    height: auto;
+  }
+  #new_frame_group {
+    display: none;
+  }
+  /* 只留右框、右框又在这个断点隐藏了，这条通栏就真没内容了：整块收起，
+     否则会留一条 340px 的空白把「即刻」和分类条顶下去 */
+  #home_top_row.no-swiper {
+    display: none;
+  }
+}
+
+@media screen and (max-width:767px) {
+  #home_top_row {
+    height: auto;
+  }
+  #home_swiper_slot > #home_swiper {
+    padding: 0;
+  }
+}

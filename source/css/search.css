@@ -1,0 +1,598 @@
+/* ==========================================================================
+   搜索弹窗 —— 样式取自 blog.zhheo.com 的 php-search.css，按静态站需要精简
+   结构：#heosearch > .search-dialog > navbar + input-panel + tabs + results
+   数据：/search.xml（hexo-generator-searchdb），逻辑见 source/js/main.js
+   ========================================================================== */
+
+@keyframes search_close {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+@keyframes heo-spin {
+  to { transform: rotate(360deg); }
+}
+
+.search-dialog {
+  position: fixed;
+  z-index: 1001;
+  display: none;
+  padding: 1rem;
+  width: 30rem;
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-lightblack);
+  background: var(--heo-card-bg);
+  border: var(--style-border);
+  transition: var(--t);
+  top: 0; right: 0; bottom: 0; left: 0;
+  margin: auto;
+  height: fit-content;
+  max-height: 90dvh;
+}
+
+#heosearch .search-dialog {
+  transition: none;
+  animation: slide-in .6s ease 0s 1 normal none running;
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 80px;
+  width: min(calc(1400px - 3rem), calc(100% - 32px));
+  height: min(800px, calc(100vh - 120px));
+  max-height: min(800px, calc(100vh - 120px));
+  height: min(800px, calc(var(--heosearch-vh, 100vh) - 120px));
+  max-height: min(800px, calc(var(--heosearch-vh, 100vh) - 120px));
+}
+@media screen and (max-height: 900px) {
+  #heosearch .search-dialog { margin-top: auto; }
+}
+@media (hover: none), (pointer: coarse), (max-width: 768px) {
+  .search-dialog { animation: none !important; }
+}
+
+/* ---------- 标题栏 ---------- */
+#heosearch .search-dialog #heosearch-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.search-dialog__title {
+  font-size: 1.4em;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--heo-lighttext);
+}
+.search-dialog span.search-close-button {
+  color: var(--heo-secondtext);
+  font-size: 1.4em;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50px;
+  transition: var(--t);
+}
+.search-dialog span.search-close-button:hover {
+  color: var(--heo-white);
+  background: var(--heo-lighttext);
+}
+
+/* ---------- 遮罩 ---------- */
+#search-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform: translateZ(0);
+  background: var(--heo-maskbgdeep);
+}
+@media (hover: none), (pointer: coarse), (max-width: 768px) {
+  #search-mask {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    animation-duration: 10ms !important;
+    animation-fill-mode: forwards !important;
+  }
+}
+
+/* ---------- 输入区 ---------- */
+#heosearch .search-dialog .ais-search-box {
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+}
+#heosearch .search-dialog .ais-search-box input {
+  padding: .25rem .7rem;
+  outline: 0;
+  background: var(--heo-secondbg);
+  color: var(--search-input-color, var(--heo-fontcolor));
+  border-radius: 999px !important;
+  border: var(--style-border);
+  width: 100%;
+  height: 44px;
+}
+#heosearch .search-dialog .ais-search-box input:focus { border: var(--style-border-hover); }
+#heosearch .search-dialog .ais-search-box input::placeholder { opacity: .6; }
+#heosearch .search-dialog #heosearch-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#heosearch .search-dialog #heosearch-search-btn {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: var(--style-border);
+  background: var(--heo-secondbg);
+  color: var(--heo-secondtext);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--t-fast);
+}
+#heosearch .search-dialog #heosearch-search-btn:hover {
+  color: var(--heo-card-bg);
+  background: var(--heo-lighttext);
+  border-color: var(--heo-lighttext);
+}
+#heosearch .search-dialog #heosearch-search-btn .icon-search-2-line { font-size: 20px; }
+
+/* ---------- 标签页 ---------- */
+#heosearch .search-dialog #heosearch-tabs {
+  display: none;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: 100%;
+  padding-top: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#heosearch .search-dialog #heosearch-tabs::-webkit-scrollbar { display: none; }
+#heosearch .search-dialog .php-search-tab {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--heo-secondtext);
+  background: var(--heo-secondbg);
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: var(--t-fast);
+}
+#heosearch .search-dialog .php-search-tab:hover { color: var(--heo-main); }
+#heosearch .search-dialog .php-search-tab.active {
+  color: var(--heo-card-bg);
+  background: var(--heo-lighttext);
+}
+
+/* ---------- 结果容器 ---------- */
+.ais-hits, div#heosearch-results { width: 100%; flex-direction: column; }
+.ais-hits { display: flex; gap: 16px; }
+div#heosearch-results { gap: 4px; }
+#heosearch .search-dialog #heosearch-results {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  transform: translateZ(0);
+}
+#heosearch .search-dialog #heosearch-results::-webkit-scrollbar { width: 6px; }
+#heosearch .search-dialog #heosearch-results::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: var(--heo-card-border);
+}
+/* 搜索结果：一页固定条数 + 底部分页，不再有滚动条 */
+#heosearch .search-dialog #heosearch-results.results--hits {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-right: 0;
+}
+#heosearch .search-dialog #heosearch-results.results--hits::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+div#heosearch-hits {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+/* 搜索结果是一条条紧凑列表，不要区块之间那 24px 间距 */
+#heosearch .search-dialog #heosearch-hits.is-hits { gap: 0; }
+div#heosearch-stats {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  margin-top: 0;
+  text-align: center;
+}
+
+/* ---------- 分页器 ---------- */
+#heosearch .search-dialog #heosearch-pager {
+  display: none;
+  flex: 0 0 auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding: 0 6px;
+  border-radius: 8px;
+  color: var(--heo-fontcolor);
+  font-size: .8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--t-fast);
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item a:hover {
+  background: var(--heo-theme-op);
+  color: var(--heo-main);
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item.current a {
+  border-radius: 12px;
+  background: var(--heo-lighttext);
+  color: var(--heo-card-bg);
+  cursor: default;
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item.current a:hover {
+  background: var(--heo-lighttext);
+  color: var(--heo-card-bg);
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item.is-disabled a {
+  opacity: .35;
+  cursor: default;
+  pointer-events: none;
+}
+#heosearch .search-dialog #heosearch-pager .ais-pagination--item.is-ellipsis span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  color: var(--heo-secondtext);
+  font-size: .8rem;
+}
+
+/* ---------- 单条结果 ---------- */
+#heosearch .search-dialog .heosearch-hit-item {
+  position: relative;
+  padding-left: 0;
+  font-weight: 700;
+  width: 100%;
+  line-height: 1.5;
+}
+#heosearch .search-dialog .heosearch-hit-item:not(:has(.heosearch-hit-cover)) { padding-left: 1.2em; }
+#heosearch .search-dialog .heosearch-hit-item:not(:has(.heosearch-hit-cover))::before {
+  position: absolute;
+  top: .53em;
+  left: 0;
+  width: .5em;
+  height: .5em;
+  border: .15rem solid #307af6;
+  border-radius: .5em;
+  background: 0 0;
+  content: "";
+  line-height: .5em;
+  transition: var(--t-fast);
+}
+#heosearch .search-dialog .heosearch-hit-item a {
+  cursor: pointer;
+  padding: 2px 0;
+  margin: 8px 0;
+  font-weight: 700;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: auto;
+  max-width: 100%;
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--heo-fontcolor);
+}
+#heosearch .search-dialog .heosearch-hit-item a:hover { color: var(--heo-lighttext); }
+#heosearch .search-dialog .heosearch-hit-cover {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--heo-card-border);
+}
+#heosearch .search-dialog .heosearch-hit-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#heosearch .search-dialog .heosearch-hit-title {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 3px;
+}
+#heosearch .search-dialog .heosearch-hit-item em {
+  font-weight: 700;
+  font-style: normal;
+  color: var(--heo-theme);
+}
+
+/* ---------- 区块（随机推荐 / 热门文章） ---------- */
+#heosearch .search-dialog .heosearch-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+#heosearch .search-dialog .heosearch-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 4px;
+}
+#heosearch .search-dialog .heosearch-section-title {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--heo-secondtext);
+}
+#heosearch .search-dialog .heosearch-section-more {
+  border: none;
+  background: 0 0;
+  cursor: pointer;
+  color: var(--heo-secondtext);
+  font-size: .75rem;
+  font-weight: 400;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: var(--t-fast);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  line-height: 1;
+}
+#heosearch .search-dialog .heosearch-section-more:hover {
+  color: var(--heo-lighttext);
+  background: var(--heo-theme-op);
+}
+#heosearch .search-dialog .heosearch-section-more i {
+  font-size: .9em;
+  line-height: 1;
+}
+
+/* ---------- 文章卡片网格 ---------- */
+#heosearch .search-dialog #heosearch-post-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+@media screen and (max-width: 1200px) {
+  #heosearch .search-dialog #heosearch-post-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 900px) {
+  #heosearch .search-dialog #heosearch-post-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+#heosearch .search-dialog .heosearch-post-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--heo-secondbg);
+  border: var(--style-border-always);
+  transition: var(--t-fast);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 192px;
+}
+#heosearch .search-dialog .heosearch-post-card-link {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+#heosearch .search-dialog .heosearch-post-card-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--heo-card-border);
+}
+#heosearch .search-dialog .heosearch-post-card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--t-slow);
+}
+@media (hover: hover) {
+  #heosearch .search-dialog .heosearch-post-card:hover .heosearch-post-card-cover img { transform: scale(1.05); }
+}
+#heosearch .search-dialog .heosearch-post-card-title-wrap {
+  flex: 1 1 auto;
+  min-height: 2.8em;
+  max-height: 4.8em;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+#heosearch .search-dialog .heosearch-post-card-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* ---------- 博主推荐（友链卡） ---------- */
+#heosearch .search-dialog .heosearch-flink-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+#heosearch .search-dialog .heosearch-flink-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--heo-secondbg);
+  text-decoration: none;
+  transition: var(--t-fast);
+}
+#heosearch .search-dialog .heosearch-flink-item:hover { background: var(--heo-theme-op); }
+#heosearch .search-dialog .heosearch-flink-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--heo-card-border);
+}
+#heosearch .search-dialog .heosearch-flink-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#heosearch .search-dialog .heosearch-flink-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#heosearch .search-dialog .heosearch-flink-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+  font-size: 15px;
+  line-height: 1;
+  min-width: 0;
+}
+#heosearch .search-dialog .heosearch-flink-name-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#heosearch .search-dialog .heosearch-flink-name .heosearch-flink-tag { flex-shrink: 0; }
+#heosearch .search-dialog .heosearch-flink-tag {
+  font-size: .7rem;
+  font-weight: 400;
+  color: var(--heo-theme);
+  background: var(--heo-theme-op);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+#heosearch .search-dialog .heosearch-flink-descr {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--heo-secondtext);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 加载态 ---------- */
+.heosearch-suggest-loading,
+.heosearch-suggest-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .85rem;
+  color: var(--heo-secondtext);
+  padding: 1rem 4px;
+}
+.search-loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--heo-main) 0turn .8turn, transparent .8turn 1turn);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 2px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, #0000 calc(100% - 2px), #000 calc(100% - 2px));
+  animation: heo-spin .8s linear infinite;
+}
+#heosearch .search-dialog #heosearch-suggests {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* ---------- 移动端 ---------- */
+@media screen and (max-width: 767px) {
+  .search-dialog {
+    top: 0;
+    left: 0;
+    margin: 0;
+    margin-top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+  #heosearch .search-dialog {
+    width: 100%;
+    height: 100vh;
+    height: var(--heosearch-vh, 100vh);
+    max-height: 100vh;
+    max-height: var(--heosearch-vh, 100vh);
+    margin: 0;
+    border-radius: 0;
+  }
+  #heosearch .search-dialog .ais-search-box input { font-size: 16px; }
+  #heosearch .search-dialog #heosearch-post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

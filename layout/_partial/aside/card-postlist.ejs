@@ -1,0 +1,36 @@
+<%
+  /* 侧栏「带序号的图文列表」卡片体 —— 近期热门 / 随机推荐 共用这一份视觉
+     由 card-recent.ejs / card-random.ejs 通过 partial 第二参数传入：
+       card = { list, title, icon, more, rootClass, listId }
+       list      文章数组（调用方已排好序 / 已打乱）
+       title     卡片标题
+       icon      标题图标类名（icon-*）
+       more      「更多」链接；空字符串则不显示
+       rootClass 单据标识类（card-recent / card-random），供单卡微调
+       listId    列表容器 id */
+  var c = (typeof card !== 'undefined' && card) ? card : {};
+  var list = c.list || [];
+  var title = c.title || '';
+  var icon = c.icon || 'icon-fire-fill';
+  var more = c.more === undefined ? '/archives/' : c.more;
+  var moreText = c.moreText || '更多';
+  var rootClass = c.rootClass || '';
+  var listId = c.listId || '';
+%>
+<div class="card-widget card-postlist<%= rootClass ? ' ' + rootClass : '' %>">
+  <div class="item-headline">
+    <i class="heoblogIcon <%= icon %>"></i>
+    <span><%= title %></span>
+    <% if (more) { %><a class="power-charge" href="<%- url_for(more) %>" title="<%= moreText %>"><%= moreText %><i class="heoblogIcon icon-external-link-fill"></i></a><% } %>
+  </div>
+  <div class="hot-post-list"<% if (listId) { %> id="<%= listId %>"<% } %>>
+    <% list.forEach(function (p, i) { %>
+    <a href="<%- url_for(p.path) %>" class="hot-post-link" title="<%= p.title %>">
+      <span class="post-rank rank-<%= (i % 5) + 1 %>"><%= i + 1 %></span>
+      <div class="post-title-container">
+        <span class="post-title"><%= p.title %></span>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+</div>

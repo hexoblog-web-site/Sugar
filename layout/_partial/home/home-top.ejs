@@ -1,0 +1,152 @@
+<%#
+  首页顶部两栏：左「全站推荐」轮播 + 右「新品框架」推荐墙
+  ---------------------------------------------------------------------------
+  右边这块对齐的是安知鱼主题首页右侧的 topGroup：
+
+    默认   一张「新品框架」封面把下面的 6 篇文章整个盖住（只看到封面）
+    悬停   封面淡出，露出 3×2 六张文章卡；鼠标移开，封面回来
+    悬停按钮  封面不动（脚本加 .hold）—— 否则按钮跟着封面一起消失，点不到
+    触屏   点封面展开 / 收回，点右下角按钮去「更多」页面（配了 link 的话）
+
+  封面上那行手写 hello 是内联 SVG：把安知鱼那张卡的 lottie 动画
+  （/static/hello.lottie）拆出来重画的，渐变和笔画都照搬，动画用
+  stroke-dashoffset 复刻，不引播放器。默认完整显示，进视口时写一遍，
+  封面重新盖回来时再写一遍 —— 见 css/home-top.css 的 nf-hello-draw。
+
+  遮罩下面放哪几篇：不是「最新那几篇」（那样和下面的列表一字不差地重），
+  而是从「不在首页第一页、也没被左边幻灯片用掉」的文章里按时间倒序取，
+  同一封面只上一次（new_frame.cover_dedupe，默认开）；
+  配了 new_frame.items 就按 items 来。
+  规则写在 scripts/liublog-home-pick.js（两块的选文都归它管，免得各算一套）。
+
+  模板 home/home-top.ejs · 样式 css/home-top.css · 脚本 js/partial/home-top.js
+  配置 theme.home.home_top.new_frame
+  轮播没有内容时整块不渲染。
+%>
+<%
+  var top = theme.home.home_top || {};
+  var nf = top.new_frame || {};
+  var swiperHtml = partial('_partial/home/home-swiper');
+  var hasSwiper = swiperHtml && swiperHtml.replace(/\s/g, '').length > 0;
+
+  /* 3 列 × 2 行刚好铺满 600×340，配多了会溢出这块的高度，所以卡死在 6 */
+  var nfCount = Math.min(parseInt(nf.count, 10) || 6, 6);
+
+  /* ---------- 挑文章：有封面的优先，没封面的补位 ----------
+     不再取「首页第一页」—— 那样和下面的列表是同一批，滚下去等于什么都没翻新。
+     交给 lb_home_pick：池子 = 全部文章 － 首页第一页 － 幻灯片已用掉的，
+     所以右上框和下面列表、左边幻灯片都不重样。见 scripts/liublog-home-pick.js */
+  var picks = lb_home_pick('frame', nfCount) || [];
+
+  var nfName = nf.name || '新品框架';
+  var nfTitle = nf.title || '';
+  var nfButton = nf.button || '更多推荐';
+  /* 右下角按钮跳到哪：配了就是真链接，留空则只是个「展开」按钮 */
+  var nfLink = nf.link ? url_for(nf.link) : '';
+  var nfOuter = /^https?:/i.test(String(nf.link || ''));
+  /* 开关只认 new_frame.enable。top.enable 是老配置里的外层开关，已经删掉了，
+     这里留着判断只是为了老配置写了 false 时不至于忽然又冒出来。 */
+  var nfOn = top.enable !== false && nf.enable !== false && picks.length > 0;
+
+  /* 封面对齐首页卡片那套兜底：文章没封面时用 post.default_cover，
+     也没有就留空（.new-frame-item-cover 有底色，空图不至于露破洞）。
+     原来的 theme.error_img.post_page 在本主题配置里根本不存在，
+     一旦真的走到兜底就整页 500 —— 这里换掉。 */
+  function coverOf(p) { return p.cover || p.top_img || p.thumbnail || theme.post.default_cover || ''; }
+%>
+<%
+  /* 两块各自开关：谁开谁上；两个都关就整条通栏不渲染（首页直接从「即刻」开始） */
+  var rowCls = [];
+  if (!hasSwiper) rowCls.push('no-swiper');
+  if (!nfOn) rowCls.push('no-new-frame');
+%>
+<% if (hasSwiper || nfOn) { %>
+<section class="home-top-full">
+<%# class 只输出值、不拼属性：拼整段属性时引号会被转义成 &#34;，类名就失效了 %>
+<% if (rowCls.length) { %>
+<div id="home_top_row" class="<%= rowCls.join(' ') %>">
+<% } else { %>
+<div id="home_top_row">
+<% } %>
+  <% if (hasSwiper) { %>
+  <div id="home_swiper_slot"><%- swiperHtml %></div>
+  <% } %>
+
+  <% if (nfOn) { %>
+  <div id="new_frame_group" class="new-frame-group">
+    <div class="new-frame-grid">
+      <% picks.forEach(function (p) { %>
+      <%# 手动条目可能写外链：外链原样输出，站内的才走 url_for；
+          新窗口看 target（写了听它的，没写就外链才新窗口） %>
+      <% var pOuter = /^https?:/i.test(String(p.path || '')); %>
+      <a class="new-frame-item" href="<%- pOuter ? p.path : url_for(p.path) %>" title="<%= p.title %>"<% if (p.newTab) { %> target="_blank" rel="noopener"<% } %>>
+        <div class="new-frame-item-cover">
+          <span class="new-frame-item-badge">荐</span>
+          <%# alt 留空：标题就在图下面，读屏不用把同一句话念两遍 %>
+          <% var pCover = coverOf(p); %>
+          <% if (pCover) { %>
+          <img src="<%- url_for(pCover) %>" alt="" loading="lazy" decoding="async" width="200" height="112">
+          <% } %>
+        </div>
+        <div class="new-frame-item-info">
+          <span class="new-frame-item-title"><%= p.title %></span>
+        </div>
+      </a>
+      <% }); %>
+    </div>
+
+    <%# 遮罩：盖在 6 张卡上面。悬停 / 展开时淡出，让下面的卡露出来 %>
+    <div id="new_frame_card" class="new-frame-card">
+      <%# 遮罩上的 hello：是把安知鱼那张卡的 lottie 动画（/static/hello.lottie，
+           1853 字节，只有一个形状图层：22 个顶点的单笔路径 + 17 色标渐变描边）
+           拆成了内联 SVG，动画靠 stroke-dashoffset 复刻，不引播放器。 %>
+      <svg class="new-frame-hello" viewBox="1 170 494 159" role="img" aria-label="hello" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <defs>
+          <linearGradient id="nf_hello_grad" gradientUnits="userSpaceOnUse" x1="27.46" y1="278.52" x2="479.41" y2="241.63">
+            <stop offset="0.000" stop-color="#009196"/>
+            <stop offset="0.055" stop-color="#2f9dad"/>
+            <stop offset="0.110" stop-color="#5ea9c5"/>
+            <stop offset="0.171" stop-color="#8ecd82"/>
+            <stop offset="0.233" stop-color="#bdf13f"/>
+            <stop offset="0.299" stop-color="#dee328"/>
+            <stop offset="0.365" stop-color="#ffd510"/>
+            <stop offset="0.422" stop-color="#ffc51c"/>
+            <stop offset="0.480" stop-color="#ffb628"/>
+            <stop offset="0.543" stop-color="#ff8825"/>
+            <stop offset="0.605" stop-color="#ff5b22"/>
+            <stop offset="0.671" stop-color="#ff4481"/>
+            <stop offset="0.738" stop-color="#ff2ddf"/>
+            <stop offset="0.806" stop-color="#a473e9"/>
+            <stop offset="0.875" stop-color="#49b9f3"/>
+            <stop offset="0.938" stop-color="#39bdf7"/>
+            <stop offset="1.000" stop-color="#28c1fa"/>
+          </linearGradient>
+        </defs>
+        <%# pathLength=100 把路径长度归一化，dasharray/dashoffset 直接按百分比写，不用去量 %>
+        <path class="new-frame-hello-line" d="M9.58,320.02 C9.58,320.02 109.45,263.87 116.59,202.79 C120.66,167.94 88.55,172.64 83.76,208.07 C79.85,237.01 70.06,314.68 70.06,314.68 C70.06,314.68 79.48,246.60 109.88,249.60 C143.28,253.51 99.61,313.82 138.14,314.25 C172.40,314.63 207.50,284.71 208.79,265.01 C210.27,242.30 179.46,238.47 169.97,266.73 C161.24,292.71 180.76,321.96 214.38,314.71 C266.16,303.55 291.56,228.50 293.99,202.93 C296.56,175.95 276.87,173.39 264.88,197.36 C253.68,219.76 235.00,308.85 275.58,316.39 C323.97,325.39 361.65,236.76 366.36,206.78 C370.91,177.79 352.22,169.60 338.10,195.22 C322.89,222.81 300.55,320.58 354.37,315.96 C399.33,312.11 382.84,250.46 426.41,246.58 C445.97,244.84 454.06,263.30 452.63,281.93 C451.13,301.41 432.72,317.89 414.53,315.32 C397.91,312.98 389.42,290.22 393.76,275.29 C399.11,256.88 415.96,246.86 426.41,246.58 C441.29,246.17 448.78,255.59 462.05,255.38 C473.84,255.19 485.73,241.76 485.73,241.76" pathLength="100" stroke="url(#nf_hello_grad)" stroke-width="15.09" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100 100" stroke-dashoffset="0"/>
+      </svg>
+      <div class="new-frame-card-info">
+        <div class="new-frame-card-tips"><%= nfName %></div>
+        <% if (nfTitle) { %><div class="new-frame-card-title"><%= nfTitle %></div><% } %>
+      </div>
+      <div class="new-frame-card-action">
+        <%# 配了 link 就是真链接，点它去「更多」那个页面；
+            没配就退化成按钮，只在触屏上当「展开」用 %>
+        <% if (nfLink) { %>
+        <a class="banner-button" href="<%- nfLink %>"<% if (nfOuter) { %> target="_blank" rel="noopener"<% } %>>
+          <span class="banner-button-icon"><i class="heoblogIcon icon-arrow-right-s-line"></i></span>
+          <span class="banner-button-text"><%= nfButton %></span>
+        </a>
+        <% } else { %>
+        <button class="banner-button" type="button" aria-expanded="false" aria-controls="new_frame_group">
+          <span class="banner-button-icon"><i class="heoblogIcon icon-arrow-right-s-line"></i></span>
+          <span class="banner-button-text"><%= nfButton %></span>
+        </button>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+</section>
+<% } %>

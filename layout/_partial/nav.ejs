@@ -1,0 +1,265 @@
+<%
+  /* ================= 导航栏配置 =================
+     顺序、开关、图标、文案全部来自 _config.yml 的 navigation_bar_settings.items，
+     这里只按顺序把每一项渲染成对应的结构。
+     内容都跟着导航项走：type: menu 的 menus、type: app_menu 的 groups / more */
+  var menus = lb_nav_menu();
+  var appMenu = lb_app_menu();
+  var appGroups = appMenu.groups;
+  var appMore = appMenu.more || {};
+  var siteName = lb_site('site_name', '') || config.title;
+
+  /* 外观皮肤：nav.style = itlaoli（白底整条）| none（不铺背景）
+     皮肤只决定 #page-header 上挂哪个类，样式在 source/css/nav.css 末尾 */
+  var navStyle = lb_nav_skin();
+  /* 左侧 logo：有 image 用图，没有就用文字站名 */
+  var navLogo = lb_nav_logo();
+
+  var leftItems = lb_nav_items('left');
+  var centerItems = lb_nav_items('center');
+  var rightItems = lb_nav_items('right');
+  var allItems = leftItems.concat(centerItems, rightItems);
+  /* 居中菜单只渲染一次，位置固定在 #nav-middle */
+  var hasMenu = allItems.some(function (i) { return i.type === 'menu'; });
+
+  function sideItems(list) {
+    return list.filter(function (i) { return i.type !== 'menu'; });
+  }
+  function isActive(u) {
+    if (!u) return false;
+    var p = page.path || '';
+    if (u === '/') return is_home();
+    return p.indexOf(u.replace(/^\//, '').replace(/\/$/, '')) === 0;
+  }
+  /* 应用菜单的数据来源：
+     优先用 yml 里手写的 children；没写 children 但写了 source，就自动生成条目。
+     source: posts / categories / tags
+     limit：自动列出多少条；posts 默认 10，categories / tags 默认全部，写 0 表示不限
+     child_icon：统一给自动生成的条目指定图标（不给就用默认图标） */
+  function entriesOf(g) {
+    var list = g.children || [];
+    if (list.length || !g.source) return list;
+    var s = String(g.source).toLowerCase();
+    var limit = (g.limit === undefined || g.limit === null)
+      ? (s.indexOf('post') === 0 ? 10 : 0)
+      : g.limit;
+    var icon = g.child_icon || '';
+    var out = [];
+    function push(name, url, ico) { out.push({ name: name, url: url, icon: icon || ico }); }
+    if (s.indexOf('post') === 0) {
+      var q = site.posts.sort('date', -1);
+      if (limit) q = q.limit(limit);
+      q.each(function (p) { push(p.title, url_for(p.path), 'icon-book-mark-fill'); });
+    } else if (s.indexOf('categor') === 0) {
+      var c = site.categories.sort('length', -1);
+      if (limit) c = c.limit(limit);
+      c.each(function (x) { push(x.name, url_for(x.path), 'icon-folder-5-fill'); });
+    } else if (s.indexOf('tag') === 0) {
+      var t = site.tags.sort('length', -1);
+      if (limit) t = t.limit(limit);
+      t.each(function (x) { push(x.name, url_for(x.path), 'icon-price-tag-3-fill'); });
+    }
+    return out;
+  }
+%>
+<% var navBgStyle = lb_nav_bg_style(); %>
+<header id="page-header" class="<%= is_post() ? 'post-bg' : 'not-top-img' %> nav-skin-<%= navStyle %>"<% if (navBgStyle) { %> style="<%- navBgStyle %>"<% } %>>
+  <nav id="nav">
+    <div id="nav-inner">
+      <div id="nav-left">
+        <% /* 移动端才有、桌面端隐藏，所以不受 nav.left 配置影响，始终保留 */ %>
+        <div id="toggle-menu">
+          <a class="site-page" rel="nofollow" href="javascript:void(0);" title="菜单" role="button" onclick="heo.toggleMobileMenu(event)">
+            <i class="heoblogIcon icon-menu-fill"></i>
+          </a>
+        </div>
+        <% sideItems(leftItems).forEach(function (it) { %>
+          <% if (it.type === 'app_menu') { %>
+          <% if (appGroups.length) { %>
+          <div class="app-menu-button">
+            <i class="app-menu-button-icon heoblogIcon <%= it.icon %>"></i>
+            <div class="app-menu-list-groups">
+              <% appGroups.forEach(function (g) { %>
+              <% var entries = entriesOf(g); %>
+              <% /* 一级 = 分组：有 url 才渲染成可点标题，否则纯标题 */ %>
+              <div class="app-menu-list-group">
+                <% if (g.url) { %>
+                <a class="app-menu-list-title is-link" href="<%- url_for(g.url) %>"<% if (g.target) { %> target="<%= g.target %>" rel="noopener external nofollow"<% } %>>
+                  <% if (g.icon) { %><i class="app-menu-list-title-icon heoblogIcon <%= g.icon %>"></i><% } %>
+                  <span><%= g.name %></span>
+                </a>
+                <% } else { %>
+                <div class="app-menu-list-title">
+                  <% if (g.icon) { %><i class="app-menu-list-title-icon heoblogIcon <%= g.icon %>"></i><% } %>
+                  <span><%= g.name %></span>
+                </div>
+                <% } %>
+                <div class="app-menu-list">
+                  <% entries.forEach(function (e) { %>
+                  <a class="app-menu-item" href="<%- url_for(e.url || '/') %>" title="<%= e.name %>"<% if (e.target) { %> target="<%= e.target %>" rel="noopener external nofollow"<% } %>>
+                    <% if (e.icon) { %><i class="app-menu-item-icon heoblogIcon <%= e.icon %>"></i><% } else if (e.icon_image) { %><img class="app-menu-item-icon" src="<%- url_for(e.icon_image) %>" alt="<%= e.name %>"><% } %>
+                    <span class="app-menu-item-text"><%= e.name %></span>
+                  </a>
+                  <% }); %>
+                </div>
+              </div>
+              <% }); %>
+              <% if (appMore && appMore.url) { %>
+              <a class="app-menu-bottom-btn" href="<%- url_for(appMore.url) %>" rel="external nofollow" target="_blank">
+                <i class="app-menu-bottom-btn-icon heoblogIcon icon-arrow-right-circle-fill"></i>
+                <span class="app-menu-bottom-btn-text"><%= appMore.name || '更多' %></span>
+              </a>
+              <% } %>
+            </div>
+          </div>
+          <% } %>
+
+          <% } else if (it.type === 'site_name') { %>
+          <a id="site-name" href="<%- url_for(it.url || '/') %>" title="<%= it.title %>" heotip="<%= it.title %>">
+            <% if (navLogo.image) { %>
+            <img class="site-logo-img nav-logo-img is-light" src="<%- url_for(navLogo.image) %>" alt="<%= siteName %>" style="max-height:<%= navLogo.height %>px">
+            <% if (navLogo.image_dark !== navLogo.image) { %>
+            <img class="site-logo-img nav-logo-img is-dark" src="<%- url_for(navLogo.image_dark) %>" alt="<%= siteName %>" style="max-height:<%= navLogo.height %>px">
+            <% } %>
+            <% } else { %>
+            <span class="nav-logo-text">
+              <span class="site-name-text"><%= it.name || siteName %></span>
+              <% if (navLogo.tagline) { %><span class="nav-logo-tagline"><%= navLogo.tagline %></span><% } %>
+            </span>
+            <% } %>
+          </a>
+
+          <% } else if (it.type === 'darkmode') { %>
+          <div class="nav-button" id="nav-darkmode">
+            <a class="site-page nav-darkmode-btn" href="javascript:void(0);" onclick="heo.toggleDarkMode();return false;" title="<%= it.title %>" heotip="<%= it.title %>" rel="nofollow">
+              <span class="nav-darkmode-icon" aria-hidden="true"></span>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'link') { %>
+          <div class="nav-button">
+            <a class="site-page" href="<%- url_for(it.url || '/') %>" title="<%= it.title %>" heotip="<%= it.title %>"<% if (it.target) { %> target="<%= it.target %>" rel="noopener external nofollow"<% } %>>
+              <% if (it.icon) { %><i class="heoblogIcon <%= it.icon %>"></i><% } %>
+              <% if (it.name) { %><span class="nav-text"><%= it.name %></span><% } %>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'text') { %>
+          <div class="nav-button">
+            <span class="site-page nav-text" title="<%= it.title %>">
+              <% if (it.icon) { %><i class="heoblogIcon <%= it.icon %>"></i><% } %>
+              <span><%= it.name %></span>
+            </span>
+          </div>
+          <% } %>
+        <% }); %>
+      </div>
+
+      <div id="page-name">
+        <a id="page-name-text" onclick="heo.scrollToDest(0, 500)" title="返回顶部"><%= is_post() ? page.title : '' %></a>
+      </div>
+
+      <% if (hasMenu) { %>
+      <div id="nav-middle">
+        <div class="menus_items">
+          <% menus.forEach(function (m) { %>
+            <% if (m.children && m.children.length) { %>
+            <div class="menus_item">
+              <button class="site-page<%= isActive(m.url) ? ' active' : '' %>" type="button" aria-haspopup="true" aria-expanded="false">
+                <% if (m.icon) { %><i class="heoblogIcon <%= m.icon %>"></i><% } %>
+                <span> <%= m.name %></span>
+                <i class="heoblogIcon icon-arrow-down-s-line expand"></i>
+              </button>
+              <ul class="menus_item_child">
+                <% m.children.forEach(function (c) { %>
+                <li>
+                  <a class="site-page child" href="<%- url_for(c.url || '/') %>"<% if (c.target) { %> target="<%= c.target %>" rel="noopener"<% } %>>
+                    <% if (c.icon) { %><i class="heoblogIcon <%= c.icon %>"></i><% } %>
+                    <span> <%= c.name %></span>
+                  </a>
+                </li>
+                <% }); %>
+              </ul>
+            </div>
+            <% } else { %>
+            <div class="menus_item">
+              <a class="site-page<%= isActive(m.url) ? ' active' : '' %>" href="<%- url_for(m.url || '/') %>">
+                <% if (m.icon) { %><i class="heoblogIcon <%= m.icon %>"></i><% } %>
+                <span> <%= m.name %></span>
+              </a>
+            </div>
+            <% } %>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <div id="nav-right">
+        <% sideItems(rightItems).forEach(function (it) { %>
+          <% if (it.type === 'random_post') { %>
+          <div class="nav-button" id="randomPost_button">
+            <a class="site-page" onclick="heo.toRandomPost()" title="<%= it.title %>" heotip="<%= it.title %>" rel="nofollow">
+              <i class="heoblogIcon <%= it.icon %>"></i>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'search') { %>
+          <div class="nav-button" id="search-button">
+            <a class="site-page social-icon search" title="<%= it.title %>" href="javascript:void(0);" heotip="<%= it.title %>" rel="nofollow" onclick="heo.openSearch()">
+              <i class="heoblogIcon <%= it.icon %>"></i>
+              <span class="search-btn-spinner" aria-hidden="true"></span>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'console') { %>
+          <% /* 开态图标取 icon（默认仪表盘），关态图标取 icon_close（默认 ✕） */ %>
+          <div class="nav-button" id="nav-console">
+            <a class="console_switchbutton" onclick="heo.toggleConsole()" title="<%= it.title %>" href="javascript:void(0);" rel="external nofollow" heotip="<%= it.title %>">
+              <img class="console-icon-avatar" id="navConsoleAvatar" alt="用户头像" style="display:none">
+              <i class="heoblogIcon <%= it.icon %> console-icon-dashboard"></i>
+              <i class="heoblogIcon <%= it.iconClose %> console-icon-close"></i>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'totop') { %>
+          <div class="nav-button" id="nav-totop" onclick="heo.scrollToDest(0, 500)" heotip="<%= it.title %>">
+            <a class="totopbtn" rel="nofollow" href="javascript:void(0);" title="<%= it.title %>">
+              <i class="heoblogIcon <%= it.icon %>"></i>
+              <span id="percent">0</span>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'darkmode') { %>
+          <div class="nav-button" id="nav-darkmode">
+            <a class="site-page nav-darkmode-btn" href="javascript:void(0);" onclick="heo.toggleDarkMode();return false;" title="<%= it.title %>" heotip="<%= it.title %>" rel="nofollow">
+              <span class="nav-darkmode-icon" aria-hidden="true"></span>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'link') { %>
+          <div class="nav-button">
+            <a class="site-page" href="<%- url_for(it.url || '/') %>" title="<%= it.title %>" heotip="<%= it.title %>"<% if (it.target) { %> target="<%= it.target %>" rel="noopener external nofollow"<% } %>>
+              <% if (it.icon) { %><i class="heoblogIcon <%= it.icon %>"></i><% } %>
+              <% if (it.name) { %><span class="nav-text"><%= it.name %></span><% } %>
+            </a>
+          </div>
+
+          <% } else if (it.type === 'text') { %>
+          <div class="nav-button">
+            <span class="site-page nav-text" title="<%= it.title %>">
+              <% if (it.icon) { %><i class="heoblogIcon <%= it.icon %>"></i><% } %>
+              <span><%= it.name %></span>
+            </span>
+          </div>
+          <% } %>
+        <% }); %>
+      </div>
+    </div>
+    <%# 阅读进度条：贴在导航下沿，滚动时按页面进度拉伸（nav.js 写宽度）。
+        放在 #nav 内部而不是 header 上，导航 fixed 时它跟着一起走。 %>
+    <div id="nav-progress" aria-hidden="true"><div id="nav-progress-bar"></div></div>
+  </nav>
+  <% if (is_post()) { %>
+  <%- partial('_partial/post/header') %>
+  <% } %>
+</header>

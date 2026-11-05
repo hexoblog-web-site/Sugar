@@ -1,0 +1,15 @@
+# 依赖与系统垃圾
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 日志与临时文件
+*.log
+npm-debug.log*
+.tmp/

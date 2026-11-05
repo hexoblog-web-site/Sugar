@@ -1,0 +1,89 @@
+/* rightside.css
+ *
+ * 首页「rightside」板块的样式。
+ *
+ * 拆分自下列文件（拆分脚本已归档到 hexo/_tools/archive/，本文件从现在起手改）：
+ *   source/css/heoblogmain.css          11 条
+ *   source/css/home.css                  2 条
+ *   source/css/heoblogmw768.css          1 条
+ *
+ * 改这个板块的样式请只改本文件；对应模板 layout/_partial/rightside.ejs。
+ */
+
+/* ===== 来自 source/css/heoblogmain.css ===== */
+#rightside #rightside-config-hide {
+  transition: transform .4s ease 0s;
+}
+#rightside #rightside-config-hide.show {
+  transform: translate(0,0)!important;
+}
+#rightside>div>a,
+#rightside>div>button {
+  display: block;
+  margin-bottom: 2px;
+  width: 30px;
+  height: 30px;
+  background-color: var(--btn-bg);
+  color: var(--btn-color);
+  text-align: center;
+  font-size: 16px;
+}
+#rightside #mobile-toc-button {
+  display: none;
+}
+@media screen and (max-width:899px) {
+  #rightside #mobile-toc-button {
+    display: block;
+  }
+  #rightside #hide-aside-btn {
+    display: none;
+  }
+}
+
+#rightside {
+  display: none;
+  padding-right: 8px;
+  position: fixed;
+  right: -38px;
+  bottom: 88px;
+  z-index: 100;
+  opacity: 0;
+  transition: var(--t-500);
+}
+#rightside>div>a,
+#rightside>div>button {
+  margin-bottom: 8px;
+  transition: var(--t);
+}
+#rightside #rightside-config-hide {
+  transform: translate(42px,0);
+}
+@media (hover:hover) {
+  #rightside>div>a:hover,
+  #rightside>div>button:hover {
+    background-color: var(--btn-hover-color);
+  }
+  #rightside>div>a:hover,
+  #rightside>div>button {
+    transition: var(--t);
+  }
+}
+
+/* ===== 来自 source/css/home.css ===== */
+@media (hover:hover) {
+  #rightside>div>a:hover,
+  #rightside>div>button:hover {
+    background-color: var(--btn-hover-color);
+  }
+  #rightside>div>a:hover,
+  #rightside>div>button {
+    transition: var(--t);
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  #rightside {
+    display: none;
+  }
+}

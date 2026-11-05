@@ -1,0 +1,660 @@
+/* home-swiper.css
+ *
+ * 首页「全站推荐」轮播板块的样式。
+ *
+ * 三件套（文件名与类名 #home_swiper / .home-swiper-* 严格对应）：
+ *   模板  layout/_partial/home/home-swiper.ejs
+ *   样式  source/css/home-swiper.css    （本文件）
+ *   脚本  source/js/partial/home-swiper.js
+ *
+ * 拆分自下列文件（拆分脚本已归档到 hexo/_tools/archive/，本文件从现在起手改）：
+ *   source/css/home.css                 51 条
+ *   source/css/heoblogmw768.css         18 条
+ *   source/css/theme-extra.css          20 条
+ *   source/css/liublog-fix.css           5 条
+ *
+ * 改轮播的外观请只改本文件，不会碰到下面的分类条与文章卡片。
+ */
+
+/* ===== 来自 source/css/home.css ===== */
+#home_swiper {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.home-swiper-content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--heo-shadow-border);
+  animation: slide-in .6s .1s backwards;
+  height: 340px;
+}
+.home-swiper-left.heo-pointer-glow-host {
+  border-radius: inherit;
+  overflow: hidden;
+}
+.home-swiper-left.heo-pointer-glow-host .heo-pointer-glow {
+  z-index: 3;
+  border-radius: inherit;
+  overflow: hidden;
+}
+.home-swiper-left.heo-pointer-glow-host .heo-pointer-glow::after,
+.home-swiper-left.heo-pointer-glow-host .heo-pointer-glow::before {
+  border-radius: inherit;
+}
+.home-swiper-left.heo-pointer-glow-host .home-swiper-banner,
+.home-swiper-left.heo-pointer-glow-host .home-swiper-banner-item {
+  z-index: auto;
+}
+.home-swiper-left.heo-pointer-glow-host .home-swiper-title {
+  z-index: 4;
+}
+.home-swiper-left {
+  flex: 1;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+.home-swiper-left .home-swiper-title {
+  position: absolute;
+  bottom: 32px;
+  left: 32px;
+  z-index: 10;
+  text-align: left;
+  width: calc(100% - 64px);
+  max-width: calc(100% - 64px);
+  pointer-events: none;
+}
+.home-swiper-left .home-swiper-title a {
+  pointer-events: auto;
+}
+.home-swiper-banner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.home-swiper-banner-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .45s ease,visibility 0s linear .45s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  background-color: var(--heo-card-bg);
+  cursor: pointer;
+  --home-swiper-theme: var(--heo-theme);
+  --home-swiper-theme-op: var(--heo-theme-op);
+  --home-swiper-theme-op-deep: var(--heo-theme-op-deep);
+}
+.home-swiper-banner-item.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+  transition: opacity .45s ease,visibility 0s;
+}
+@media (prefers-reduced-motion:reduce) {
+  .home-swiper-banner-item,
+  .home-swiper-banner-item.active {
+    transition: none;
+  }
+}
+
+.home-swiper-cover {
+  width: 80%;
+  max-width: 80%;
+  flex-shrink: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-swiper-cover-img {
+  max-width: 100%;
+  height: auto;
+  width: auto;
+  max-height: 100%;
+  object-fit: contain;
+  filter: blur(0);
+  border-radius: 8px 0 0 8px;
+  mask-image: radial-gradient(ellipse 60% 60% at center,#000 0,rgba(0,0,0,.8) 30%,rgba(0,0,0,.4) 50%,rgba(0,0,0,0) 80%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: filter .5s ease;
+}
+.home-swiper-banner-item.has-banner-cover {
+  padding: 0;
+}
+.home-swiper-banner-item.has-banner-cover .home-swiper-cover {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+.home-swiper-banner-item.has-banner-cover .home-swiper-cover-img {
+  mask-image: none;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+.home-swiper-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  background: linear-gradient(to top,var(--home-swiper-theme,var(--heo-theme)) 0,transparent 100%);
+  -webkit-mask-image: linear-gradient(to top,#000 0,transparent 100%);
+  mask-image: linear-gradient(to top,#000 0,transparent 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+.home-swiper-banner-item.active .home-swiper-cover-img {
+  filter: blur(0);
+}
+.home-swiper-left .home-swiper-title a {
+  color: var(--heo-white);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color .3s;
+  margin-bottom: -6px;
+}
+.home-swiper-title a:hover,
+.home-swiper-title-tag {
+  color: var(--heo-white);
+}
+.home-swiper-title-tag {
+  font-size: 12px;
+  opacity: .8;
+  margin-top: 2px;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 15%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.home-swiper-title-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.home-swiper-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.home-swiper-banner-arrows {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.home-swiper-banner-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--heo-white-op);
+  color: var(--heo-white);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--t);
+  border: none;
+  pointer-events: auto;
+}
+.home-swiper-banner-arrow:hover {
+  background: var(--heo-white);
+  transform: scale(1.1);
+  color: var(--heo-main);
+  box-shadow: none;
+}
+.home-swiper-banner-arrow:active {
+  transform: scale(.8);
+}
+.home-swiper-indicators {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.home-swiper-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.4);
+  cursor: pointer;
+  transition: var(--t);
+  display: block;
+  pointer-events: auto;
+}
+.home-swiper-indicator.active {
+  background: rgba(255,255,255,.9);
+  width: 24px;
+  border-radius: 4px;
+}
+@media screen and (max-width:767px) {
+  #home_swiper {
+    padding: 0 1rem;
+    margin-top: 0;
+  }
+  .home-swiper-content {
+    border-radius: 0;
+    flex-direction: column;
+    height: auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .home-swiper-left {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .home-swiper-banner {
+    height: 200px;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: auto;
+  }
+  .home-swiper-banner::-webkit-scrollbar {
+    display: none;
+  }
+  .home-swiper-left .home-swiper-title a {
+    font-size: 18px;
+    pointer-events: none;
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .home-swiper-indicators {
+    margin-top: 10px;
+  }
+  .home-swiper-banner-item {
+    padding: 16px;
+    min-width: 100%;
+    width: 100%;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+  }
+  .home-swiper-banner-item::after {
+    display: none;
+  }
+  .home-swiper-left .home-swiper-title {
+    bottom: 1rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+    max-width: calc(100% - 2rem);
+    pointer-events: none;
+  }
+  .home-swiper-title a {
+    font-size: 1.2rem;
+    pointer-events: auto;
+  }
+  .home-swiper-title-tag {
+    display: none;
+  }
+  .home-swiper-indicators {
+    pointer-events: none;
+  }
+  .home-swiper-indicator {
+    width: 6px;
+    height: 6px;
+  }
+  .home-swiper-indicator.active {
+    width: 20px;
+  }
+  .home-swiper-banner-arrow {
+    display: none;
+  }
+  .home-swiper-banner-item.has-banner-cover .home-swiper-cover-img {
+    object-position: 70% center;
+  }
+}
+
+#home_swiper {
+  margin-bottom: 4px;
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  #home_swiper {
+    padding: 0 1rem;
+    margin-top: 0;
+  }
+  .home-swiper-content {
+    border-radius: 0;
+    flex-direction: column;
+    height: auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .home-swiper-left {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .home-swiper-banner {
+    height: 200px;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: auto;
+  }
+  .home-swiper-banner::-webkit-scrollbar {
+    display: none;
+  }
+  .home-swiper-left .home-swiper-title a {
+    font-size: 18px;
+    pointer-events: none;
+    display: block;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .home-swiper-indicators {
+    margin-top: 10px;
+  }
+  .home-swiper-banner-item {
+    padding: 16px;
+    min-width: 100%;
+    width: 100%;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+  }
+  .home-swiper-banner-item::after {
+    display: none;
+  }
+  .home-swiper-left .home-swiper-title {
+    bottom: 1rem;
+    left: 1rem;
+    width: calc(100% - 2rem);
+    max-width: calc(100% - 2rem);
+    pointer-events: none;
+  }
+  .home-swiper-title a {
+    font-size: 1.2rem;
+    pointer-events: auto;
+  }
+  .home-swiper-title-tag {
+    display: none;
+  }
+  .home-swiper-indicators {
+    pointer-events: none;
+  }
+  .home-swiper-indicator {
+    width: 6px;
+    height: 6px;
+  }
+  .home-swiper-indicator.active {
+    width: 20px;
+  }
+  .home-swiper-banner-arrow {
+    display: none;
+  }
+  .home-swiper-banner-item.has-banner-cover .home-swiper-cover-img {
+    object-position: 70% center;
+  }
+  .home-swiper-banner-item:not(.has-banner-cover) .home-swiper-cover {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ===== 来自 source/css/theme-extra.css ===== */
+@media (min-width: 769px) {
+  #home_swiper.home-swiper {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+  }
+  .home-swiper-content {
+    position: relative;
+    width: 100%;
+    display: flex;
+    background: var(--heo-card-bg);
+    border: var(--style-border-always);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 340px;
+  }
+  .home-swiper-left {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+  .home-swiper-banner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .home-swiper-banner-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--heo-card-bg);
+  }
+  .home-swiper-banner-item.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+  .home-swiper-cover {
+    width: 80%;
+    max-width: 80%;
+    flex-shrink: 0;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .home-swiper-cover-img {
+    max-width: 100%;
+    height: auto;
+    width: auto;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .home-swiper-banner-item.has-banner-cover {
+    padding: 0;
+  }
+  .home-swiper-banner-item.has-banner-cover .home-swiper-cover {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+  }
+  .home-swiper-banner-item.has-banner-cover .home-swiper-cover-img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+  .home-swiper-indicators {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .home-swiper-indicator {
+    pointer-events: auto;
+  }
+  //- 主 CSS 加载前隐藏箭头按钮，避免无样式闪烁
+  .home-swiper-banner-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-swiper-content {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+  .home-swiper-left {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+  .home-swiper-banner {
+    height: 200px !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    scroll-behavior: auto !important;
+  }
+  .home-swiper-banner-item {
+    position: relative !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  .home-swiper-banner-item .home-swiper-cover {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+  .home-swiper-banner-item .home-swiper-cover-img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+}
+
+/* ===== 来自 source/css/liublog-fix.css ===== */
+/* 轮播标题区在无多图时的间距 */
+.home-swiper-title>a {
+  display: block;
+}
+/* ===== 首页横幅环境柔光：当前幻灯片的主色在横幅四周晕开 =====
+   --banner-tint 由 main.js 在每次切换轮播时写入 body，换图时颜色跟着变 */
+#home_swiper {
+  position: relative;
+}
+#home_swiper::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -26px;
+  bottom: -18px;
+  z-index: 0;
+  border-radius: 36px;
+  background-color: rgba(var(--banner-tint,66,90,239),.46);
+  filter: blur(36px);
+  pointer-events: none;
+}
+#home_swiper>.home-swiper-content {
+  position: relative;
+  z-index: 1;
+}
+/* ===== 主色联动开关：_config.yml → home.banner_tint: false =====
+   关闭后横幅柔光 / 整页染色 / 作者卡渐变 / 中控台环境色 全部回到主题主色，
+   JS 那边也不再写入 --banner-tint / --console-tint */
+html.no-banner-tint #home_swiper::before {
+  display: none;
+}
+
+/* ===== 悬停显示摘要（对齐安知鱼 banner 板块的交互） =====
+   默认只看到「遮罩图 + 标题」；鼠标移到轮播上，标题上方浮出这一篇的摘要，
+   移开收回 —— 摘要文字由 home-swiper.js 在换图时同步（data-excerpt）。 */
+.home-swiper-excerpt {
+  max-height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  overflow: hidden;
+  font-size: .85rem;
+  line-height: 1.7;
+  color: rgb(255 255 255 / 86%);
+  text-shadow: 0 1px 10px rgb(0 0 0 / 40%);
+  transition: max-height .35s ease, margin .35s ease, opacity .3s ease, transform .3s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* 这一篇没有摘要时不占位（否则 hover 会多出一条空白） */
+.home-swiper-excerpt:empty {
+  display: none;
+}
+
+.home-swiper-left:hover .home-swiper-excerpt {
+  max-height: 3.6em;
+  margin-bottom: .3rem;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 触屏没有 hover，摘要只会白占地方 */
+@media (hover: none) {
+  .home-swiper-excerpt {
+    display: none;
+  }
+}

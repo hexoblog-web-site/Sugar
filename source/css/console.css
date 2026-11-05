@@ -1,0 +1,681 @@
+/* console.css
+ *
+ * 中控台面板（导航栏右侧的仪表盘按钮打开的那一层）。
+ *
+ * 对应模板 layout/_partial/console.ejs
+ * 对应脚本 source/js/partial/console.js
+ *
+ * 内部顺序 = 规则在合并产物里的真实先后，不要重排：
+ *   1) 主样式里原本排在 console.css 之前的规则
+ *   2) 本文件原有的面板样式
+ *   3) 各断点文件里的规则（必须排在最后，否则窄屏覆盖不到）
+ *   4) 覆盖层
+ *
+ * 不属于这里的：a.console_switchbutton（导航栏上的按钮）、#nav-console
+ */
+
+/* ===== 1. 主样式（heoblogmain / home） ===== */
+/* ===== 来自 source/css/heoblogmain.css ===== */
+#console {
+  display: none;
+}
+#console.show {
+  display: flex;
+}
+#keyboard-tips {
+  position: fixed;
+  top: 70px;
+  left: 20px;
+  z-index: 999;
+  background: var(--heo-maskbgdeep);
+  border-radius: 12px;
+  border: var(--style-border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: none;
+  box-shadow: var(--heo-shadow-border);
+  opacity: 0;
+  transition: var(--t);
+  user-select: none;
+  pointer-events: none;
+}
+#keyboard-tips.show {
+  opacity: 1;
+  transition: var(--t-100);
+  pointer-events: all;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+#keyboard-tips .keybordList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  gap: 8px;
+}
+#keyboard-tips .keyboardTitle {
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  line-height: 1;
+}
+#keyboard-tips .keybordItem {
+  display: flex;
+  margin-top: 4px;
+  align-items: center;
+}
+#keyboard-tips .keybordItem[hidden] {
+  display: none!important;
+}
+#keyboard-tips .keybordItem .keyContent {
+  cursor: pointer;
+  line-height: 1;
+  transition: var(--t);
+}
+#keyboard-tips .keyGroup {
+  display: flex;
+  align-items: center;
+  width: 90px;
+}
+#keyboard-tips .keyGroup .key {
+  padding: .2em .4em;
+  font-family: inherit;
+  background-color: var(--heo-card-bg);
+  color: var(--heo-fontcolor);
+  border: var(--style-border);
+  border-color: var(--heo-secondtext);
+  border-bottom: 2px solid var(--heo-secondtext);
+  box-shadow: var(--heo-shadow-border);
+  border-radius: .25rem;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+  font-weight: 500;
+  font-size: .875em;
+  margin-right: 4px;
+  vertical-align: baseline;
+  line-height: 1;
+  height: 24px;
+  cursor: pointer;
+  transition: var(--t);
+}
+@media (hover:hover) {
+  #console .aside-list-item:hover .thumbnail {
+    color: var(--heo-white);
+  }
+  #console .aside-list-item:hover .content .comment,
+  #console .aside-list-item:hover .content time {
+    color: var(--heo-card-bg);
+  }
+  #console .button-group .console-btn-item:hover a {
+    background: var(--heo-main);
+  }
+  #console .button-group .console-btn-item:not(.on) a:hover {
+    background: var(--heo-main)!important;
+    color: var(--heo-white)!important;
+  }
+  #console .button-group .console-btn-item:hover a {
+    color: var(--heo-white);
+  }
+  .console-card.tags .card-tag-cloud a:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg)!important;
+    box-shadow: var(--heo-shadow-main);
+  }
+  #console .close-btn i:hover {
+    color: var(--heo-lighttext);
+    background: var(--heo-main-op);
+    border-radius: 32px;
+  }
+  #console .console-card.history .card-archive-list .card-archive-list-link:hover {
+    background: var(--heo-main);
+    color: var(--heo-card-bg);
+  }
+  #console .button-group .console-btn-item button:hover {
+    background: var(--heo-main);
+    color: var(--heo-white);
+  }
+  #console .button-group .console-btn-item.on button:hover {
+    background: var(--heo-blue);
+    filter: brightness(1.2);
+    color: var(--heo-white);
+  }
+  #keyboard-tips .keybordItem:hover .keyContent {
+    color: var(--heo-lighttext);
+  }
+  #keyboard-tips .keybordItem:hover .key {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg);
+  }
+}
+
+/* ===== 来自 source/css/home.css ===== */
+@media (hover:hover) {
+  #console .aside-list-item:hover .thumbnail {
+    color: var(--heo-white);
+  }
+  #console .aside-list-item:hover .content .comment,
+  #console .aside-list-item:hover .content time {
+    color: var(--heo-card-bg);
+  }
+  #console .button-group .console-btn-item:hover a {
+    background: var(--heo-main);
+  }
+  #console .button-group .console-btn-item:not(.on) a:hover {
+    background: var(--heo-main)!important;
+    color: var(--heo-white)!important;
+  }
+  #console .button-group .console-btn-item:hover a {
+    color: var(--heo-white);
+  }
+  .console-card.tags .card-tag-cloud a:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg)!important;
+    box-shadow: var(--heo-shadow-main);
+  }
+  #console .close-btn i:hover {
+    color: var(--heo-lighttext);
+    background: var(--heo-main-op);
+    border-radius: 32px;
+  }
+  #console .console-card.history .card-archive-list .card-archive-list-link:hover {
+    background: var(--heo-main);
+    color: var(--heo-card-bg);
+  }
+  #console .button-group .console-btn-item button:hover {
+    background: var(--heo-main);
+    color: var(--heo-white);
+  }
+  #console .button-group .console-btn-item.on button:hover {
+    background: var(--heo-blue);
+    filter: brightness(1.2);
+    color: var(--heo-white);
+  }
+  #keyboard-tips .keybordItem:hover .keyContent {
+    color: var(--heo-lighttext);
+  }
+  #keyboard-tips .keybordItem:hover .key {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg);
+  }
+}
+
+/* ===== 2. 面板样式 ===== */
+/* 环境色：由 main.js 按当前轮播图主色写到 body 上，这里只给默认值 */
+body {
+  --console-tint: 66, 90, 239;
+  /* 毛玻璃白度：调低才能让底下的环境色透出来（原 --heo-maskbg 的 .6 会把颜色洗白） */
+  --console-glass: rgba(255, 255, 255, 0.44);
+  --console-card-bg: rgba(255, 255, 255, 0.58);
+}
+[data-theme="dark"] body {
+  --console-glass: rgba(0, 0, 0, 0.52);
+  --console-card-bg: rgba(0, 0, 0, 0.66);
+}
+
+#console {
+  display: none;
+  position: fixed;
+  width: 100dvw;
+  height: 100dvh;
+  top: 0;
+  left: 0;
+  z-index: 900;
+  opacity: 0;
+  transition: opacity .3s;
+  user-select: none;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  /* 底层染上当前幻灯片主色，毛玻璃透出的就是这层色 */
+  background-color: rgba(var(--console-tint), 0.58);
+}
+#console.show { display: flex; opacity: 1; pointer-events: all; }
+
+/* 背后那层毛玻璃：铺满视口、位于内容之下 */
+.console-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: var(--console-glass);
+  /* 环境色由 #console 底层铺染，这里只保留白色毛玻璃与模糊 */
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform: translateZ(0);
+  backdrop-filter: none;
+}
+#console.show .console-mask {
+  backdrop-filter: saturate(180%) blur(20px);
+  animation: to_show 0.6s ease;
+}
+
+/* 内容容器 */
+.console_content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  pointer-events: none;
+  width: 100%;
+  max-width: min(1400px - 3rem, 100% - 32px);
+  height: calc(100dvh - 100px);
+  min-height: 420px;
+  gap: 12px;
+  margin: 80px auto 0;
+}
+#console.show .console_content > * { pointer-events: auto; }
+
+/* 展开时的上浮动画 */
+#console .button-group,
+.console-row { transform: translateY(20px); transition: var(--t); opacity: 0; }
+#console.show .console-row--top { transform: translateY(0); opacity: 1; transition-delay: 50ms; }
+#console.show .console-row--main { transform: translateY(0); opacity: 1; transition-delay: 0.12s; }
+#console.show .button-group { transform: translateY(0); opacity: 1; transition-delay: 0.2s; }
+
+/* ---------- 行布局 ---------- */
+.console-row--top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+  height: 120px;
+}
+.console-row--main {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 640px;
+}
+
+/* ---------- 卡片 ---------- */
+#console .console-card,
+.console-user__card {
+  background: var(--heo-maskbgdeep);
+  box-shadow: var(--heo-shadow-glass);
+  border-radius: 12px;
+}
+#console .console-card {
+  /* 卡片也沾一点环境色，避免出现「背景很艳、卡片死白」的割裂感 */
+  background-color: var(--heo-maskbgdeep);
+  background-image: linear-gradient(160deg,
+    rgba(var(--console-tint), 0.12) 0%,
+    rgba(var(--console-tint), 0.05) 46%,
+    rgba(var(--console-tint), 0) 100%);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  min-width: 0;
+}
+/* 卡片标题区：tips 独占一行，标题与「查看全部」同处一行 */
+.card-content { display: block; }
+.card-hor-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+#console .author-content-item-tips {
+  opacity: 0.8;
+  font-size: 0.6rem;
+  line-height: 24px;
+  margin-bottom: 4px;
+}
+#console .author-content-item-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+}
+#console .go_to_recent_comments {
+  margin-left: auto;
+  color: var(--heo-fontcolor);
+  transition: var(--t);
+  display: block;
+}
+#console .go_to_recent_comments i { font-size: 22px; }
+#console .go_to_recent_comments:hover { color: var(--heo-theme); }
+
+/* ---------- 顶部用户卡 ---------- */
+.console-user { width: 100%; min-width: 0; }
+.console-user__card {
+  /* 个人信息卡同样跟随幻灯片主色 */
+  background-color: var(--console-card-bg);
+  background-image: linear-gradient(118deg,
+    rgba(var(--console-tint), 0.36) 0%,
+    rgba(var(--console-tint), 0.14) 52%,
+    rgba(var(--console-tint), 0.02) 82%);
+}
+.console-user__card {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 22px;
+  height: 100%;
+  box-sizing: border-box;
+}
+.console-user__avatar-link { display: inline-flex; flex-shrink: 0; border-radius: 50%; }
+.console-user__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  margin-right: 16px;
+  transition: var(--t);
+}
+.console-user__avatar-link:hover .console-user__avatar {
+  border-color: var(--heo-theme);
+  box-shadow: 0 0 0 1px var(--heo-theme);
+}
+.console-user__meta { min-width: 0; flex: 1; line-height: 1; align-self: center; }
+.console-user__name {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.console-user__sub {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--heo-secondtext);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+.console-user__sub b { color: var(--heo-theme); font-weight: 700; }
+.console-user__actions { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+.console-user__btn {
+  appearance: none;
+  border: var(--style-border);
+  background: var(--heo-card-bg);
+  color: var(--heo-fontcolor);
+  border-radius: 999px;
+  height: 34px;
+  padding: 0 16px;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--t);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.console-user__btn:hover { border-color: var(--heo-theme); color: var(--heo-theme); }
+.console-user__btn--primary {
+  background: var(--heo-lighttext);
+  color: var(--heo-card-bg);
+  border-color: transparent;
+  font-weight: 600;
+}
+.console-user__btn--primary:hover { opacity: 0.85; color: var(--heo-card-bg); }
+
+/* ---------- 文章 / 分类列表 ---------- */
+.console-posts__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.console-posts__list::-webkit-scrollbar { display: none; }
+.console-posts__item { border-bottom: var(--style-border); }
+.console-posts__item:last-child { border-bottom: none; }
+.console-posts__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 2px;
+  color: var(--heo-fontcolor);
+  transition: var(--t);
+  min-width: 0;
+}
+.console-posts__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--t);
+}
+.console-posts__link:hover .console-posts__title { color: var(--heo-theme); }
+.console-posts__date {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  font-variant-numeric: tabular-nums;
+}
+.console-posts__count {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 标签卡 ---------- */
+#console .console-card.tags .card-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  gap: 6px;
+  scrollbar-width: none;
+}
+#console .console-card.tags .card-tag-cloud::-webkit-scrollbar { display: none; }
+#console .console-card.tags .card-tag-cloud a {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--heo-card-bg);
+  border: var(--style-border);
+  font-weight: 700;
+  color: var(--heo-fontcolor) !important;
+  font-size: 14px !important;
+  line-height: 1.7;
+  transition: var(--t);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+#console .console-card.tags .card-tag-cloud a:hover {
+  background: var(--heo-theme);
+  color: var(--heo-white) !important;
+  border-color: var(--heo-theme);
+}
+#console .console-card.tags .card-tag-cloud a sup { opacity: 0.6; font-size: 11px; }
+
+/* ---------- 底部按钮组 ---------- */
+#console .button-group { display: flex; justify-content: center; width: fit-content; }
+#console .button-group .console-btn-item {
+  width: 80px;
+  height: 40px;
+  transition: var(--t);
+  cursor: pointer;
+}
+#console .button-group .console-btn-item:not(:last-child) { margin-right: 0.5rem; }
+#console .button-group .console-btn-item button {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--heo-maskbg), var(--heo-maskbgdeep));
+  box-shadow: var(--heo-shadow-glass);
+  border-radius: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: var(--heo-fontcolor);
+  cursor: pointer;
+  transition: var(--t);
+}
+#console .button-group .console-btn-item button i { font-size: 24px; }
+#console .button-group .console-btn-item button.asideSwitch i { font-size: 20px; }
+#console .button-group .console-btn-item.on button {
+  background: var(--heo-blue);
+  color: var(--heo-white);
+  box-shadow: var(--heo-shadow-blue);
+}
+#console .button-group .console-btn-item:hover button {
+  background: var(--heo-theme);
+  color: var(--heo-white);
+}
+#console .button-group i { font-size: 1rem; }
+
+/* ---------- 键盘快捷键面板 ---------- */
+#keyboard-tips {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 901;
+  width: min(560px, calc(100% - 32px));
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: var(--heo-maskbgdeep);
+  box-shadow: var(--heo-shadow-glass);
+  opacity: 0;
+  transition: var(--t);
+  pointer-events: none;
+}
+#keyboard-tips.show { display: block; opacity: 1; transform: translateX(-50%) translateY(0); }
+#keyboard-tips .keyboardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--heo-fontcolor);
+}
+#keyboard-tips .keybordList { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+#keyboard-tips .keybordItem { display: flex; align-items: center; gap: 8px; }
+#keyboard-tips .key {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: var(--style-border);
+  background: var(--heo-card-bg);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+}
+#keyboard-tips .keyContent .content { font-size: 13px; color: var(--heo-secondtext); }
+
+/* 打开中控台时锁滚动 */
+body.console-open { overflow: hidden; }
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 1200px) {
+  .console-row--main { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 1100px) {
+  .console-row--top { grid-template-columns: 1fr; }
+  .console-row--main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 899px) {
+  .console_content { margin-top: 80px; }
+}
+@media screen and (max-width: 768px) {
+  .console_content {
+    height: calc(100dvh - 100px);
+    margin-top: 80px;
+    justify-content: flex-start;
+    overflow: hidden auto;
+    padding-bottom: 0;
+    scrollbar-width: none;
+  }
+  .console_content::-webkit-scrollbar { display: none; }
+  .console-row--main { grid-template-columns: 1fr; }
+  .console-row--top { height: auto; }
+  .console-user__card { padding: 14px 16px; gap: 4px; }
+  #console .console-card { padding: 16px; }
+  #console .author-content-item-title { font-size: 20px; }
+  .console-user__actions .console-user__btn:not(.console-user__btn--primary) { display: none; }
+}
+
+/* ===== 3. 断点 ===== */
+/* ===== 来自 source/css/heoblogmw1300.css ===== */
+@media screen and (max-width:1299px) {
+  #console .console-card-group {
+    justify-content: center;
+  }
+  #consoleMusic {
+    display: none;
+  }
+  #consoleCommentBarrage {
+    display: none;
+  }
+  #console .aside-list {
+    overflow-y: scroll;
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw1200.css ===== */
+@media screen and (max-width:1200px) {
+  div#console_recentcomments {
+    overflow-y: scroll;
+  }
+  div#console_recentcomments::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  div#console_recentcomments::-webkit-scrollbar-thumb {
+    background-color: var(--heo-main-op);
+  }
+  div#console_recentcomments::-webkit-scrollbar {
+    width: 8px;
+  }
+  #console_recentcomments .comment-card {
+    min-width: 100%;
+    height: calc(100% / 3 - 8px);
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  #console .console-card-group {
+    display: none;
+  }
+  #consoleHideAside {
+    display: none;
+  }
+}
+
+/* ===== 4. 覆盖层 ===== */
+/* ===== 来自 source/css/liublog-fix.css ===== */
+/* 中控台回到最初的纯玻璃态 */
+html.no-banner-tint #console {
+  background-color: transparent;
+}
+html.no-banner-tint .console-mask {
+  background-color: var(--heo-maskbg);
+}
+html.no-banner-tint .console-user__card {
+  background-color: var(--heo-maskbgdeep);
+  background-image: none;
+}
+html.no-banner-tint #console .console-card {
+  background-image: none;
+}

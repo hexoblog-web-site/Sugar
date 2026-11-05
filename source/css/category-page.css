@@ -1,0 +1,260 @@
+/* ==========================================================================
+ * 分类索引页  category-page.css
+ * --------------------------------------------------------------------------
+ * 模板  layout/_partial/page/category-body.ejs（索引分支）+ layout/categories.ejs
+ * 脚本  无（纯静态，hover 全交给 CSS）
+ *
+ * 数值来源：blog.zhheo.com/zhheo/categories.css 原文件逐条对照。
+ * 目标站根字号 20px，与本站一致；但它的 .category-list-* 用 em（基准 16px），
+ * 直接搬 em 到本站会变成 21px，所以统一换算成了 px：
+ *   1.05em → 16.8px    0.78em → 12.48px    0.92em → 14.72px
+ *   1rem   → 20px      1.5rem → 30px       0.4rem → 8px      2rem → 40px
+ * ========================================================================== */
+
+/* ---------------- 页面容器 ---------------- */
+
+#category.cat-page {
+  display: flex;
+  flex: 1 1 auto;      /* 主容器是 flex，隐藏侧栏后要自己吃掉整宽 */
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: 10px;
+}
+
+/* ---------------- 顶部统计药丸 ---------------- */
+
+.tag-page-stats {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  margin: 0 0 30px;
+  padding: 6px 8px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 999px;
+  box-shadow: var(--heo-shadow-border);
+}
+
+.tag-page-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: var(--t);
+}
+
+.tag-page-stat:hover {
+  color: var(--heo-main);
+  background: var(--heo-theme-op);
+  text-decoration: none;
+}
+
+.tag-page-stat i {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--heo-main);
+}
+
+.tag-page-stat b {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--heo-fontcolor);
+}
+
+/* ---------------- 分类卡片列表 ---------------- */
+
+#category .category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+#category .category-list-item {
+  display: flex;
+  min-width: 0;
+  gap: 16px;
+  padding: 16px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-border);
+  transition: var(--t);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+#category .category-list-item:hover {
+  border: var(--style-border-hover);
+  box-shadow: var(--heo-shadow-main);
+}
+
+/* 左侧分类方块：图标 / 名称 / 篇数，竖排居中 */
+#category .category-list-category {
+  flex: 0 0 auto;
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px 12px;
+  color: var(--heo-fontcolor);
+  text-decoration: none;
+  background: var(--heo-secondbg);
+  border-radius: 10px;
+  transition: var(--t);
+}
+
+#category .category-list-category:hover {
+  color: var(--heo-main);
+  background: var(--heo-theme-op);
+  text-decoration: none;
+}
+
+.category-list-category-icon {
+  font-size: 26px;
+  color: var(--heo-main);
+}
+
+.category-list-category-name {
+  max-width: 100%;
+  font-size: 16.8px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-list-category-count {
+  font-size: 12.48px;
+  line-height: 2;         /* 目标站实测 24.96px，参与竖向居中的计算 */
+  color: var(--heo-lighttext);
+  opacity: 0.85;
+}
+
+/* 右侧文章标题：桌面两列 */
+#category .category-list-posts {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  gap: 2px 12px;
+  align-content: start;
+}
+
+#category .category-list-post {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  padding: 6px 8px;
+  overflow: hidden;
+  font-size: 14.72px;
+  line-height: 1.4;
+  color: var(--heo-fontcolor);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: var(--t);
+}
+
+#category .category-list-post:hover {
+  color: var(--heo-main);
+  background: var(--heo-theme-op);
+  text-decoration: none;
+}
+
+/* 标题前的小圆点 */
+#category .category-list-post::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  background: var(--heo-lighttext);
+  border-radius: 50%;
+  opacity: 0.45;
+}
+
+.category-list-post-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-list-empty {
+  padding: 8px;
+  font-size: 14.4px;
+  color: var(--heo-lighttext);
+  opacity: 0.7;
+}
+
+/* ---------------- 移动端 ---------------- */
+
+@media screen and (max-width: 767px) {
+  /* 目标站这一页主容器留白是 10px 20px。
+     要盖住 heoblogmw768.css 里的 `.page .layout#content-inner:has(#category){padding:0}`，
+     所以这里把选择器写得和它同级再多一点。 */
+  .page .layout#content-inner.hide-aside:has(#category.cat-page) {
+    padding: 10px 20px;
+  }
+
+  /* 标题在手机上收到 40px（这条原本在 heoblogmw768.css 里，被写在媒体查询外，已移到这里） */
+  .equipment-page-title {
+    font-size: 40px;
+  }
+
+  .tag-page-stats {
+    width: 100%;
+    max-width: 340px;
+    padding: 6px;
+    justify-content: center;
+  }
+
+  .tag-page-stat {
+    gap: 6px;
+    padding: 6px 14px;
+  }
+
+  .tag-page-stat i {
+    font-size: 18px;
+  }
+
+  .tag-page-stat b {
+    font-size: 18px;
+  }
+
+  /* 卡片转竖向：分类方块变成一行标签，文章列表改单列 */
+  #category .category-list-item {
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  #category .category-list-category {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  #category .category-list-category-name {
+    text-align: left;
+  }
+
+  #category .category-list-posts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

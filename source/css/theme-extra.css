@@ -1,0 +1,273 @@
+:root {
+  --heo-white: #fff;
+  --heo-white-op: rgba(255, 255, 255, 0.15);
+  --heo-black: #000;
+  --heo-black-op: rgba(0, 0, 0, 0.15);
+  --heo-none: #00000000;
+  --heo-gray-op: #9999992b;
+  --heo-gray-op-deep: #99999996;
+  --heo-vip: #e5a80d;
+  --heo-main: var(--heo-theme);
+  --heo-main-op: var(--heo-theme-op);
+  --heo-main-op-deep: var(--heo-theme-op-deep);
+  --heo-main-op-light: var(--heo-theme-op-light);
+  --heo-main-none: var(--heo-theme-none);
+  --heo-shadow-theme: 0 8px 12px -3px var(--heo-theme-op);
+  --heo-shadow-blackdeep: 0 2px 16px -3px rgba(0, 0, 0, .15);
+  --heo-shadow-main: 0 8px 12px -3px var(--heo-main-op);
+  --heo-shadow-blue: 0 8px 12px -3px rgba(40, 109, 234, .20);
+  --heo-shadow-white: 0 8px 12px -3px rgba(255, 255, 255, .20);
+  --heo-shadow-black: 0 0 12px 4px rgba(0, 0, 0, .05);
+  --heo-shadow-yellow: 0 38px 77px -26px rgba(255, 201, 62, .12);
+  --heo-shadow-red: 0 8px 12px -3px #ee7d7936;
+  --heo-shadow-green: 0 8px 12px -3px #87ee7936;
+  --heo-logo-color: linear-gradient(215deg, #4584ff 0%, #cf0db9 100%);
+  --heo-snackbar-time: 5s;
+  --heo-musicColor: var(--heo-main);
+  --heo-musicColor-op: var(--heo-main-op);
+  --heo-bottom-float-gap: 4px;
+  --heo-need-end-hide-offset: 320px;
+  --heo-dock-right: 20px;
+  --heo-dock-bottom: 20px;
+  --heo-dock-width: 300px;
+  --heo-dock-duration: 0.6s;
+  --heo-dock-ease: cubic-bezier(0.42, 0, 0.3, 1.11);
+  --heo-dock-blur: saturate(180%) blur(20px);
+  --global-bg: #fff;
+  --hr-border: #97bcfb;
+  --hr-before-color: #6ea2f9;
+  --search-bg: #f6f8fa;
+  --search-input-color: var(--heo-fontcolor);
+  --search-result-title: #4c4948;
+  --preloader-bg: #37474f;
+  --preloader-color: #fff;
+  --tab-border-color: #f0f0f0;
+  --tab-botton-bg: #f0f0f0;
+  --tab-botton-color: #1f2d3d;
+  --tab-button-hover-bg: #dcdcdc;
+  --tab-button-active-bg: #fff;
+  --sidebar-bg: #f6f8fa;
+  --btn-hover-color: #ff7242;
+  --btn-color: #fff;
+  --btn-bg: #307af6;
+  --text-bg-hover: #307af6;
+  --light-grey: #eee;
+  --text-highlight-color: #1f2d3d;
+  --blockquote-color: #6a737d;
+  --blockquote-bg: rgba(73, 177, 245, 0.1);
+  --reward-pop: #f5f5f5;
+  --toc-link-color: #666261;
+  --card-box-shadow: 0 3px 8px 6px rgba(7, 17, 27, 0.06);
+  --card-hover-box-shadow: 0 3px 8px 6px rgba(7, 17, 27, 0.15);
+  --hl-color: #eff;
+  --hl-bg: #212121;
+  --hltools-bg: #1c1c1c;
+  --hltools-color: rgba(238, 255, 255, 0.8);
+  --hlnumber-bg: #212121;
+  --hlnumber-color: rgba(238, 255, 255, 0.5);
+  --hlscrollbar-bg: #121212;
+  --hlexpand-bg: linear-gradient(180deg, rgba(33, 33, 33, 0.6), rgba(33, 33, 33, 0.9));
+  --offset: 0;
+}
+[data-theme=light] {
+  --heo-theme: #425AEF;
+  --heo-theme-op: #4259ef23;
+  --heo-theme-op-deep: #4259efdd;
+  --heo-theme-op-light: #4259ef0d;
+  --heo-theme-none: #4259ef01;
+  --heo-blue: #425AEF;
+  --heo-red: #d80020;
+  --heo-red-op: #d800201a;
+  --heo-red-op-deep: #d8002056;
+  --heo-pink: #FF7C7C;
+  --heo-green: #57bd6a;
+  --heo-green-op: #57bd6a1a;
+  --heo-green-op-deep: #57bd6a56;
+  --heo-yellow: #936900;
+  --heo-yellow-op: #d99c001a;
+  --heo-orange: #e38100;
+  --heo-purple: #7a60d2;
+  --heo-fontcolor: #363636;
+  --heo-background: #f7f9fe;
+  --heo-reverse: #000;
+  --heo-maskbg: rgba(255, 255, 255, 0.6);
+  --heo-maskbgdeep: rgba(255, 255, 255, 0.85);
+  --heo-hovertext: var(--heo-main);
+  --heo-ahoverbg: #F7F7FA;
+  --heo-lighttext: var(--heo-main);
+  --heo-secondtext: rgba(60, 60, 67, 0.8);
+  --heo-scrollbar: rgba(60, 60, 67, 0.4);
+  --heo-card-btn-bg: #edf0f7;
+  --heo-post-blockquote-bg: #fafcff;
+  --heo-post-tabs-bg: #f2f5f8;
+  --heo-secondbg: #f7f7f9;
+  --heo-shadow-nav: 0 5px 12px -5px rgba(102, 68, 68, 0.05);
+  --heo-card-bg: #fff;
+  --heo-card-bg-op: var(--heo-white-op);
+  --heo-card-bg-op-deep: #ffffff45;
+  --heo-card-bg-none: rgba(255, 255, 255, 0);
+  --heo-shadow-lightblack: 0 5px 12px -5px rgba(102, 68, 68, 0.00);
+  --heo-shadow-light2black: 0 5px 12px -5px rgba(102, 68, 68, 0.00);
+  --heo-shadow-glass: 0 5px 100px -5px rgb(140 140 140 / 55%);
+  --heo-shadow-glass-deep: 0 5px 100px -5px rgb(0 0 0 / 60%);
+  --heo-card-border: #e3e8f7;
+  --heo-shadow-border: 0 8px 16px -4px #2c2d300c;
+}
+[data-theme=light],[data-theme=dark] {
+  --style-border: 1px solid var(--heo-card-border);
+  --style-border-always: 1px solid var(--heo-card-border);
+  --style-border-hover: 1px solid var(--heo-lighttext);
+  --style-border-hover-always: 1px solid var(--heo-lighttext);
+  --style-border-dashed: 1px dashed var(--heo-theme-op);
+  --style-border-forever: 2px solid var(--heo-lighttext);
+}
+[data-theme=dark] {
+  --heo-theme: #ffc848;
+  --heo-theme-op: #f2b94b23;
+  --heo-theme-op-deep: #f2b94bdd;
+  --heo-theme-none: #f2b94b00;
+  --heo-blue: #0084FF;
+  --heo-red: #FF3842;
+  --heo-red-op: #ff38421a;
+  --heo-red-op-deep: #ff38426e;
+  --heo-pink: #d44040;
+  --heo-green: #3e9f50;
+  --heo-green-op: #3e9f501a;
+  --heo-green-op-deep: #3e9f506e;
+  --heo-purple: #7a60d2;
+  --heo-yellow: #ffc93e;
+  --heo-yellow-op: #ffc93e30;
+  --heo-orange: #ff953e;
+  --heo-fontcolor: #F7F7FA;
+  --heo-background: #17191d;
+  --heo-reverse: #fff;
+  --heo-maskbg: rgba(0, 0, 0, 0.6);
+  --heo-maskbgdeep: rgba(0, 0, 0, 0.85);
+  --heo-hovertext: #0A84FF;
+  --heo-ahoverbg: #fff;
+  --heo-lighttext: var(--heo-theme);
+  --heo-secondtext: #a1a2b8;
+  --heo-scrollbar: rgba(200, 200, 223, 0.4);
+  --heo-card-btn-bg: #30343f;
+  --heo-post-blockquote-bg: #000;
+  --heo-post-tabs-bg: #121212;
+  --heo-secondbg: #21232a;
+  --heo-shadow-nav: 0 5px 20px 0 rgba(28, 28, 28, 0.4);
+  --heo-card-bg: #1b1c20;
+  --heo-card-bg-op: var(--heo-black-op);
+  --heo-card-bg-op-deep: #00000045;
+  --heo-card-bg-none: #1d1b2600;
+  --heo-shadow-lightblack: 0 5px 12px -5px rgba(102, 68, 68, 0.0);
+  --heo-shadow-light2black: 0 5px 12px -5px rgba(102, 68, 68, 0.0);
+  --heo-shadow-glass: 0 5px 100px -5px rgba(0, 0, 0, 0.55);
+  --heo-shadow-glass-deep: 0 5px 100px -5px rgba(0, 0, 0, 0.90);
+  --heo-card-border: #3d3d3f;
+  --heo-shadow-border: 0 8px 16px -4px #00000050;
+}
+html, body {
+  background: transparent;
+  margin: 0;
+  height: 100%;
+}
+body {
+  position: relative;
+  min-height: 100%;
+  background: var(--heo-background);
+  color: var(--heo-fontcolor);
+  font-size: 16px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei";
+  line-height: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+* {
+  box-sizing: border-box;
+}
+/* #home_top_blur 是 banner 的「柔光占位」底板，规则在 heoblogmain.css 里：
+ *   position:absolute; top:0; height:320px; background: var(--heo-background)
+ * 原本 banner 贴着视口顶部，这块 320px 高的底板就藏在 banner 后面，z-index:0 没影响。
+ * 现在首页顶部通栏（幻灯片 + 新品框架）下移到了即刻条下面，
+ * 底板正好压住通栏上半截，把卡片封面盖成一片跟页面同色的白。
+ * 它本身就是页面同色底 + 20% 的模糊大图，沉到内容之下就看不见、也不会挡任何东西。
+ *
+ * 两个坑：
+ *   1) 不能照抄原来的选择器 .homePage #home_top_blur.home-top-blur：
+ *      CSS 压缩器做去重时保留的是前面那条，这里会整条被丢掉（改了等于没改）；
+ *      所以多带一级 .layout--home 把特异性抬上去，既是新规则又稳赢。
+ *   2) DOM 位置不能动 —— 下面那几条 :has(#home_top_blur) 还要靠它给分类条定位。
+ */
+.homePage .layout.layout--home #home_top_blur.home-top-blur {
+  z-index: -1;
+}
+.home_barAndPosts:has(#home_top_blur) {
+  animation: none;
+}
+.home_barAndPosts:has(#home_top_blur) #recent-posts,
+.home_barAndPosts:has(#home_top_blur) #recent-posts .recent-post-item {
+  animation: slide-in 0.6s 0.6s backwards;
+}
+.homePage #home_top_blur .home-top-blur-bg {
+  position: absolute;
+  inset: -32px;
+  background-color: var(--heo-main-op);
+  background-size: cover;
+  background-position: center 30%;
+  filter: blur(28px) saturate(1.25) brightness(1.05);
+  transform: scale(1.1);
+  opacity: 0.2;
+}
+@media (max-width: 768px) {
+  .homePage .layout#content-inner {
+    padding: 0 !important;
+  }
+  
+  
+  .homePage #home_top_blur.home-top-blur {
+    display: none !important;
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+#loading-box {
+  -webkit-user-select: none;
+}
+#loading-box .loading-bg{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  background: var(--heo-card-bg);
+  z-index: 1999;
+  opacity: 1;
+  pointer-events: all;
+}
+#loading-box.loaded .loading-bg{
+  display: none;
+}
+body:has(#loading-box:not(.loaded)) {
+  background: var(--heo-card-bg) !important;
+}
+#loading-box .loading-img{
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  animation-duration: 0.2s;
+  animation-name: loadingAction;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+@keyframes loadingAction {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.6;
+  }
+}

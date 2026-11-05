@@ -1,0 +1,217 @@
+/* ==========================================================================
+   文章列表样式（site_settings.post_list.style）
+   ---------------------------------------------------------------------------
+   card    卡片式：封面在上、标题在下，宽屏两列并排 —— 就是 post-card.css 的默认样子
+   banner  横幅长条：一条一行，左图右文，摘要常显
+
+   两种样式共用 post-card.ejs 一套结构，切换只靠 #recent-posts 上的 .list-banner。
+   本文件只写 banner 的覆盖，card 一律沿用 post-card.css，不要在这里重复定义。
+
+   为什么选择器这么长：post-card.css 与 heoblogmw1300 / 1200 / 768 里有大量
+   `#recent-posts>.recent-post-item .post_cover` 这类 1 id + N class 的规则，
+   还夹着 !important（移动端 width/height）。要压住它们只能同维度加层：
+   #recent-posts.list-banner（1 id + 1 class）> .recent-post-item。
+   ========================================================================== */
+
+#recent-posts.list-banner {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+#recent-posts.list-banner > .recent-post-item {
+  --banner-cover-w: 300px;
+
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  min-height: 176px;
+  height: auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* ---------- 左：封面 ----------
+   post_cover 交给 flex 拉伸到和右侧文字同高，内部 a 用绝对定位铺满，
+   这样不论封面原图多高都只裁不撑（img 的 height:100% 需要父级有确定高度）。 */
+#recent-posts.list-banner > .recent-post-item > .post_cover,
+#recent-posts.list-banner > .recent-post-item > .post_cover.left_radius,
+#recent-posts.list-banner > .recent-post-item > .post_cover.right_radius {
+  position: relative;
+  flex: 0 0 var(--banner-cover-w);
+  width: var(--banner-cover-w);
+  max-width: var(--banner-cover-w);
+  height: auto;
+  aspect-ratio: auto;
+  align-self: stretch;
+  order: 0;
+  border-radius: 0;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+#recent-posts.list-banner > .recent-post-item > .post_cover > a {
+  position: absolute;
+  inset: 0;
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#recent-posts.list-banner > .recent-post-item > .post_cover img.post_bg {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  transition: transform .45s cubic-bezier(.4, 0, .25, 1);
+}
+
+/* ---------- 右：文字 ---------- */
+#recent-posts.list-banner > .recent-post-item > .recent-post-info {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  padding: 20px 26px 16px;
+  gap: 10px;
+  justify-content: center;
+  order: 1;
+}
+
+#recent-posts.list-banner > .recent-post-item > .recent-post-info > .recent-post-info-top {
+  width: 100%;
+}
+
+/* 标题：默认样式是「绝对定位 + 上下 40px 内边距」，banner 里回到正常文档流 */
+#recent-posts.list-banner > .recent-post-item > .recent-post-info > .recent-post-info-top > .article-title,
+#recent-posts.list-banner > .recent-post-item > .recent-post-info > .article-title {
+  position: static;
+  top: auto;
+  left: auto;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  transition: color .2s ease;
+}
+
+#recent-posts.list-banner .recent-post-info-top-tips {
+  margin-bottom: 6px;
+}
+
+/* 摘要：banner 的「图文」就在这里，常显两行 */
+#recent-posts.list-banner > .recent-post-item > .recent-post-info > .article-content {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: .85rem;
+  line-height: 1.7;
+  color: var(--heo-secondtext);
+  word-break: break-word;
+}
+
+#recent-posts.list-banner > .recent-post-item > .recent-post-info > .article-meta-wrap {
+  width: auto;
+  margin-left: 0;
+  margin-top: 2px;
+  color: var(--heo-secondtext);
+}
+
+/* 宽屏也要保持单列（card 样式在 1300+ 会变成两列并排） */
+@media screen and (min-width: 1300px) {
+  #recent-posts.list-banner > .recent-post-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    max-width: 100%;
+    width: 100%;
+    min-height: 176px;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .post_cover,
+  #recent-posts.list-banner > .recent-post-item > .post_cover.left_radius,
+  #recent-posts.list-banner > .recent-post-item > .post_cover.right_radius {
+    flex: 0 0 var(--banner-cover-w);
+    width: var(--banner-cover-w);
+    height: auto;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .recent-post-info {
+    min-height: 0;
+    padding: 20px 26px 16px;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .recent-post-info > .recent-post-info-top > .article-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1200px) {
+  #recent-posts.list-banner > .recent-post-item {
+    --banner-cover-w: 250px;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .recent-post-info {
+    padding: 18px 22px 14px;
+  }
+}
+
+/* 窄屏（≤768）：回到竖排大图卡片，摘要压到两行。
+   post-card.css 的移动端规则用了 width/height !important，这里必须跟着加。 */
+@media screen and (max-width: 768px) {
+  #recent-posts.list-banner {
+    gap: .5rem;
+  }
+
+  #recent-posts.list-banner > .recent-post-item {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .post_cover,
+  #recent-posts.list-banner > .recent-post-item > .post_cover.left_radius,
+  #recent-posts.list-banner > .recent-post-item > .post_cover.right_radius {
+    position: relative;
+    flex: 0 0 auto;
+    width: 100% !important;
+    max-width: 100%;
+    height: 170px !important;
+    aspect-ratio: auto;
+    order: 1;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .recent-post-info {
+    width: 100%;
+    height: auto;
+    padding: 16px 20px 18px;
+    order: 2;
+  }
+
+  #recent-posts.list-banner > .recent-post-item > .recent-post-info > .article-content {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: .82rem;
+  }
+}
+
+/* ---------- hover ---------- */
+@media (hover: hover) {
+  #recent-posts.list-banner > .recent-post-item:hover img.post_bg {
+    transform: scale(1.04);
+  }
+
+  #recent-posts.list-banner > .recent-post-item:hover .article-title {
+    color: var(--heo-theme);
+  }
+}

@@ -1,0 +1,333 @@
+/* liublog 局部修正：目标站结构在 Hexo 侧的适配补丁
+   只做「结构差异导致的对不齐」，不改目标站原有的视觉规则 */
+
+/* 站点名：目标站导航左侧只显示图标，这里改成「文字站名 + hover 换成小房子」。
+   nav.css 的 #nav #site-name 固定 70px，且 :after 已备好 \e061 图标和 hover 显隐，
+   所以这里只补宽度、文字排版和 :after 的铺满定位，不重复定义图标。 */
+#nav #site-name{width:auto;padding:0 16px 0 4px;white-space:nowrap;position:relative}
+/* 字号：九宫格图标 20px、右侧工具图标 22px，站名原来 15px 明显偏小，
+   提到 18px 与图标同一视觉量级，同时不抢中间菜单（约 20px）的主次。
+   垂直对齐：原来 inline-block + line-height:35px 走基线对齐，行盒在 flex 容器里
+   比中心低约 1.7px，看起来就是"字比图标沉下去一点"。改成块级 + line-height:1，
+   交给 .nav-logo-text 的 flex 居中，位置只由字体本身决定。
+   居中后字高 18px、图标 20px，上沿差 1px 是必然的对称结果。
+   不再补 1px 下移做底边齐平 —— 那样底边虽然齐了，但中文字面重心本身偏下，
+   视觉上整块字会显得比图标"沉"，所以保持几何中心对齐（中心差 0）。 */
+#nav #site-name .nav-logo-text{display:flex;align-items:center;height:35px}
+#nav #site-name .site-name-text{display:block;font-size:18px;font-weight:700;letter-spacing:.5px;line-height:1;white-space:nowrap}
+/* 滚动后导航铺白底（nav-skin-itlaoli），而 #nav #site-name 声明的颜色是 --heo-white，
+   在文章页 / 归档页 / 分类页 / 标签页上滚动后就是白字白底，站名直接"消失"。
+   首页靠 body.homePage 的另一条规则侥幸正常，非首页全部命中，这里统一按滚动态给回深色。
+   暗色模式下 --heo-fontcolor 本身是浅色、导航底是深色，这条同样成立。 */
+#page-header.nav-fixed #nav #site-name,
+#page-header.nav-fixed #nav #site-name .site-name-text,
+#page-header.nav-fixed #nav #site-name i{color:var(--heo-fontcolor)}
+/* 九宫格图标（应用菜单）同上：nav.css 里 .app-menu-button 的颜色是 --heo-white，
+   靠 body.page 才切到 --heo-fontcolor。首页是 body.homePage.page、分类/标签页是 body.page
+   都正常；但 about（body.about）、归档（body.archive）这类页面 body 不带 page，
+   未滚动时就是白底白图标，按钮整个"消失"——看起来像只有首页才有。
+   这里对「非文章横幅顶」的导航统一给回正文色；文章页 banner 顶部仍保持白色，
+   滚动后由 .nav-fixed #nav .app-menu-button 接管。
+   加 :not(:hover) 是为了不压掉原有 hover 态（粉底白字）。 */
+#page-header:not(.post-bg) #nav .app-menu-button:not(:hover),
+#page-header:not(.post-bg) #nav .app-menu-button:not(:hover) i{color:var(--heo-fontcolor)}
+/* 回到顶部：未滚动时隐藏整个按钮（目标站滚动后才出现进度数字） */
+#nav-totop{display:none}
+#nav-totop.show{display:flex}
+#percent{opacity:1}
+
+/* 站内搜索弹层：主体样式见 search.css，这里只放运行时状态 */
+html.search-open{overflow:hidden}
+html.search-open body{overflow:hidden}
+#heosearch-hits-empty,
+.heosearch-suggest-empty{padding:1.4rem 4px;color:var(--heo-secondtext)}
+#heosearch .search-dialog #heosearch-hits-empty{font-size:.9rem;font-weight:400}
+#heosearch #heosearch-results{display:flex}
+body.hide-aside .home-layout-row{display:block}
+body.hide-aside .home_barAndPosts{width:100%}
+/* 站点 logo：只有 _config.yml 配了 site_logo 才显示图片，默认纯文字站名 */
+#site-name .site-logo-img{width:20px;height:20px;border-radius:6px;margin:0 8px 0 12px;display:inline-block;vertical-align:middle;object-fit:contain}
+/* 站名 hover：文字淡出 + 图标铺满，图标字形与显隐由 nav.css 的 :after 提供 */
+#site-name .site-logo-img,#site-name .site-name-text{transition:opacity .2s ease}
+#site-name:hover .site-logo-img,#site-name:hover .site-name-text{opacity:0}
+#nav #site-name:after{left:0;right:0;top:0;bottom:0}
+#nav #site-name:hover{background:var(--heo-main)}
+
+.post-bottom-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 0;padding:0 2px;color:var(--heo-secondtext);font-size:13px;line-height:1}
+.post-bottom-tools .post-tools-date{display:inline-flex;align-items:center;gap:6px}
+.post-bottom-tools .post-tools-date i{font-size:14px;line-height:1;opacity:.85}
+.post-bottom-tools .post-report{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;margin:-6px -10px -6px 0;border-radius:8px;color:var(--heo-main);font-size:13px;text-decoration:none;transition:background .2s,color .2s}
+.post-bottom-tools .post-report i{font-size:14px;line-height:1}
+.post-bottom-tools .post-report:hover{background:var(--heo-main);color:var(--heo-white);text-decoration:none}
+/* 手机端文章页：主色底上只浮一张白纸。
+   原来只有 #article-container 是白的，标签块 / 版权卡 / 工具条各占一段背景，
+   蓝底从缝里透出来，正文末尾被切成好几块。这里把 #post 整块变白，子块透明；
+   同时把工具条从竖排（heoblogmw768 里是 flex-direction:column）改回一行。 */
+@media screen and (max-width:767px){
+  .post #post{background:var(--heo-card-bg);border-radius:12px;padding:1rem 20px;margin:0 8px}
+  .post #post #article-container,.post #post .post-bottom-tools{background:transparent}
+  .post .post-tags-block{margin-top:1rem}
+  .post-bottom-tools{flex-direction:row;align-items:center;justify-content:space-between;margin:14px 0 2px;padding:0}
+}
+#heo-toast{position:fixed;left:50%;bottom:60px;transform:translate(-50%,10px);background:rgba(0,0,0,.78);color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:3000}
+#heo-toast.show{opacity:1;transform:translate(-50%,0)}
+/* 文章页头部：确保 post-bg 有固定高度，标题信息压在封面底部 */
+#page-header.post-bg{height:24rem;min-height:24rem;display:block;position:relative}
+#page-header.post-bg #post-info{position:absolute;left:0;right:0;bottom:2.6rem;z-index:12;display:flex;flex-direction:column;max-width:1400px;margin:0 auto;padding:0 2rem;color:var(--heo-white)}
+#page-header.post-bg #post-info .post-title{color:var(--heo-white);text-shadow:0 2px 12px rgba(0,0,0,.35)}
+#page-header.post-bg #post-info .meta-firstline,#page-header.post-bg #post-info .meta-secondline{color:rgba(255,255,255,.92)}
+#page-header.post-bg #post-info .meta-firstline a{color:#fff;background:rgba(255,255,255,.18)}
+#page-header.post-bg .coverdiv{position:absolute;inset:0;width:100%;height:100%;margin:0;transform:none;filter:none;overflow:hidden}
+#page-header.post-bg .coverdiv img{width:100%;height:100%;object-fit:cover;display:block}
+#page-header.post-bg .coverdiv:after{box-shadow:none;background:none}
+/* 非首页（分类/标签/归档/独立页）的导航：白底 + 深色文字，否则白字白底看不见。
+   :not(.post-bg) 不可省 —— 文章页头同样是 .not-top-img，这条 1,2,1 的 60px
+   会盖掉 #page-header.post-bg 的高度，把移动端页头压成一条 136px 的缝。 */
+body:not(.homePage) #page-header.not-top-img:not(.post-bg){background:var(--heo-card-bg);height:60px;box-shadow:0 1px 0 var(--heo-gray-op)}
+/* 文内链接用：文章页头是主色底，导航保持 nav.css 的白字，所以这里同样排除 .post-bg。
+   选择器已是 2,3,2，普通声明就够，不必 !important。 */
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) #nav a,
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) #site-name,
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) #site-name .site-name-text,
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) .nav-button i,
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) .nav-button a{color:var(--heo-fontcolor)}
+body:not(.homePage) #page-header.not-top-img:not(.post-bg):not(.nav-fixed) #page-name-text{color:var(--heo-fontcolor)}
+/* 关于页 */
+.about-page{display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.about-hero .about-hero-inner{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.about-avatar img{width:104px;height:104px;border-radius:50%;object-fit:cover;border:4px solid var(--heo-main-op-light)}
+.about-hero-text{flex:1;min-width:0}
+.about-name{margin:0 0 6px;font-size:22px}
+.about-subtitle{color:var(--heo-main);font-weight:700;margin-bottom:8px}
+.about-desc{color:var(--heo-secondtext);line-height:1.8;font-size:14px}
+.about-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.about-tag{font-size:12px;padding:3px 10px;border-radius:20px;background:var(--heo-main-op-light);color:var(--heo-main)}
+.about-paragraphs p{margin:0 0 12px;line-height:1.9;color:var(--heo-fontcolor)}
+.about-sign{color:var(--heo-secondtext);font-style:italic;border-left:3px solid var(--heo-main-op);padding-left:10px;margin-top:10px}
+.about-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.about-stat{text-align:center;padding:16px 8px;border-radius:12px;background:var(--heo-background)}
+.about-stat i{font-size:20px;color:var(--heo-main)}
+.about-stat-value{font-size:22px;font-weight:700;margin:6px 0 2px}
+.about-stat-unit{font-size:12px;color:var(--heo-secondtext);margin-left:2px}
+.about-stat-label{font-size:12px;color:var(--heo-secondtext)}
+.about-milestones{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.about-milestone{padding:4px 14px;border-radius:20px;background:var(--heo-background);color:var(--heo-secondtext);font-size:13px}
+.about-milestone.is-done{background:var(--heo-main-op-light);color:var(--heo-main);font-weight:700}
+.about-milestone.is-ellipsis{background:transparent}
+.about-timeline{position:relative;padding-left:18px;margin-top:6px}
+.about-timeline:before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--heo-main-op)}
+.about-timeline-item{position:relative;padding:0 0 14px 8px}
+.about-timeline-dot{position:absolute;left:-17px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--heo-main)}
+.about-timeline-date{font-size:12px;color:var(--heo-main);font-weight:700}
+.about-timeline-text{font-size:14px;color:var(--heo-fontcolor);line-height:1.7}
+.about-contact{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.about-contact-item{display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;background:var(--heo-background);transition:var(--t)}
+.about-contact-item:hover{background:var(--heo-main-op-light)}
+.about-contact-item i{font-size:18px;color:var(--heo-main)}
+.about-contact-name{font-weight:700;font-size:14px}
+.about-contact-desc{font-size:12px;color:var(--heo-secondtext);word-break:break-all}
+@media(max-width:768px){.about-stats{grid-template-columns:repeat(2,1fr)}}
+
+/* 站点运行状态：小人 + 运行时长 */
+#workboard{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--heo-secondtext)}
+#workboard img.boardsign{width:100%;max-width:130px;border-radius:0;display:block}
+#runtimeTextTip{font-size:12px;color:var(--heo-secondtext);text-align:center}
+#runtime{color:var(--heo-main);font-weight:700}
+/* shields 徽标行 */
+#ghbdages{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:0 1rem}
+#ghbdages .github-badge{display:inline-flex}
+#ghbdages .github-badge img{height:20px;max-width:170px;border-radius:4px;display:block;pointer-events:none}
+
+@keyframes heo-blink{0%,100%{opacity:1}50%{opacity:0}}
+/* ================= 文章页头（heo 风格：纯色底 + 右侧封面缩略图 + 胶囊 meta） ================= */
+/* 头部背景：优先使用 JS 从封面提取的的主题色 */
+#page-header.post-bg::before{background-color:var(--heo-cover-bg,var(--heo-main));
+  background-image:linear-gradient(180deg,rgba(255,255,255,.06) 0%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)}
+/* 全幅封面图仅作为底图隐藏（供取色），不再直接铺满 */
+#page-header.post-bg .coverdiv{position:absolute;left:-9999px;top:0;width:10px;height:10px;opacity:0;pointer-events:none}
+/* 右侧封面缩略图（桌面端） */
+#page-header.post-bg .post-cover-aside{display:none}
+@media screen and (min-width:1200px){
+  #page-header.post-bg .post-cover-aside{display:block;position:absolute;
+    right:max(calc((100vw - 1400px)/2 + 30px),30px);top:50%;
+    width:300px;aspect-ratio:16/9;transform:translateY(-50%);
+    border-radius:15px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.25);
+    transition:transform .3s ease,box-shadow .3s ease;z-index:11}
+  #page-header.post-bg .post-cover-aside:hover{transform:translateY(-50%) scale(1.03);box-shadow:0 12px 32px rgba(0,0,0,.3)}
+  #page-header.post-bg .post-cover-aside-link{display:block;width:100%;height:100%;line-height:0}
+  #page-header.post-bg .post-cover-aside-img{width:100%;height:100%;object-fit:cover;display:block}
+}
+/* 第一行：原创 / 分类 胶囊 */
+#page-header.post-bg #post-info .meta-firstline{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#page-header.post-bg #post-info .post-meta-original,
+#page-header.post-bg #post-info a.post-meta-categories,
+#page-header.post-bg #post-info span.post-meta-categories{display:inline-flex;align-items:center;
+  padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;
+  font-size:.85rem;line-height:1.2;cursor:pointer;text-decoration:none;transition:var(--t)}
+#page-header.post-bg #post-info .post-meta-original:hover,
+#page-header.post-bg #post-info a.post-meta-categories:hover{background:var(--heo-white);color:var(--heo-main)}
+/* 第二行：meta 胶囊 */
+#page-header.post-bg #post-info .meta-secondline{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#page-header.post-bg #post-info .meta-secondline>span{display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;
+  font-size:.85rem;line-height:1.2;cursor:default;transition:var(--t)}
+#page-header.post-bg #post-info .meta-secondline>span i{font-size:1em;line-height:1}
+#page-header.post-bg #post-info .meta-secondline>span:hover{background:var(--heo-white);color:var(--heo-main)}
+/* 标题字号 */
+#page-header.post-bg #post-info .post-title{font-size:2.4rem;line-height:1.3;font-weight:700;margin-top:4px;margin-bottom:8px}
+@media screen and (max-width:768px){
+  #page-header.post-bg #post-info .post-title{font-size:1.6rem}
+}
+/* 头部信息定位微调（高度统一由上面的 24rem 决定，这里不再重复声明 height） */
+#page-header.post-bg #post-info{bottom:3rem}
+/* 首页/列表页：关闭文章区 translateY(20px) 入场动画
+   slide-in 的 from 是 translateY(20px)+opacity:0，配合 backwards 延迟，
+   加载时整块会先下沉再滑上来，视觉上像“内容自己跳一下”。
+   源头分散在三处：.home_barAndPosts、:has(#home_top_blur) #recent-posts、
+   分类/标签页的 #recent-posts .recent-post-item。下面按同等特异性逐个覆盖，
+   靠后加载取胜，不用 !important。 */
+.home_barAndPosts{animation:none}
+.home_barAndPosts #recent-posts,
+.home_barAndPosts:has(#home_top_blur) #recent-posts,
+.home_barAndPosts:has(#home_top_blur) #recent-posts .recent-post-item{animation:none}
+#category #recent-posts .recent-post-item,
+#tag #recent-posts .recent-post-item{animation:none}
+
+/* 非文章页页头恒 60px（JS 已让 .not-top-img 常驻，这里兜底脚本未执行的情况）。
+   源头 @media(min-width:1300px){#page-header,#page-header.post-bg{height:25rem}} 只写了 #page-header，
+   本选择器 #page-header:not(.post-bg)（1,1,0）比它（1,0,0）高，不用 !important。
+   文章页的 24rem 由上面 #page-header.post-bg 统一给出，宽屏断点不再另写。 */
+#page-header:not(.post-bg){height:60px}
+
+/* 首页整块底色也随主色染一层（顶部晕开、向下淡出），换图时同步渐变 */
+body.homePage #web_bg{
+  background-image:radial-gradient(1100px 560px at 50% -100px,
+    rgba(var(--banner-tint,66,90,239),.30),
+    rgba(var(--banner-tint,66,90,239),0) 72%);
+}
+
+html.no-banner-tint body.homePage #web_bg{background-image:none}
+
+/* 九宫格菜单项：字体图标版（icon_image 图片版沿用 nav.css 的 img 规则）
+   nav.css 里没有针对 .app-menu-item-icon 的颜色/字体声明，这里普通声明即可，
+   选择器本身 2,3,2 已经足够高。 */
+body #page-header #nav .app-menu-list .app-menu-item .app-menu-item-icon:not(img){
+  flex:0 0 24px;width:24px;height:24px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;line-height:1;color:var(--heo-main);
+  transition:var(--t);
+}
+body #page-header #nav .app-menu-list .app-menu-item:hover .app-menu-item-icon:not(img){color:var(--heo-card-bg)}
+/* 菜单里的「首页」图标：主题字体里的 Home 字形（\e061）没有对应类名，这里补一个 */
+#nav .app-menu-list .app-menu-item .app-menu-item-icon.icon-home:before{
+  content:"\e061";
+  font-family:heoblogIcon;
+  font-weight:400;
+}
+/* ===== 应用菜单（九宫格）一级标题：图标 + 名称 =====
+   一级是分组，可以配 url：配了渲染成 <a class="... is-link">，不配是纯标题 */
+#nav .app-menu-button .app-menu-list-group .app-menu-list-title{
+  display:flex;align-items:center;gap:6px;
+}
+/* 权重需高于 nav.css 的 #page-header.not-top-img #nav .app-menu-button i（两个 id），
+   否则字号会被顶成 20px；图标盒固定 20px，换字号时文字位置不会跳 */
+#page-header #nav .app-menu-button .app-menu-list-group .app-menu-list-title .app-menu-list-title-icon{
+  font-size:16px;line-height:1;width:20px;height:20px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:var(--heo-secondtext);transition:var(--t);
+}
+#nav .app-menu-button .app-menu-list-group .app-menu-list-title.is-link{
+  color:var(--heo-secondtext);transition:var(--t);
+}
+#nav .app-menu-button .app-menu-list-group .app-menu-list-title.is-link:hover,
+#page-header #nav .app-menu-button .app-menu-list-group .app-menu-list-title.is-link:hover .app-menu-list-title-icon{
+  color:var(--heo-main);
+}
+
+/* ===== 移动端文章页头部 =====
+   源头 heoblogmw768 这段本来有两套规则互相打架，且都带着 !important：
+   ① `#page-header.post-bg{height:30rem!important}` 与同断点里的 `height:18rem` 重复声明；
+   ② `.meta-secondline{justify-content:center!important}`、`.post-title{margin:.2rem auto!important}`
+      两处 !important，让后面的修正只能靠更重的 !important 才能盖住。
+   已从源头处理：30rem 那条整条删掉（保留 18rem），两个 !important 降为普通声明。
+   于是这里按正常层叠写就行 —— 选择器 #page-header.post-bg #post-info（1,2,0）
+   本来就高于源头的 #page-header #post-info（1,1,1），同特异性处后加载即生效。 */
+@media screen and (max-width:767px){
+  #page-header.post-bg{
+    height:auto;min-height:0;margin-bottom:0;
+    padding:5.2rem 0 1.6rem;
+  }
+  #page-header.post-bg #post-info{
+    position:static;bottom:auto;top:auto;
+    width:100%;max-width:none;margin:0;
+    padding:0 1.2rem;gap:10px;height:auto;
+  }
+  /* 标题不再截断：长标题换行显示完整（源头固定两行高 + line-clamp:3） */
+  #page-header.post-bg #post-info .post-title{
+    display:block;height:auto;min-height:0;
+    -webkit-line-clamp:unset;line-clamp:unset;
+    overflow:visible;font-size:1.45rem;line-height:1.45;
+    text-align:left;margin:2px 0 6px;word-break:break-word;
+  }
+  #page-header.post-bg #post-info .meta-firstline,
+  #page-header.post-bg #post-info .meta-secondline{
+    justify-content:flex-start;gap:8px;
+  }
+  #page-header.post-bg #post-info .post-meta-original,
+  #page-header.post-bg #post-info a.post-meta-categories,
+  #page-header.post-bg #post-info .meta-secondline>span{
+    font-size:.72rem;padding:4px 10px;
+  }
+  /* 原版在页头下方铺的 15rem 高阴影带，高度收掉后会糊到正文上 */
+  #page-header.post-bg:before{display:none}
+}
+
+/* ===== 移动端正文 =====
+   1) 两侧留白：根因在 heoblogmain / heoblogmw768 那两条
+      `.layout>div:first-child:not(...):not(#bbTimeList){padding:1rem 2rem|0}` ——
+      :not() 里的 #bbTimeList 也计入 ID 特异性，选择器被抬到 1,5,1 / 1,6,1，
+      压过了同文件的 #post{padding:0 20px}(1,0,0)，文章卡内边距便一直是 0 或 40px。
+      已把那两处改成 :not(:where(#bbTimeList))，ID 不再贡献特异性（0,5,1 / 0,6,1），
+      #post 自己的 20px 在移动端正常生效，这里不用再补内边距、也不用 !important。
+   2) 代码块的整体外观和横向滚动已经搬到 highlight.css / code.js
+      （figure.highlight 那两条老规则删掉，否则会和新样式打架）。
+      这里只留 markdown 表格的横向滚动。 */
+
+/* 正文里的 markdown 表格：列宽按内容走，超出时表格自身横向滚动 */
+@media screen and (max-width:991px){
+  #article-container table:not(.highlight table){
+    display:block;max-width:100%;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;white-space:nowrap;
+  }
+  #article-container table:not(.highlight table) td,
+  #article-container table:not(.highlight table) th{white-space:nowrap}
+}
+
+/* ===== 404 页 =====
+   原主题的 left 栏靠 .error-img 的 background-image 出图，
+   模板里换成了图标 <i> 就只剩一块纯蓝底，这里把插图接回来 */
+#error-wrap .error-content .error-img{
+  background-size:cover;background-position:center;background-repeat:no-repeat;
+}
+@media screen and (max-width:767px){
+  #error-wrap .error-content{flex-direction:column;height:auto;padding-bottom:1.2rem}
+  /* 源头是 flex:1 1 0%，basis 为 0 会把插图压没，这里给固定 basis */
+  #error-wrap .error-content .error-img{width:100%;height:11rem;flex:0 0 11rem;border-radius:8px 8px 0 0}
+  #error-wrap .error-content .error-info{padding:1rem .8rem}
+  #error-wrap .error-content .error-info .error_title{font-size:5em}
+}
+
+/* 即刻条的字标/箭头颜色不用在这里补：#bbTimeList 已声明
+   color:var(--heo-fontcolor)，.bber-logo 与 a.bber-gotobb 都是 inherit。 */
+
+/* 语义标题：给首页 / 归档 / 分类 / 标签 / 分页页补 h1，只给读屏器和
+   搜索引擎看，不占布局、不影响视觉（clip 而不是 display:none，才不会被忽略） */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

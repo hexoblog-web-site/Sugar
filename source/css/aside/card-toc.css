@@ -1,0 +1,39 @@
+/* card-toc.css
+ *
+ * 侧栏「目录」卡（card-toc.ejs）。
+ *
+ * 由 source/css/aside.css 拆分而来；改侧栏请只改本目录下的对应卡片文件，theme 的 bundle 会自动拼接。
+ */
+@media screen and (min-width:900px){
+#aside-content #card-toc{right:0!important;display:flex;gap:8px;flex-direction:column}
+}
+@media screen and (max-width:899px){
+#aside-content #card-toc{position:fixed;right:-100%;bottom:30px;z-index:100;max-height:calc(100% - 60px);width:300px;opacity:0;transform-origin:right bottom}
+}
+#aside-content #card-toc .toc-content{overflow-y:auto;max-height:calc(100dvh - 300px)}
+@media screen and (max-width:899px){
+#aside-content #card-toc .toc-content{max-height:calc(100dvh - 140px)}
+}
+#aside-content #card-toc .toc-content .toc-child{display:none}
+@media screen and (max-width:899px){
+#aside-content #card-toc .toc-content .toc-child{display:block!important}
+}
+#aside-content #card-toc .toc-content .toc-item.active .toc-child{display:block}
+#aside-content #card-toc .toc-content li,#aside-content #card-toc .toc-content ol{list-style:none}
+#aside-content #card-toc .toc-content>ol{padding:0!important}
+#aside-content #card-toc .toc-content ol{margin:0;padding-left:.4rem}
+#aside-content #card-toc .toc-content::before{position:absolute;top:.6rem;right:1.2rem;color:#a9a9a9;content:attr(progress-percentage);font-style:italic;font-size:1.2rem}
+#aside-content #card-toc .toc-content .toc-link.active{line-height:24px;border-radius:12px;border-left-color:var(--heo-hovertext);background-color:var(--heo-card-bg);color:var(--heo-lighttext);font-weight:700;font-size:20px}
+#aside-content #card-toc .toc-content .toc-item.active .toc-link{opacity:1;border-radius:8px}
+#aside-content #card-toc .toc-content .toc-link{transition:var(--t-fast);line-height:24px;padding:8px;border-radius:12px;color:var(--heo-secondtext);min-height:40px;display:flex;align-items:center;cursor:pointer}
+#aside-content #card-toc .toc-content .toc-link:not(.active) span{opacity:.6;cursor:pointer;filter:blur(1px);transition:var(--t);width:100%}
+#card-toc{padding:.5rem!important}
+#aside-content #card-toc .toc-content:before{display:none}
+.toc-content::-webkit-scrollbar{width:8px;height:8px}
+.toc-content::-webkit-scrollbar-thumb{background:var(--heo-secondbg);opacity:.5;border-radius:8px;cursor:pointer;border:2px solid var(--heo-card-bg)}
+.toc-content::-webkit-scrollbar-track{background-color:var(--heo-card-bg)}
+@media (hover:hover){
+#aside-content #card-toc:hover .toc-content .toc-link:not(.active) span{filter:blur(0);opacity:1}
+#aside-content #card-toc .toc-content .toc-link:not(.active) span:hover{color:var(--heo-lighttext)}
+#aside-content #card-toc .toc-content .toc-link:hover{background:var(--heo-main-op-light)}
+}

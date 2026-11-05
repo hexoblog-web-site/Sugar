@@ -1,0 +1,27 @@
+/* card-archives.css
+ *
+ * 侧栏「归档 / 分类」卡（card-archives.ejs / card-categories）。
+ *
+ * 由 source/css/aside.css 拆分而来；改侧栏请只改本目录下的对应卡片文件，theme 的 bundle 会自动拼接。
+ */
+#aside-content .card-archives ul.card-archive-list,#aside-content .card-categories ul.card-category-list{margin:0;padding:0;list-style:none}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a,#aside-content .card-categories ul.card-category-list>.card-category-list-item a{padding:.15rem .5rem;width:100%;color:var(--heo-fontcolor);transition:var(--t-400)}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a span,#aside-content .card-categories ul.card-category-list>.card-category-list-item a span{display:inline-block;vertical-align:bottom}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a span:last-child,#aside-content .card-categories ul.card-category-list>.card-category-list-item a span:last-child{text-align:right}
+#aside-content .card-categories .card-category-list.child{padding:0 0 0 .8rem}
+#aside-content .card-categories .card-category-list>.parent>a .card-category-list-name{width:70%!important}
+#aside-content .card-categories .card-category-list>.parent>a .card-category-list-count{width:calc(30% - 20px);text-align:right}
+#aside-content .card-categories .card-category-list>.parent i{float:right;margin-right:-.35rem;padding:.35rem;transition:transform .3s ease 0s;transform:rotate(0)}
+#aside-content .card-categories .card-category-list>.parent i.expand{transform:rotate(-90deg)}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a,#aside-content .card-categories ul.card-category-list>.card-category-list-item a{border-radius:8px;margin:4px 0;display:flex;flex-direction:column;align-content:space-between;border:var(--style-border)}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a span:first-child,#aside-content .card-categories ul.card-category-list>.card-category-list-item a span:first-child{width:auto}
+#aside-content .card-archives ul.card-archive-list,#aside-content .card-categories ul.card-category-list{display:flex;flex-direction:row;justify-content:space-between;flex-wrap:wrap}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a span:last-child,#aside-content .card-categories ul.card-category-list>.card-category-list-item a span:last-child{width:fit-content;margin-left:4px}
+#aside-content>div.sticky_layout>div.card-widget.card-archives>div>ul>li.card-archive-list-item.more.is-center{margin-top:8px;background:var(--heo-card-btn-bg);border-radius:8px;transition:var(--t)}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item.more span,#aside-content .card-categories ul.card-category-list>.card-category-list-item.more span{transition:var(--t)}
+@media (hover:hover){
+#aside-content>div.sticky_layout>div.card-widget.card-archives>div>ul>li.card-archive-list-item.more.is-center :hover{color:var(--heo-white);background:var(--heo-blue);border-radius:8px;transition:var(--t)}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item:hover.more span,#aside-content .card-categories ul.card-category-list>.card-category-list-item.more span{transition:var(--t)}
+#aside-content>div.sticky_layout>div.card-widget.card-archives>div>ul>li.card-archive-list-item.more.is-center :hover span{background:0 0}
+#aside-content .card-archives ul.card-archive-list>.card-archive-list-item a:hover,#aside-content .card-categories ul.card-category-list>.card-category-list-item a:hover{color:var(--heo-white);background-color:var(--heo-theme);box-shadow:var(--heo-shadow-theme);border-radius:8px;padding:.15rem .5rem;border:var(--style-border-hover)}
+}

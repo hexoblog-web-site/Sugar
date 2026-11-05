@@ -1,0 +1,49 @@
+<%
+  /* 对齐目标站 nav#pagination 结构：
+     span.current / a.page-number / span.space / a.extend.next / .toPageGroup */
+  if (page.total > 1) {
+    var cur = page.current || 1;
+    var total = page.total;
+    var base = (page.base || '/') .replace(/\/$/, '');
+    function pUrl(n) { return url_for(n === 1 ? base + '/' : base + '/page/' + n + '/'); }
+    var show = [];
+    var i;
+    for (i = 1; i <= total; i++) {
+      if (i === 1 || i === total || Math.abs(i - cur) <= 1) show.push(i);
+      else if (show[show.length - 1] !== '...') show.push('...');
+    }
+%>
+<nav id="pagination">
+  <div class="pagination">
+    <%# 上一页：不在第 1 页才出现（第 1 页没有上一页）。
+        结构与「下页」左右对称，文案走 CSS 的 .pagination_tips_prev（悬停滑块动画） %>
+    <% if (cur > 1) { %>
+    <a class="extend prev" rel="prev" href="<%- pUrl(cur - 1) %>">
+      <i class="heoblogIcon icon-arrow-left-s-line"></i>
+      <div class="pagination_tips_prev">上页</div>
+    </a>
+    <% } %>
+    <% show.forEach(function (n) { %>
+      <% if (n === '...') { %>
+        <span class="space">&hellip;</span>
+      <% } else if (n === cur) { %>
+        <span class="page-number current"><%= n %></span>
+      <% } else { %>
+        <a class="page-number" href="<%- pUrl(n) %>"><%= n %></a>
+      <% } %>
+    <% }); %>
+    <% if (cur < total) { %>
+    <a class="extend next" rel="next" href="<%- pUrl(cur + 1) %>">
+      <div class="pagination_tips_next">下页</div>
+      <i class="heoblogIcon icon-arrow-right-s-line"></i>
+    </a>
+    <% } %>
+    <div class="toPageGroup" heotip="跳转到指定页面">
+      <input id="toPageText" oninput="value=value.replace(/[^0-9]/g,'')" maxlength="3" title="跳转到指定页面" onkeyup="if (this.value === '0') this.value = ''">
+      <a id="toPageButton" onclick="heo.toPage('<%- base %>')">
+        <i class="heoblogIcon icon-youxiangshuangjiantou"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+<% } %>

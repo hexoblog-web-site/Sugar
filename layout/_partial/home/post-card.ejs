@@ -1,0 +1,63 @@
+<%
+  var post = locals.post, index = locals.index || 0;
+  /* 列表样式：card 卡片式 / banner 横幅长条（_config.yml → site_settings.post_list.style） */
+  var pl = lb_post_list();
+  var noLazy = lb_site('lazyload', true) === false;
+  var cover = post.cover || post.top_img || post.thumbnail || theme.post.default_cover || '';
+  var side = (index % 2 === 0) ? 'left_radius' : 'right_radius';
+  /* banner 是「一条一行」的左图右文，不交替 */
+  if (!pl.alternate_cover || pl.banner) side = 'left_radius';
+  var cat = '';
+  if (post.categories && post.categories.length) {
+    cat = post.categories.toArray()[0].name;
+  }
+  var isNewest = (index === 0 && (page.current || 1) === 1);
+  var link = url_for(post.path);
+  /* 日期显示：7 天内显示「x天前」，与目标站一致；更早显示 MM/DD */
+  var daysAgo = Math.floor((Date.now() - new Date(post.date).getTime()) / 86400000);
+  var dateText = daysAgo < 1 ? '今天' : (daysAgo < 7 ? daysAgo + '天前' : date(post.date, 'MM/DD'));
+  /* banner 样式下摘要常显：取文章描述 / 摘要 / 正文开头，去标签后截断 */
+  var excerpt = '';
+  if (pl.banner) {
+    var raw = post.description || post.excerpt || post.content || '';
+    var plainText = strip_html(String(raw)).replace(/\s+/g, ' ').trim();
+    excerpt = plainText.length > pl.excerpt_length
+      ? plainText.slice(0, pl.excerpt_length) + '…'
+      : plainText;
+  }
+%>
+<div class="recent-post-item<%= isNewest ? ' lastestpost-item' : '' %>" onclick="heo.handlePostClick('<%= link %>', event)">
+  <% if (cover) { %>
+  <div class="post_cover <%= side %>">
+    <a href="<%= link %>" title="<%= post.title %>">
+      <img class="post_bg" src="<%- url_for(cover) %>" alt="<%= post.title %>" loading="<%= noLazy ? 'eager' : 'lazy' %>" decoding="async">
+    </a>
+  </div>
+  <% } %>
+  <div class="recent-post-info<%= cover ? '' : ' no-cover' %>">
+    <div class="recent-post-info-top">
+      <div class="recent-post-info-top-tips">
+        <% if (cat) { %><span class="original"><%= cat %></span><% } %>
+        <% if (isNewest) { %><span class="lastestpost">最新</span><% } %>
+        <span class="unReadPost" data-path="<%= link %>">未读</span>
+      </div>
+      <%# 对标目标站：卡片标题是 h2 级语义。这里保留 <a> 是为了不动
+          post-card.css 里几十条 `> .article-title` 直接子选择器，
+          用 ARIA 补上标题层级，视觉与点击区域完全不变。 %>
+      <a class="article-title" href="<%= link %>" title="<%= post.title %>" role="heading" aria-level="2"><%= post.title %></a>
+    </div>
+    <% if (pl.banner && excerpt) { %>
+    <div class="article-content"><%= excerpt %></div>
+    <% } %>
+    <div class="article-meta-wrap">
+      <div class="article-meta comment-avatars">
+        <div class="comment-avatar" title="<%= config.author || '作者' %>">
+          <img src="<%- url_for(lb_author().avatar || '/images/avatar.jpg') %>" alt="<%= config.author || '作者' %>" loading="<%= noLazy ? 'eager' : 'lazy' %>">
+        </div>
+      </div>
+      <span class="post-meta-date">
+        <time datetime="<%= date_xml(post.date) %>" title="创建 <%= date(post.date, 'YYYY-MM-DD HH:mm:ss') %>"><%= dateText %></time>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,656 @@
+/* footer.css
+ *
+ * 首页「footer」板块的样式。
+ *
+ * 拆分自下列文件（拆分脚本已归档到 hexo/_tools/archive/，本文件从现在起手改）：
+ *   source/css/heoblogmain.css          75 条
+ *   source/css/home.css                 11 条
+ *   source/css/heoblogmw768.css         11 条
+ *   source/css/liublog-fix.css          19 条
+ *
+ * 改这个板块的样式请只改本文件；对应模板 layout/_partial/footer.ejs。
+ */
+
+/* ===== 来自 source/css/heoblogmain.css ===== */
+#footer-wrap {
+  position: relative;
+}
+#footer-wrap a {
+  padding: 4px 12px;
+  border-radius: 5px;
+}
+#footer-wrap,
+#footer-wrap a {
+  color: var(--heo-fontcolor);
+}
+#footer-wrap a {
+  height: 44px;
+  line-height: 36px;
+}
+div#footer_deal {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+.footer_mini_logo {
+  width: 50px;
+  height: 50px;
+  margin: 0 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: cubic-bezier(0,0,0,1.29) .5s;
+  user-select: none;
+  border-radius: 50px;
+  overflow: hidden;
+}
+#footer_mini_logo .lottie-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 400px;
+  height: 400px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+#footer_mini_logo .lottie-stage {
+  width: 200px;
+  height: 200px;
+  transform: scale(.25);
+}
+#footer_mini_logo .lottie-stage img {
+  position: absolute;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: none;
+}
+#footer_mini_logo .fm-bg {
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 200px;
+}
+#footer_mini_logo .fm-rig {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200px;
+  height: 200px;
+  transform-origin: 100px 160px;
+  animation: css-fm-body 4s ease-in-out infinite;
+}
+#footer_mini_logo .fm-body {
+  left: -1px;
+  top: 60px;
+  width: 202px;
+  height: 200px;
+}
+#footer_mini_logo .fm-eyeball {
+  left: 65px;
+  top: 128px;
+  width: 62px;
+  height: 62px;
+  animation: css-fm-eyeball 4s ease-in-out infinite;
+}
+#footer_mini_logo .fm-pupil {
+  left: 79px;
+  top: 154.6px;
+  width: 32px;
+  height: 32px;
+  animation: css-fm-pupil 4s ease-in-out infinite;
+}
+#footer_mini_logo .fm-ear-l {
+  left: 119.6px;
+  top: 115.4px;
+  width: 24px;
+  height: 26px;
+  animation: css-fm-ear-l 4s ease-in-out infinite;
+}
+#footer_mini_logo .fm-ear-r {
+  left: 58.2px;
+  top: 116.4px;
+  width: 24px;
+  height: 28px;
+  animation: css-fm-ear-r 4s ease-in-out infinite;
+}
+#footer_mini_logo .fm-ahoge {
+  left: 74px;
+  top: 65.4px;
+  width: 58px;
+  height: 67px;
+  transform-origin: 29px 68px;
+  animation: css-fm-ahoge 4s ease-in-out infinite;
+}
+@media (max-width:768px) {
+  #footer_mini_logo .lottie-stage * {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  #footer_mini_logo .lottie-stage * {
+    animation: none!important;
+  }
+}
+
+.heoblog_footerlogo_img {
+  filter: drop-shadow(0 12px 12px #ee7d7936);
+}
+#footer {
+  position: relative;
+  background: linear-gradient(180deg,var(--heo-card-bg-none) 0,var(--heo-card-bg) 25%);
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  width: 100%;
+}
+.footer-bar-right {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+#footer-wrap,
+.footer-bar-right {
+  display: flex;
+  flex-wrap: wrap;
+}
+#footer-wrap {
+  justify-content: space-around;
+  padding: 20px 50px 0;
+  text-align: left!important;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+#footer-wrap h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+#footer-wrap h3 {
+  padding: 0 12px;
+}
+#footer-wrap p {
+  margin: 0 0 0 .2rem;
+  font-size: .8rem;
+  opacity: .8;
+}
+#footer-wrap i {
+  margin-right: .5rem;
+  width: 22px;
+  font-size: 18px;
+  display: inline-block;
+}
+#footer-wrap #letlogo {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  margin: auto 0;
+  max-width: 200px;
+}
+#footer-wrap #letlink .link_group {
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px;
+  min-width: 180px;
+}
+#footer-wrap #letlink {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin: 0 0 1rem;
+}
+#footer:before {
+  position: absolute!important;
+  width: 100%!important;
+  height: 100%!important;
+  content: ''!important;
+  z-index: -1;
+}
+div#heo-footer-bar {
+  display: none;
+}
+.post div#heo-footer-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+}
+div#heo-footer-bar a.footer-bar-link {
+  padding: 4px 16px;
+  background: var(--heo-secondbg);
+  border-radius: 20px;
+  margin-top: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: var(--style-border-always);
+}
+.footer-bar-link .author-avatar {
+  width: 20px;
+  border-radius: 20px;
+  min-height: 20px;
+  min-width: 20px;
+}
+div#heo-footer-bar .footer-logo {
+  font-size: 24px;
+}
+div#heo-footer-bar .footer-bar-description {
+  color: var(--heo-secondtext);
+  font-weight: 700;
+}
+#heo-footer .footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#heo-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 1rem;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+#heo-footer .footer-item {
+  font-size: .8rem;
+  line-height: .8rem;
+  color: var(--heo-fontcolor);
+  margin-right: auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 99px;
+}
+#friend-links-in-footer {
+  width: 100px;
+}
+#heo-footer .footer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#heo-footer .footer-title-group {
+  display: flex;
+  align-items: center;
+  margin: 0 0 0 8px;
+}
+#heo-footer .footer-title-group a {
+  margin-left: 8px;
+}
+#heo-footer .footer-title-group i {
+  line-height: 1;
+  color: var(--heo-secondtext);
+  transition: var(--t);
+  font-size: 16px;
+  opacity: .6;
+}
+#heo-footer .footer-title-group .footer-title {
+  margin: 0;
+}
+#heo-footer .random-friends-btn {
+  display: flex;
+}
+#heo-footer .footer-title {
+  color: var(--heo-fontcolor);
+  font-size: .8rem;
+  margin-left: 8px;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: fit-content;
+}
+#footer-bar {
+  color: var(--heo-fontcolor);
+  margin-top: 1rem;
+  background: var(--heo-secondbg);
+  display: flex;
+  overflow: hidden;
+  z-index: 899;
+  transition: var(--t);
+  border-top: var(--style-border-always);
+  width: 100%;
+}
+#footer-bar .footer-bar-links {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  line-height: 1;
+  padding: 1rem 1.5rem;
+}
+#footer-bar .footer-bar-left {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 32px;
+  align-items: center;
+}
+#footer-bar .footer-bar-link {
+  margin: 0 4px;
+  color: var(--heo-fontcolor);
+  font-size: .8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 8px;
+  border-radius: 32px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#footer-bar .footer-bar-link.cc {
+  margin-right: 0;
+}
+#footer-bar .footer-bar-link.cc i {
+  font-size: 18px;
+}
+#footer-bar>div>div.footer-bar-left>span {
+  margin-right: 1rem;
+}
+#footer_deal i {
+  font-size: .9rem;
+  line-height: .9rem;
+  height: .9rem;
+  pointer-events: none;
+}
+#footer-bar .beian-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#footer-bar .beian-group .footer-bar-link {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--heo-secondtext);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+#footer-bar .beian-group .footer-bar-link span {
+  transition: var(--t);
+}
+div#footer-bar-tips {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+img.beian-icon {
+  height: 14px;
+  min-width: 13px;
+  min-height: 14px;
+}
+@media (hover:hover) {
+  #footer-bar .beian-group a:hover {
+    background: 0 0;
+    color: var(--heo-lighttext);
+  }
+  #footer-wrap a:hover {
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  #footer-wrap a:hover {
+    color: var(--heo-hovertext);
+    background-color: var(--heo-none);
+  }
+  .footer_mini_logo:hover {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transform: scale(1.2);
+  }
+  #footer-wrap a#heoblog_footerlogo:hover {
+    background: var(--heo-none);
+  }
+  div#heo-footer-bar a.footer-bar-link:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg);
+    transform: scale(1.1);
+    border-color: var(--heo-lighttext);
+  }
+  #heo-footer .footer-item:hover {
+    color: var(--heo-lighttext);
+    background: var(--heo-main-op);
+  }
+  [data-theme=dark] #heo-footer .footer-item:hover {
+    background: var(--heo-theme-op);
+  }
+  #heo-footer .footer-title-group a:hover i {
+    color: var(--heo-main);
+    opacity: 1;
+  }
+  #footer-bar .footer-bar-link:hover {
+    color: var(--heo-main);
+    background: var(--heo-main-op);
+  }
+  #footer-bar .copyright a.footer-bar-link:hover {
+    color: var(--heo-lighttext);
+  }
+  [data-theme=dark] #footer-bar .copyright a.footer-bar-link:hover {
+    background: var(--heo-theme-op);
+  }
+  #footer-bar .footer-bar-right a:hover {
+    color: var(--heo-lighttext);
+  }
+}
+
+/* ===== 来自 source/css/home.css ===== */
+@media (hover:hover) {
+  #footer-bar .beian-group a:hover {
+    background: 0 0;
+  }
+  #footer-wrap a:hover {
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  #footer-wrap a:hover {
+    color: var(--heo-hovertext);
+    background-color: var(--heo-none);
+  }
+  .footer_mini_logo:hover {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    transform: scale(1.2);
+  }
+  #footer-wrap a#heoblog_footerlogo:hover {
+    background: var(--heo-none);
+  }
+  div#heo-footer-bar a.footer-bar-link:hover {
+    background: var(--heo-main);
+    color: var(--heo-white);
+    transform: scale(1.1);
+    border-color: var(--heo-main);
+  }
+  #heo-footer .footer-item:hover {
+    color: var(--heo-lighttext);
+    background: var(--heo-main-op);
+  }
+  [data-theme=dark] #heo-footer .footer-item:hover {
+    background: var(--heo-theme-op);
+  }
+  #heo-footer .footer-title-group a:hover i {
+    color: var(--heo-main);
+    opacity: 1;
+  }
+  #footer-bar .footer-bar-link:hover {
+    color: var(--heo-main);
+    background: var(--heo-main-op);
+  }
+  #footer-bar .footer-bar-right a:hover {
+    color: var(--heo-lighttext);
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  .footer_mini_logo {
+    display: none;
+  }
+  div#footer_deal {
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+  #footer {
+    margin-top: 0;
+    z-index: 0;
+  }
+  .post #footer {
+    background: var(--heo-card-bg);
+    background-image: none;
+  }
+  #letlink {
+    flex-direction: column!important;
+    text-align: center!important;
+  }
+  #letlogo {
+    display: none!important;
+  }
+  #footer-wrap {
+    margin-top: 1rem!important;
+  }
+  #heo-footer .footer-group {
+    width: calc(50vw - 40px);
+    min-width: 130px;
+  }
+  #footer-bar .footer-bar-links {
+    justify-content: center;
+    gap: 8px;
+  }
+  #footer-bar .footer-bar-left {
+    justify-content: center;
+  }
+  #footer-bar .beian-group {
+    justify-content: center;
+  }
+}
+
+/* ===== 来自 source/css/liublog-fix.css ===== */
+/* 页脚 logo 用站点图标 */
+#heo-footer-bar .footer-logo-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  object-fit: contain;
+}
+/* ================= 页脚（anzhiyu footer 结构） ================= */
+/* 导航栏：anzhiyu 用 #anzhiyu-footer，规则与已移植的 #heo-footer 保持一致 */
+#heo-footer,
+#anzhiyu-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 1200px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 1rem;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+#anzhiyu-footer .footer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 110px;
+}
+#anzhiyu-footer .footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#anzhiyu-footer .footer-title {
+  color: var(--heo-fontcolor);
+  font-size: .8rem;
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+}
+#anzhiyu-footer .footer-title-group {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+#anzhiyu-footer .footer-title-group .footer-title {
+  margin: 0;
+}
+#anzhiyu-footer .footer-title-group a {
+  margin-left: 8px;
+  display: inline-flex;
+}
+#anzhiyu-footer .footer-title-group i {
+  line-height: 1;
+  color: var(--heo-secondtext);
+  font-size: 14px;
+  opacity: .6;
+  transition: var(--t);
+}
+#anzhiyu-footer .footer-title-group a:hover i {
+  color: var(--heo-main);
+  opacity: 1;
+}
+#anzhiyu-footer .footer-item {
+  font-size: .8rem;
+  line-height: 1;
+  color: var(--heo-fontcolor);
+  margin-right: auto;
+  padding: 2px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 110px;
+  cursor: pointer;
+  transition: var(--t);
+}
+#anzhiyu-footer .footer-item:hover {
+  color: var(--heo-main);
+}
+/* 顶部图标行中间的圆形头像（回顶） */
+#footer_deal .footer_mini_logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 1rem;
+  cursor: pointer;
+  user-select: none;
+  position: static;
+  transition: cubic-bezier(0,0,0,1.29) .5s;
+}
+#footer_deal .footer_mini_logo:hover {
+  transform: scale(1.2);
+}
+/* 自定义文本（备案号） */
+.footer_custom_text {
+  color: var(--heo-secondtext);
+  font-size: 12px;
+  text-align: center;
+  padding: 0 1rem;
+  line-height: 1.8;
+}
+.footer_custom_text a {
+  color: var(--heo-main);
+}
+/* 底栏：版权 + 打字机副标题占一整行 */
+#footer-bar .footer-bar-left {
+  flex: 1 1 auto;
+}
+#footer-type-tips {
+  flex: 0 0 100%;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  min-height: 18px;
+  line-height: 1.4;
+}
+#footer-bar-subtitle:after {
+  content: '|';
+  margin-left: 2px;
+  color: var(--heo-main);
+  animation: heo-blink 1s step-end infinite;
+}

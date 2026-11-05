@@ -1,0 +1,24 @@
+<%
+  /* 近期热门：配置见 _config.yml 的 sidebar_settings.widgets 里 type: recent
+     列表体视觉由 card-postlist.ejs 提供，本文件只负责「选哪些文章」 */
+  var cfg = lb_widget('recent');
+  var count = Number(cfg.count) > 0 ? Number(cfg.count) : 5;
+
+  /* 置顶（front-matter top: 1）优先，其余按发布时间倒序 */
+  var all = site.posts.sort('date', -1).toArray();
+  var tops = all.filter(function (p) { return p.top; });
+  tops.sort(function (a, b) { return (Number(a.top) || 999) - (Number(b.top) || 999); });
+  var rest = all.filter(function (p) { return !p.top; });
+  var list = tops.concat(rest).slice(0, count);
+%>
+<%- partial('_partial/aside/card-postlist', {
+  card: {
+    list: list,
+    title: cfg.title || '近期热门',
+    icon: cfg.icon || 'icon-fire-fill',
+    more: cfg.more === undefined ? '/archives/' : cfg.more,
+    moreText: cfg.more_text || '更多',
+    rootClass: 'card-recent',
+    listId: 'card-recent'
+  }
+}) %>

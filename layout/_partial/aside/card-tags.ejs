@@ -1,0 +1,22 @@
+<%
+  /* 标签云：配置见 _config.yml 的 sidebar_settings.widgets 里 type: tags */
+  var cfg = lb_widget('tags');
+  var n = Number(cfg.count) > 0 ? Number(cfg.count) : 24;
+  var title = cfg.title || '标签';
+  var icon = cfg.icon || 'icon-price-tag-3-fill';
+  var more = cfg.more === undefined ? '/tags/' : cfg.more;
+  var moreText = cfg.more_text || '更多';
+  var tags = site.tags.sort('length', -1).limit(n).toArray();
+%>
+<div class="card-widget card-tags card-home-tags">
+  <div class="item-headline">
+    <i class="heoblogIcon <%= icon %>"></i>
+    <span><%= title %></span>
+    <% if (more) { %><a class="power-charge" href="<%- url_for(more) %>" title="<%= moreText %>"><%= moreText %><i class="heoblogIcon icon-external-link-fill"></i></a><% } %>
+  </div>
+  <div class="card-tag-cloud">
+    <% tags.forEach(function (t) { %>
+    <a href="<%- url_for(t.path) %>" id="<%= t.name %>" style="font-size: 0.8rem; color: var(--heo-fontcolor)"><span class="tags-punctuation"></span> <%= t.name %> <span class="tagsPageCount"><%= t.length %></span></a>
+    <% }); %>
+  </div>
+</div>

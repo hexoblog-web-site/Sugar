@@ -1,0 +1,382 @@
+/* highlight.css
+ *
+ * 正文里的代码块。对应 Hexo 默认 highlight.js 的输出结构：
+ *   figure.highlight.<lang>
+ *     > div.highlight-tools   ← 由 js/partial/code.js 注入（语言名 + 复制按钮）
+ *     > table
+ *         > td.gutter > pre   行号
+ *         > td.code   > pre   代码本体
+ *
+ * 取的是安知鱼 highlight_theme: mac 那一套观感：
+ *   深色块（#212121）· 顶部工具条带三颗红黄绿点 · 右上角复制 · 超长自动折叠
+ *   明暗两种模式下都用深色块（代码就该是深色，和正文的白底形成对比）
+ *
+ * 三件套：
+ *   样式  source/css/highlight.css        （本文件）
+ *   脚本  source/js/partial/code.js        （注入工具条 / 复制 / 折叠）
+ *   配置  _config.yml → code
+ */
+
+:root {
+  --hl-bg: #212121;
+  --hl-tools-bg: #1b1b1b;
+  --hl-gutter-bg: #1d1d1d;
+  --hl-border: rgba(255, 255, 255, .08);
+  --hl-fg: #eeffff;
+  --hl-gutter-fg: rgba(238, 255, 255, .35);
+  --hl-tools-fg: rgba(238, 255, 255, .62);
+  --hl-shadow: 0 10px 26px -18px rgba(0, 0, 0, .55);
+
+  /* 语法着色（Material Palenight 口味，和安知鱼 darker 一致） */
+  --hl-comment: #969896;
+  --hl-keyword: #c792ea;
+  --hl-string: #c3e88d;
+  --hl-number: #f78c6c;
+  --hl-function: #82aaff;
+  --hl-attr: #ffcb6b;
+  --hl-variable: #89ddff;
+  --hl-tag: #ff5370;
+  --hl-meta: #ffcb6b;
+}
+
+/* ---------- 外层容器 ---------- */
+#article-container figure.highlight {
+  position: relative;
+  margin: 1rem 0 1.4rem;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--hl-bg);
+  color: var(--hl-fg);
+  border: 1px solid var(--hl-border);
+  box-shadow: var(--hl-shadow);
+  line-height: 1.7;
+}
+
+#article-container figure.highlight table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+/* 代码横向滚动放在这一层（脚本给 table 套的壳）：
+   不放在 figure 上，否则顶部工具条会跟着一起横向滚走，复制按钮就跑出屏幕了；
+   也不用 table{display:block}，那会让 tr/td 退化成匿名表格，行号列直接塌掉。 */
+#article-container .code-body {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+#article-container figure.highlight td {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  vertical-align: top;
+}
+
+#article-container figure.highlight pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre;
+  word-break: normal;
+  overflow: visible;
+}
+
+/* 代码字体统一等宽；行号与代码必须同字号同行高，否则上下对不齐 */
+#article-container figure.highlight,
+#article-container figure.highlight pre,
+#article-container figure.highlight code,
+#article-container figure.highlight .line {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, "Courier New", monospace !important;
+}
+
+/* 行号列 */
+#article-container figure.highlight td.gutter {
+  width: 1%;
+  background: var(--hl-gutter-bg);
+  border-right: 1px solid var(--hl-border);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#article-container figure.highlight td.gutter pre {
+  padding: 14px 10px 14px 16px;
+  color: var(--hl-gutter-fg);
+  text-align: right;
+}
+
+#article-container figure.highlight td.code pre {
+  padding: 14px 18px;
+}
+
+/* ---------- 顶部工具条（脚本注入） ---------- */
+#article-container .highlight-tools {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 2.4em;
+  padding: 0 14px;
+  background: var(--hl-tools-bg);
+  border-bottom: 1px solid var(--hl-border);
+  color: var(--hl-tools-fg);
+  font-size: 13px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 三颗窗口圆点 */
+#article-container .highlight-tools::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #fc625d;
+  box-shadow: 19px 0 #fdbc40, 38px 0 #35cd4b;
+  margin-right: 62px;
+}
+
+/* 没有三颗点时（code.mac_style: false）不留空位 */
+html.no-code-mac #article-container .highlight-tools::before {
+  display: none;
+}
+
+#article-container .highlight-tools .code-lang {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  opacity: .8;
+  white-space: nowrap;
+}
+
+#article-container .highlight-tools .copy-notice {
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--hl-string);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+#article-container .highlight-tools.copy-true .copy-notice {
+  opacity: 1;
+}
+
+#article-container .highlight-tools .copy-button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--hl-tools-fg);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .2s ease, background-color .2s ease;
+}
+
+#article-container .highlight-tools .copy-button:hover {
+  color: var(--heo-white);
+  background: rgba(255, 255, 255, .1);
+}
+
+/* ---------- 折叠（代码过长时） ----------
+   注意 overflow-x 要保留 auto：折叠只裁纵向，横向长行仍然要能拖，
+   写成 overflow: hidden 会把长行直接切掉且拖不动（移动端尤其明显）。
+   高度由脚本按 theme.code.height_limit 写进内联 max-height，这里只兜底。 */
+#article-container figure.highlight.code-folded .code-body {
+  max-height: var(--code-limit, 420px);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+#article-container .code-expand-btn {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  color: var(--hl-gutter-fg);
+  font-size: 16px;
+  cursor: pointer;
+  background: linear-gradient(180deg, rgba(33, 33, 33, 0) 0%, var(--hl-bg) 62%);
+  transition: color .2s ease;
+}
+
+#article-container .code-expand-btn:hover {
+  color: var(--heo-white);
+}
+
+#article-container .code-expand-btn i {
+  transition: transform .3s ease;
+}
+
+/* 展开后箭头翻过来，提示再点一次可以收起 */
+#article-container figure.highlight:not(.code-folded) .code-expand-btn i {
+  transform: rotate(180deg);
+}
+
+#article-container figure.highlight.code-folded .code-expand-btn i {
+  transform: rotate(0deg);
+}
+
+#article-container figure.highlight:not(.code-folded) .code-expand-btn i {
+  transform: rotate(180deg);
+}
+
+/* ---------- 滚动条 ---------- */
+#article-container .code-body::-webkit-scrollbar {
+  height: 8px;
+}
+
+#article-container .code-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .18);
+  border-radius: 4px;
+}
+
+#article-container .code-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, .3);
+}
+
+#article-container .code-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- 行内代码 ---------- */
+#article-container code:not([class]) {
+  margin: 0 2px;
+  padding: .15em .45em;
+  border-radius: 6px;
+  background: var(--heo-secondbg);
+  color: var(--heo-theme);
+  border: 1px solid var(--heo-card-border);
+  font-size: .92em;
+  word-break: break-word;
+}
+
+/* 深色模式下代码块再压暗一点，别在深底页面上「发亮」 */
+[data-theme=dark] {
+  --hl-bg: #1b1b1b;
+  --hl-tools-bg: #151515;
+  --hl-gutter-bg: #181818;
+  --hl-shadow: 0 10px 26px -18px rgba(0, 0, 0, .8);
+}
+
+/* ---------- 语法着色 ---------- */
+#article-container figure.highlight .comment,
+#article-container figure.highlight .quote {
+  color: var(--hl-comment);
+  font-style: italic;
+}
+
+#article-container figure.highlight .keyword,
+#article-container figure.highlight .selector-tag,
+#article-container figure.highlight .addition,
+#article-container figure.highlight .meta-keyword {
+  color: var(--hl-keyword);
+}
+
+#article-container figure.highlight .string,
+#article-container figure.highlight .meta-string,
+#article-container figure.highlight .regexp,
+#article-container figure.highlight .addition .content {
+  color: var(--hl-string);
+}
+
+#article-container figure.highlight .number,
+#article-container figure.highlight .literal,
+#article-container figure.highlight .variable,
+#article-container figure.highlight .template-variable,
+#article-container figure.highlight .link {
+  color: var(--hl-number);
+}
+
+#article-container figure.highlight .title,
+#article-container figure.highlight .function,
+#article-container figure.highlight .class .title,
+#article-container figure.highlight .selector-id,
+#article-container figure.highlight .selector-class {
+  color: var(--hl-function);
+}
+
+#article-container figure.highlight .attr,
+#article-container figure.highlight .attribute,
+#article-container figure.highlight .built_in,
+#article-container figure.highlight .type,
+#article-container figure.highlight .symbol,
+#article-container figure.highlight .bullet,
+#article-container figure.highlight .meta,
+#article-container figure.highlight .selector-attr,
+#article-container figure.highlight .selector-pseudo,
+#article-container figure.highlight .params {
+  color: var(--hl-attr);
+}
+
+#article-container figure.highlight .name,
+#article-container figure.highlight .tag,
+#article-container figure.highlight .deletion {
+  color: var(--hl-tag);
+}
+
+#article-container figure.highlight .operator,
+#article-container figure.highlight .punctuation {
+  color: var(--hl-variable);
+}
+
+#article-container figure.highlight .emphasis {
+  font-style: italic;
+}
+
+#article-container figure.highlight .strong {
+  font-weight: 700;
+}
+
+/* deletion / addition 的块级底色（diff 用） */
+#article-container figure.highlight .deletion {
+  background: rgba(191, 66, 191, .18);
+}
+
+#article-container figure.highlight .addition {
+  background: rgba(16, 94, 222, .18);
+}
+
+/* ---------- 窄屏：行号收窄，字体略小 ---------- */
+@media screen and (max-width: 767px) {
+  #article-container figure.highlight pre {
+    font-size: 13px;
+  }
+  #article-container figure.highlight td.gutter pre {
+    padding: 12px 8px 12px 10px;
+  }
+  #article-container figure.highlight td.code pre {
+    padding: 12px 12px;
+  }
+  #article-container .highlight-tools::before {
+    margin-right: 52px;
+  }
+}

@@ -1,0 +1,1 @@
+@media screen and (max-width:1200px){.layout>div:first-child{width:100%!important}#aside-content{display:none}div#home_top_iconsCard{flex:auto;margin-right:0;width:100%}.topGroup{overflow-x:scroll;height:fit-content}.topGroup::-webkit-scrollbar{display:none}.topGroup .todayCard{display:none}.equipment-item-content-item{width:calc(50% - 12px)}}

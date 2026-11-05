@@ -1,0 +1,49 @@
+<%
+  /* 对齐目标站 .home-category-bar.category-in-bar
+     前几项为固定入口，由 theme.home.category_bar_fixed 配置（默认 4 项），其后为站点真实分类 */
+  var cats = site.categories.sort('length', -1).toArray();
+  var pinned = theme.home.category_bar_pinned || [];
+  if (pinned.length) {
+    var order = {};
+    pinned.forEach(function (n, i) { order[n] = i; });
+    cats.sort(function (a, b) {
+      var ia = order[a.name] === undefined ? 999 : order[a.name];
+      var ib = order[b.name] === undefined ? 999 : order[b.name];
+      return ia - ib;
+    });
+  }
+  var fixed = theme.home.category_bar_fixed;
+  if (!fixed || !fixed.length) {
+    fixed = [
+      { name: '精选', url: '/', icon: 'featured', color: '#2f6bff', tip: '回到首页精选' },
+      { name: '热门', url: '/archives/', icon: 'hot', color: '#ff4d4f', tip: '查看全部文章' },
+      { name: '必看', url: '/archives/', icon: 'must-read', color: '#16c2c2', tip: '查看全部文章' },
+      { name: '全部文章', url: '/archives/', icon: 'all-posts', color: '#ff8f1f', tip: '查看所有文章' }
+    ];
+  }
+%>
+<div class="home-category-bar category-in-bar">
+  <div id="category-bar">
+    <div class="category-bar-items" id="category-bar-items">
+      <% fixed.forEach(function (p, i) { %>
+      <div class="category-bar-item<%= i === 0 ? ' select' : '' %>" id="<%= p.id || p.name %>" data-default-order="<%= i %>">
+        <a href="<%- url_for(p.url || '/') %>" title="<%= p.name %>" heotip="<%= p.tip || p.name %>">
+          <span class="category-bar-link-icon" style="--category-bar-icon: url('<%- url_for('/images/category-bar/' + (p.icon || 'all-posts') + '.svg') %>'); --category-bar-icon-color: <%= p.color || '#2f6bff' %>;"></span>
+          <span><%= p.name %></span>
+        </a>
+      </div>
+      <% }); %>
+      <% cats.forEach(function (c, i) { %>
+      <div class="category-bar-item" id="<%= c.name %>" data-default-order="<%= i + fixed.length %>">
+        <a href="<%- url_for(c.path) %>" title="<%= c.name %>" heotip="<%= c.name %> 分类下共 <%= c.length %> 篇文章"><%= c.name %></a>
+      </div>
+      <% }); %>
+    </div>
+    <div class="category-bar-more-group">
+      <div class="category-bar-next" id="category-bar-next" onclick="heo.scrollCategoryBarToRight()" heotip="分类条翻页">
+        <i class="heoblogIcon icon-youxiangshuangjiantou"></i>
+      </div>
+      <a class="category-bar-more" href="<%- url_for('/categories/') %>" title="更多" heotip="查看所有分类">更多</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,588 @@
+/* category-bar.css
+ *
+ * 首页「category-bar」板块的样式。
+ *
+ * 拆分自下列文件（拆分脚本已归档到 hexo/_tools/archive/，本文件从现在起手改）：
+ *   source/css/heoblogmain.css          10 条
+ *   source/css/home.css                 59 条
+ *   source/css/heoblogmw768.css         22 条
+ *   source/css/liublog-fix.css           1 条
+ *
+ * 改这个板块的样式请只改本文件；对应模板 layout/_partial/home/category-bar.ejs。
+ */
+
+/* ===== 来自 source/css/heoblogmain.css ===== */
+@media screen and (min-width:1300px) {
+  #category-bar:hover {
+    border: var(--style-border-hover);
+    box-shadow: var(--heo-shadow-main);
+  }
+}
+
+.category-in-bar {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+  margin-bottom: 4px;
+}
+@media screen and (min-width:1300px) {
+  #category-bar {
+    box-shadow: var(--heo-shadow-border);
+    animation: slide-in .6s .3s backwards;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  #category-bar {
+    animation: slide-in .6s .3s backwards;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+  }
+}
+
+@media (hover:hover) {
+  .category-bar-item:hover a {
+    background: var(--heo-secondbg);
+    color: var(--heo-lighttext);
+  }
+  .category-bar-item.select:hover a {
+    background: var(--heo-main);
+  }
+  .category-bar-more:hover,
+  .category-bar-next:hover {
+    background: var(--heo-secondbg);
+    color: var(--heo-lighttext);
+  }
+}
+
+/* ===== 来自 source/css/home.css ===== */
+#category-bar {
+  padding: .4rem .6rem;
+  background: var(--heo-card-bg);
+  border-radius: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  border: var(--style-border);
+  transition: var(--t);
+  width: 100%;
+  justify-content: space-between;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+@media screen and (min-width:1300px) {
+  #category-bar:hover {
+    border: var(--style-border-hover);
+    box-shadow: var(--heo-shadow-main);
+  }
+}
+
+.category-bar-items {
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  display: flex;
+  border-radius: 8px;
+  align-items: center;
+  height: 30px;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+  scrollbar-width: none;
+}
+.category-in-bar #category-bar,
+.category-in-bar #tag-bar {
+  margin-bottom: 0;
+}
+.category-bar-items::-webkit-scrollbar {
+  display: none;
+}
+.category-bar-item a {
+  padding: .1rem .5rem;
+  font-weight: 700;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+}
+.category-bar-link-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background-color: var(--category-bar-icon-color,currentColor);
+  mask-image: var(--category-bar-icon);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  flex-shrink: 0;
+}
+.category-bar-item.select .category-bar-link-icon {
+  background-color: var(--heo-card-bg);
+}
+.category-bar-item.select a {
+  background: var(--heo-theme);
+  color: var(--heo-card-bg);
+  border-radius: 8px;
+}
+.homePage #category-bar-home>a {
+  background: var(--heo-lighttext);
+  color: var(--heo-white);
+  border: 1px solid var(--heo-lighttext);
+}
+.homePage #category-bar-home .category-bar-link-icon {
+  background-color: var(--heo-white);
+}
+[data-theme=dark] .homePage #category-bar-home>a {
+  color: var(--heo-card-bg);
+}
+[data-theme=dark] .homePage #category-bar-home .category-bar-link-icon {
+  background-color: var(--heo-card-bg);
+}
+.category-bar-next {
+  margin-left: 8px;
+  cursor: pointer;
+  height: 30px;
+  width: 30px;
+  display: flex;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  transition: var(--t);
+  flex-shrink: 0;
+}
+.category-bar-more {
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0 8px;
+}
+.homePage .layout.layout--home>.home-category-bar,
+.page .layout.layout--category>.home-category-bar {
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  flex-shrink: 0;
+  animation: slide-in .6s .3s backwards;
+}
+.homePage .layout.layout--home:has(#home_top_blur)>.home-category-bar {
+  animation: none;
+}
+@media screen and (min-width:1300px) {
+  #category-bar {
+    box-shadow: var(--heo-shadow-border);
+    animation: slide-in .6s .3s backwards;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+    box-shadow: none;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  #category-bar {
+    animation: slide-in .6s .3s backwards;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+  }
+}
+
+.category-bar-more-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+.home-category-bar {
+  margin-bottom: 0;
+}
+.home-category-bar #category-bar,
+.home-category-bar #category-bar:hover,
+.home-category-bar #tag-bar,
+.home-category-bar #tag-bar:hover {
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  background: 0 0;
+  animation: none;
+  transition: var(--t);
+}
+.home-category-bar .category-bar-items {
+  gap: 10px;
+  height: auto;
+  overflow-x: auto;
+  align-items: center;
+}
+.home-category-bar .category-bar-items::-webkit-scrollbar {
+  display: none;
+}
+.home-category-bar .category-bar-item a {
+  border-radius: 999px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  color: var(--heo-fontcolor);
+  font-weight: 700;
+  transition: var(--t);
+  position: relative;
+  overflow: hidden;
+}
+.home-category-bar .category-bar-item.select a {
+  background: var(--heo-main);
+  border-color: var(--heo-main);
+  color: var(--heo-card-bg);
+  box-shadow: var(--heo-shadow-main);
+  border-radius: 999px;
+}
+.home-category-bar .category-bar-item.select .category-bar-link-icon {
+  background-color: var(--heo-card-bg);
+}
+.home-category-bar .category-bar-link-icon {
+  width: 14px;
+  height: 14px;
+}
+.home-category-bar .category-bar-next {
+  border-radius: 50%;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.home-category-bar .category-bar-more {
+  border-radius: 999px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+}
+.home-category-bar .category-bar-more-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.home-category-bar .category-bar-item a,
+.home-category-bar .category-bar-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 18px;
+  font-size: 14px;
+  line-height: 1;
+  height: auto;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+@media screen and (min-width:1200px) {
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    animation: none;
+  }
+}
+
+@media (hover:hover) {
+  .category-bar-item:hover a {
+    background: var(--heo-secondbg);
+    color: var(--heo-lighttext);
+  }
+  .category-bar-item.select:hover a {
+    background: var(--heo-main);
+  }
+  .category-bar-more:hover,
+  .category-bar-next:hover {
+    background: var(--heo-secondbg);
+    color: var(--heo-lighttext);
+  }
+}
+
+@media screen and (max-width:767px) {
+  #category-bar {
+    border-radius: 0;
+    background: var(--heo-background);
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    height: 46px;
+    margin-top: 0;
+    align-items: center;
+  }
+  .category-bar-items {
+    height: 44px;
+    gap: 6px;
+  }
+  .homePage .category-bar-item:first-child {
+    margin-left: 1rem;
+  }
+  .category-bar-item.select a {
+    border-radius: 50px;
+  }
+  #category .category-bar-item a {
+    border-radius: 50px;
+  }
+  .category-bar-item a {
+    border-radius: 50px;
+    background: var(--heo-card-bg);
+    border: var(--style-border-always);
+    padding: 21px 16px;
+    font-size: 14px;
+  }
+  .category-bar-next {
+    display: none;
+  }
+  .category-bar-more {
+    display: none;
+  }
+  .homePage .layout.layout--home>.home-category-bar,
+  .page .layout.layout--category>.home-category-bar {
+    animation: none!important;
+  }
+  .home-category-bar .category-bar-item a,
+  .home-category-bar .category-bar-more {
+    border-radius: 50px;
+    background: var(--heo-card-bg);
+    border: var(--style-border-always);
+    padding: 6px 16px;
+    font-size: 14px;
+    line-height: 1;
+    height: auto;
+    min-height: 32px;
+    box-shadow: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  .home-category-bar .category-bar-next {
+    display: none;
+  }
+  .home-category-bar .category-bar-item.select a {
+    background: var(--heo-main);
+    border-color: var(--heo-main);
+    color: var(--heo-card-bg);
+    box-shadow: none;
+  }
+  .home-category-bar .category-bar-items {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 1rem;
+    width: 100%;
+    align-items: center;
+  }
+  .home-category-bar .category-bar-items::-webkit-scrollbar {
+    display: none;
+  }
+  .home-category-bar {
+    position: static;
+    top: auto;
+    z-index: auto;
+    background: var(--heo-background);
+    margin: 0!important;
+    width: 100%!important;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    border-radius: 0;
+    background: 0 0;
+    border: 0;
+    margin-bottom: 0;
+    padding: 0;
+    height: auto;
+    box-shadow: none;
+  }
+  .home-category-bar .category-bar-item a,
+  .home-category-bar .category-bar-more {
+    padding: 8px 18px;
+    min-height: 38px;
+  }
+  .home-category-bar .category-bar-next {
+    display: none;
+  }
+  .home-category-bar .category-bar-more {
+    display: none;
+  }
+  .homePage .category-bar-item:first-child {
+    margin-left: 0;
+  }
+  .homePage .layout.layout--home>.home-category-bar,
+  .page .layout.layout--category>.home-category-bar {
+    margin: 0!important;
+    width: 100%!important;
+    max-width: 100%!important;
+    padding: 0;
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  #category-bar {
+    border-radius: 0;
+    background: var(--heo-background);
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    height: 46px;
+    margin-top: 0;
+    align-items: center;
+  }
+  #category-bar.has-banner-gradient::after {
+    display: none;
+  }
+  .category-bar-items {
+    height: 44px;
+    gap: 6px;
+  }
+  .homePage .category-bar-item:first-child {
+    margin-left: 1rem;
+  }
+  .category-bar-item.select a {
+    border-radius: 50px;
+  }
+  #category .category-bar-item a {
+    border-radius: 50px;
+  }
+  .category-bar-item a {
+    border-radius: 50px;
+    background: var(--heo-card-bg);
+    border: var(--style-border-always);
+    padding: 21px 16px;
+    font-size: 14px;
+  }
+  .category-bar-next {
+    display: none;
+  }
+  .category-bar-more {
+    display: none;
+  }
+  .homePage .layout.layout--home>.home-category-bar,
+  .page .layout.layout--category>.home-category-bar {
+    animation: none!important;
+  }
+  .home-category-bar .category-bar-item a,
+  .home-category-bar .category-bar-more {
+    border-radius: 50px;
+    background: var(--heo-card-bg);
+    border: var(--style-border-always);
+    padding: 6px 16px;
+    font-size: 14px;
+    line-height: 1;
+    height: auto;
+    min-height: 32px;
+    box-shadow: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+  .home-category-bar .category-bar-next {
+    display: none;
+  }
+  .home-category-bar .category-bar-item.select a {
+    background: var(--heo-main);
+    border-color: var(--heo-main);
+    color: var(--heo-card-bg);
+    box-shadow: none;
+  }
+  .home-category-bar .category-bar-items {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 1rem;
+    width: 100%;
+    align-items: center;
+  }
+  .home-category-bar .category-bar-items::-webkit-scrollbar {
+    display: none;
+  }
+  .home-category-bar {
+    position: static;
+    top: auto;
+    z-index: auto;
+    background: var(--heo-background);
+    margin: 0!important;
+    width: 100%!important;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .home-category-bar #category-bar,
+  .home-category-bar #tag-bar {
+    border-radius: 0;
+    background: 0 0;
+    border: 0;
+    margin-bottom: 0;
+    padding: 0;
+    height: auto;
+    box-shadow: none;
+  }
+  .home-category-bar .category-bar-item a,
+  .home-category-bar .category-bar-more {
+    padding: 8px 18px;
+    min-height: 38px;
+  }
+  .home-category-bar .category-bar-next {
+    display: none;
+  }
+  .home-category-bar .category-bar-more {
+    display: none;
+  }
+  .homePage .category-bar-item:first-child {
+    margin-left: 0;
+  }
+  .homePage .layout.layout--home>.home-category-bar,
+  .page .layout.layout--category>.home-category-bar {
+    margin: 0!important;
+    width: 100%!important;
+    max-width: 100%!important;
+    padding: 0;
+  }
+}
+
+/* ===== 来自 source/css/liublog-fix.css ===== */
+/* 首页/列表页：关闭文章区 translateY(20px) 入场动画
+   原因：slide-in 的 from 是 translateY(20px)+opacity:0，配合 backwards 延迟，
+   加载时整块会先下沉 20px 再滑上来，视觉上像"内容自己向下跳一下" */
+.homePage .layout.layout--home > .home-category-bar,
+.page .layout.layout--category > .home-category-bar {
+  animation: none!important;
+}
+
+/* ---------------------------------------------------------------------------
+ * 分类条从「导航栏下方的通栏」挪到了左栏里（轮播正下方、文章列表正上方），
+ * 位置变成 #home_top_blur 覆盖的范围内。那层柔光是 position:absolute + z-index:0，
+ * 不给分类条一个更高的层叠顺序就会被它整条盖住（第一页被轮播挡着看不出来，
+ * 第二页没有轮播时直接整条消失）。这里统一抬到 z-index:1。
+ * ------------------------------------------------------------------------- */
+.home-category-bar {
+  position: relative;
+  z-index: 1;
+}

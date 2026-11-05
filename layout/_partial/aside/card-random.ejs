@@ -1,0 +1,25 @@
+<%
+  /* 随机推荐：配置见 _config.yml 的 sidebar_settings.widgets 里 type: random
+     列表体视觉由 card-postlist.ejs 提供，本文件只负责「随机取哪几篇」 */
+  var cfg = lb_widget('random');
+  var count = Number(cfg.count) > 0 ? Number(cfg.count) : 5;
+
+  /* 每次渲染随机打乱，取前 count 篇；不足时按实际数量输出 */
+  var all = site.posts.toArray();
+  for (var i = all.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = all[i]; all[i] = all[j]; all[j] = t;
+  }
+  var list = all.slice(0, count);
+%>
+<%- partial('_partial/aside/card-postlist', {
+  card: {
+    list: list,
+    title: cfg.title || '随机推荐',
+    icon: cfg.icon || 'icon-dice-line',
+    more: cfg.more === undefined ? '/archives/' : cfg.more,
+    moreText: cfg.more_text || '更多',
+    rootClass: 'card-random',
+    listId: 'card-random'
+  }
+}) %>

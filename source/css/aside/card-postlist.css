@@ -1,0 +1,50 @@
+/* card-postlist.css
+ *
+ * 侧栏「带序号图文列表」卡体，近期热门（card-recent.ejs）与随机推荐（card-random.ejs）共用。
+ *
+ * 由 source/css/aside.css 拆分而来；改侧栏请只改本目录下的对应卡片文件，theme 的 bundle 会自动拼接。
+ */
+.card-widget.card-recent-post{padding:.4rem .6rem!important}
+.card-widget.card-recent-post .aside-list{display:flex;flex-direction:column;gap:8px}
+/* ============================================================
+ * 侧栏「近期热门 / 随机推荐」序号胶囊：1~5 各自一种配色
+ * 模板输出 <span class="post-rank rank-N">，N = (下标 % 5) + 1，
+ * 所以条数超过 5 时会自动循环用色，改条数不用改样式。
+ * 尺寸、圆角、间距仍由 heoblogmain.css 的 .post-rank 负责，
+ * 这里只接管颜色（原写死的 rank-1 配色与 hover 反色已从那边移除）。
+ * ============================================================ */
+:root{
+  --lb-rank-1:#425aef;
+  --lb-rank-2:#17a34a;
+  --lb-rank-3:#d97706;
+  --lb-rank-4:#7c5cd6;
+  --lb-rank-5:#e04b4b;
+}
+[data-theme=dark]{
+  --lb-rank-1:#5b8cff;
+  --lb-rank-2:#2bc57f;
+  --lb-rank-3:#f5a524;
+  --lb-rank-4:#a78bfa;
+  --lb-rank-5:#ff6b6b;
+}
+
+.card-postlist .post-rank{
+  color:var(--lb-fg,var(--heo-fontcolor));
+  font-size:13px;
+  font-weight:600;
+  border-color:transparent;
+  transition:var(--t-fast);
+}
+
+.card-postlist .post-rank.rank-1{--lb-bg:var(--lb-rank-1);--lb-fg:#fff;background:var(--lb-rank-1);border-color:transparent}
+.card-postlist .post-rank.rank-2{--lb-bg:var(--lb-rank-2);--lb-fg:#fff;background:var(--lb-rank-2);border-color:transparent}
+.card-postlist .post-rank.rank-3{--lb-bg:var(--lb-rank-3);--lb-fg:#fff;background:var(--lb-rank-3);border-color:transparent}
+.card-postlist .post-rank.rank-4{--lb-bg:var(--lb-rank-4);--lb-fg:#fff;background:var(--lb-rank-4);border-color:transparent}
+.card-postlist .post-rank.rank-5{--lb-bg:var(--lb-rank-5);--lb-fg:#fff;background:var(--lb-rank-5);border-color:transparent}
+
+/* 悬停：整行底色转主题色，胶囊反白、数字保留本行颜色，颜色身份不丢 */
+.card-postlist .hot-post-link:hover .post-rank{
+  background:var(--heo-card-bg);
+  color:var(--lb-bg,var(--heo-fontcolor));
+  border-color:transparent;
+}

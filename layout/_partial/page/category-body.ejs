@@ -1,0 +1,71 @@
+<%
+  /* 分类页正文：单个分类（page.category 有值）列文章，索引页列全部分类。
+     category.ejs 与 categories.ejs 共用这里，避免两份模板各改各的。
+     索引页对标 blog.zhheo.com/categories/：大标题 + 统计药丸 + 每分类一张卡
+     （左边分类方块，右边两列标题，各取最新 10 篇）。 */
+  var catName = page.category;
+  var catTotal = 0;
+  if (catName) {
+    var catQ = site.categories.findOne({ name: catName });
+    catTotal = catQ ? catQ.length : page.posts.length;
+  }
+%>
+<% if (!catName) { %>
+<div id="category" class="cat-page">
+  <h1 class="equipment-page-title">查看不同领域的<%= site.categories.length %>个分类。</h1>
+
+  <div class="tag-page-stats">
+    <a class="tag-page-stat" href="<%- url_for('/categories/') %>" title="全站共 <%= site.categories.length %> 个分类">
+      <i class="ri-folders-fill"></i><b><%= site.categories.length %></b>
+    </a>
+    <a class="tag-page-stat" href="<%- url_for('/archives/') %>" title="全站共 <%= site.posts.length %> 篇文章">
+      <i class="ri-article-fill"></i><b><%= site.posts.length %></b>
+    </a>
+    <a class="tag-page-stat" href="<%- url_for('/tags/') %>" title="全站共 <%= site.tags.length %> 个标签">
+      <i class="ri-price-tag-3-fill"></i><b><%= site.tags.length %></b>
+    </a>
+  </div>
+
+  <div class="category-list">
+    <% site.categories.sort('length', -1).each(function (c) { %>
+    <div class="category-list-item">
+      <a class="category-list-category" href="<%- url_for(c.path) %>" title="<%= c.name %>">
+        <i class="heoblogIcon icon-checkbox-multiple-blank-fill category-list-category-icon"></i>
+        <span class="category-list-category-name"><%= c.name %></span>
+        <span class="category-list-category-count"><%= c.length %></span>
+      </a>
+      <div class="category-list-posts">
+        <% c.posts.sort('date', -1).limit(10).each(function (post) { %>
+        <a class="category-list-post" href="<%- url_for(post.path) %>" title="<%= post.title %>">
+          <span class="category-list-post-title"><%= post.title %></span>
+        </a>
+        <% }); %>
+        <% if (!c.length) { %><span class="category-list-empty">这个分类还没有文章</span><% } %>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</div>
+<% } else { %>
+<div id="category">
+  <div class="category-head card-widget">
+    <div class="item-headline">
+      <i class="heoblogIcon icon-folder-5-fill"></i>
+      <span><%= catName %></span>
+    </div>
+    <div class="category-count">
+      该分类下共 <b><%= catTotal %></b> 篇文章
+    </div>
+  </div>
+
+  <% if (theme.home.category_bar) { %><%- partial('_partial/home/category-bar') %><% } %>
+  <div id="recent-posts" class="recent-posts<%= lb_post_list().banner ? ' list-banner' : '' %>">
+    <% var idx = 0; %>
+    <% page.posts.sort('date', -1).each(function (post) { %>
+      <%- partial('_partial/home/post-card', { post: post, index: idx }) %>
+      <% idx++; %>
+    <% }); %>
+  </div>
+  <%- partial('_partial/pagination') %>
+</div>
+<% } %>

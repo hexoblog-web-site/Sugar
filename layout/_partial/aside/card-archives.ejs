@@ -1,0 +1,15 @@
+<div class="card-widget card-archives">
+  <div class="item-headline">
+    <i class="heoblogIcon icon-calendar-todo-fill"></i>
+    <span>归档</span>
+  </div>
+  <ul class="card-archive-list">
+    <%- list_archives({
+      type: 'yearly',
+      format: 'YYYY 年',
+      show_count: true,
+      class: 'card-archive-list-link',
+      transform: function (name) { return name; }
+    }) %>
+  </ul>
+</div>

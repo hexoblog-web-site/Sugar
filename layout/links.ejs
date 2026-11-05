@@ -1,0 +1,255 @@
+<%
+  /* 友情链接页 —— 对标 blog.anheyu.com/link
+     数据源：source/_data/link.yml（顶层是列表）
+     每组按 flink_style 决定渲染成「截图大卡」还是「列表项」：
+       flexcard       → .site-card-group  (带 siteshot 截图的卡片)
+       telescopic/其它 → .flink-list        (头像 + 名称 + 描述的横向条目)
+  */
+  var raw = site.data.link || [];
+  var groups = (Array.isArray(raw) ? raw : [raw]).filter(function (g) {
+    return g && g.link_list && g.link_list.length;
+  });
+
+  /* 摊平所有友链，用于顶部头像墙 / 随机跳转 */
+  var allLinks = [];
+  groups.forEach(function (g) {
+    (g.link_list || []).forEach(function (l) { allLinks.push(l); });
+  });
+
+  /* 顶部头像墙：每对两个头像上下交错。先把列表复制一遍凑足够对数，
+     保证一份宽度 > 屏宽，animation 位移 -50% 才能无缝接上 */
+  var pool = allLinks.concat(allLinks);
+  var need = Math.max(14, pool.length / 2);
+  var half = Math.ceil(pool.length / 2);
+  var wallPairs = [];
+  for (var i = 0; i < need; i++) {
+    var a = pool[i % pool.length];
+    var b = pool[(i + half) % pool.length];
+    if (!a || !b) continue;
+    wallPairs.push([a, b]);
+  }
+  var totalPeople = allLinks.length;
+
+  /* 头像加载失败时的兜底底色 */
+  function fbColor(name) {
+    var hue = 0;
+    for (var k = 0; k < name.length; k++) hue = (hue * 31 + name.charCodeAt(k)) % 360;
+    return 'linear-gradient(135deg,hsl(' + hue + ',62%,62%),hsl(' + ((hue + 40) % 360) + ',60%,50%))';
+  }
+  /* 站点截图加载失败时的兜底背景（同一条色带，铺在 a.img 上） */
+  function bgStyle(name) {
+    return 'background:' + fbColor(name);
+  }
+
+  /* 标签配色：与参考站一致，技术走金渐变、生活走绿，其余用主题蓝 */
+  function tagStyle(tag, vip) {
+    if (tag === '技术') return 'background:linear-gradient(38deg,#e5b085 0,#d48f16 100%)';
+    if (tag === '生活') return 'background:#57bd6a';
+    if (vip) return 'background:linear-gradient(38deg,#e5b085 0,#d48f16 100%)';
+    return '';
+  }
+  /* 友链申请列表：站内已收录的友链算「已通过」，额外的待审记录写在 _data/link_apply.yml */
+  var applyExtra = site.data.link_apply || [];
+  var applications = [];
+  applyExtra.forEach(function (a) {
+    applications.push({ name: a.name, descr: a.descr || '', status: a.status || 'pending', type: a.type || 'new' });
+  });
+  allLinks.forEach(function (l) {
+    applications.push({ name: l.name, descr: l.descr || '', status: 'approved', type: 'new' });
+  });
+
+  function avatarOf(l) { return l.avatar || l.siteshot || '/images/avatar.svg'; }
+  function esc(t) { return String(t || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+  /* 头像墙单个图标：只有图片真的加载失败才显示底色 + 首字，避免出现白圈 */
+  function wallIcon(l) {
+    return '<a class="tags-group-icon" href="' + esc(l.link) + '" target="_blank" rel="external nofollow" title="' + esc(l.name) + '">'
+      + '<span class="tags-group-fb" style="background:' + fbColor(l.name) + '">' + esc(String(l.name || '?').slice(0, 1)) + '</span>'
+      + '<img src="' + esc(avatarOf(l)) + '" alt="' + esc(l.name) + '" decoding="async" onerror="this.parentNode.classList.add(\'is-broken\');this.style.display=\'none\'">'
+      + '<span class="tags-group-title">' + esc(l.name) + '</span>'
+      + '</a>';
+  }
+%>
+<div class="post-link-page">
+
+  <%# ---------- 顶部横幅 ---------- %>
+  <div class="flink_top">
+    <div class="banners-title">
+      <div class="banners-title-small">友情链接</div>
+      <div class="banners-title-big">与 <%= totalPeople %> 名博主无限进步</div>
+    </div>
+    <div class="banner-button-group">
+      <button class="banner-button secondary" id="flink-random" type="button">
+        <span class="banner-button-icon"><i class="heoblogIcon icon-refresh-line"></i></span>
+        <span class="banner-button-text">随机访问</span>
+      </button>
+      <a class="banner-button" href="#apply-flink">
+        <span class="banner-button-icon"><i class="heoblogIcon icon-link"></i></span>
+        <span class="banner-button-text">申请友链</span>
+      </a>
+    </div>
+    <div class="tags-group-all">
+      <div class="tags-group-wrapper">
+        <% wallPairs.forEach(function (pair) { %>
+        <div class="tags-group-icon-pair"><%- wallIcon(pair[0]) %><%- wallIcon(pair[1]) %></div>
+        <% }); %>
+        <%# 第二份用于无缝循环 %>
+        <% wallPairs.forEach(function (pair) { %>
+        <div class="tags-group-icon-pair"><%- wallIcon(pair[0]) %><%- wallIcon(pair[1]) %></div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <%# ---------- 钓鱼：随机逛一个友链 ---------- %>
+  <div class="random-post-container">
+    <div class="title-section">
+      <div class="title-left">
+        <h2>🎣 钓鱼</h2>
+        <a class="random-post-start" id="flink-dice" title="换一个">
+          <i class="heoblogIcon icon-refresh-line"></i>
+        </a>
+      </div>
+    </div>
+    <div class="random-post-content" id="random-post">
+      <div><%= allLinks.length ? '三十年河东，三十年河西，莫欺我没有看过' : '还没有友链，快去添加吧' %> 来自友链 <b><%= allLinks.length ? allLinks[0].name : '暂无' %></b> 的文章：<a class="random-friends-post" href="<%= allLinks.length ? allLinks[0].link : '#' %>" target="_blank" rel="external nofollow"><%= allLinks.length ? (allLinks[0].descr || '最新文章') : '暂无' %></a></div>
+    </div>
+  </div>
+
+  <%# ---------- 分组列表 ---------- %>
+  <div id="article-container" class="flink">
+    <% groups.forEach(function (g) {
+         var isCard = (g.flink_style === 'flexcard');
+         var list = g.link_list || []; %>
+    <div class="link-group">
+      <div class="power_title_bar">
+        <h2 id="<%= g.class_name %>"><a href="#<%= g.class_name %>" class="headerlink"><%= g.class_name %> (<%= list.length %>)</a></h2>
+        <% if (g.class_desc) { %><div class="flink-desc"><%= g.class_desc %></div><% } %>
+      </div>
+
+      <% if (isCard) { %>
+      <div class="site-card-group">
+        <% list.forEach(function (l) { %>
+        <div class="site-card">
+          <% var st = tagStyle(l.tag, l.color === 'vip'); %>
+          <% if (l.tag || l.color === 'vip') { %>
+          <span class="link-tag"<% if (st) { %> style="<%= st %>"<% } %>><%= l.tag || '推荐' %><i class="light"></i></span>
+          <% } %>
+          <a class="img<%= l.siteshot ? '' : ' is-broken' %>" href="<%= l.link %>" target="_blank" rel="external nofollow" title="<%= l.name %>" style="<%= bgStyle(l.name) %>">
+            <span class="shot-fb"><%= l.name %></span>
+            <% if (l.siteshot) { %>
+            <img class="flink-avatar" src="<%= l.siteshot %>" alt="<%= l.name %>" decoding="async" onerror="this.style.display='none';this.parentNode.classList.add('is-broken')">
+            <% } %>
+          </a>
+          <a class="info" href="<%= l.link %>" target="_blank" rel="external nofollow" title="<%= l.name %>">
+            <div class="site-card-avatar">
+              <img class="flink-avatar" src="<%= avatarOf(l) %>" alt="<%= l.name %>" loading="lazy" decoding="async" onerror="this.style.opacity='0'">
+            </div>
+            <div class="site-card-text">
+              <span class="title"><%= l.name %></span>
+              <span class="desc" title="<%= l.descr || '' %>"><%= l.descr || '' %></span>
+            </div>
+          </a>
+        </div>
+        <% }); %>
+      </div>
+      <% } else { %>
+      <div class="flink-list">
+        <% list.forEach(function (l) { %>
+        <div class="flink-list-item">
+          <% var st2 = tagStyle(l.tag, l.color === 'vip'); %>
+          <% if (l.tag || l.color === 'vip') { %>
+          <span class="link-tag"<% if (st2) { %> style="<%= st2 %>"<% } %>><%= l.tag || '推荐' %><i class="light"></i></span>
+          <% } %>
+          <a class="cf-friends-link" href="<%= l.link %>" target="_blank" rel="external nofollow" title="<%= l.name %>">
+            <img class="flink-avatar" src="<%= avatarOf(l) %>" alt="<%= l.name %>" loading="lazy" decoding="async" onerror="this.style.opacity='0'">
+            <div class="flink-item-info">
+              <span class="flink-item-name"><%= l.name %></span>
+              <span class="flink-item-desc" title="<%= l.descr || '' %>"><%= l.descr || '' %></span>
+            </div>
+          </a>
+        </div>
+        <% }); %>
+      </div>
+      <% } %>
+    </div>
+    <% }); %>
+  </div>
+
+  <%# ---------- 正文（申请说明） ---------- %>
+  <% if (page.content && page.content.trim()) { %>
+  <div class="post-content" id="apply-flink">
+    <%- page.content %>
+  </div>
+  <% } else { %>
+  <div class="post-content" id="apply-flink"></div>
+  <% } %>
+
+  <%# ---------- 申请条件 ---------- %>
+  <div class="flink-conditions">
+    <h3 class="flink-cond-title">申请条件</h3>
+    <p class="flink-cond-sub">请先确认满足以下条件：</p>
+    <div class="flink-cond-list">
+      <% ['我已添加 <b>老刘博客</b> 博客的友情链接', '我的链接主体为 <b>个人</b>，网站类型为博客', '我的网站现在可以在中国大陆区域正常访问', '网站内容符合中国大陆法律法规', '我的网站可以在 1 分钟内加载完成首屏'].forEach(function (t) { %>
+      <label class="flink-cond-item">
+        <input type="checkbox">
+        <span class="flink-cond-box" aria-hidden="true"></span>
+        <span class="flink-cond-text"><%- t %></span>
+      </label>
+      <% }); %>
+    </div>
+    <div class="flink-cond-tip">请先勾选所有条件后再填写申请表单</div>
+  </div>
+
+  <%# ---------- 友链申请列表 ---------- %>
+  <div class="applications-card" id="flink-applications">
+    <div class="applications-header">
+      <div class="header-title">友链申请列表 <span class="header-count" id="app-count">（共 <%= applications.length %> 条）</span></div>
+      <div class="header-filters">
+        <div class="status-filter-wrap">
+          <select class="status-filter" id="app-status" aria-label="按状态筛选">
+            <option value="all">全部状态</option>
+            <option value="pending">待审核</option>
+            <option value="approved">已通过</option>
+            <option value="rejected">未通过</option>
+          </select>
+          <i class="heoblogIcon icon-arrow-down-s-line" aria-hidden="true"></i>
+        </div>
+        <input class="name-search" id="app-search" type="search" placeholder="搜索名称" aria-label="按名称搜索">
+      </div>
+    </div>
+    <div class="applications-list">
+      <div class="application-items" id="app-items"></div>
+      <div class="pagination" id="app-pagination"></div>
+    </div>
+  </div>
+
+  <%# ---------- 评论 ---------- %>
+  <% if (theme.comments.enable && page.comments !== false) { %>
+  <div class="post-comments card-widget">
+    <div class="item-headline"><i class="heoblogIcon icon-chat-1-fill"></i><span>评论</span></div>
+    <% if (theme.comments.use === 'twikoo' && theme.comments.twikoo.envId) { %>
+      <div id="twikoo-container"></div>
+    <% } else { %>
+      <div class="comments-placeholder">请在主题 <code>_config.yml</code> 中配置评论系统（如 twikoo 的 <code>envId</code>）。</div>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  /* 供 link.js 使用：全部友链（随机跳转 / 钓鱼用） */
+  window.FLINK_DATA = <%- JSON.stringify(allLinks.map(function (l) { return { n: l.name, u: l.link, d: l.descr || '' }; })) %>;
+  /* 友链申请列表（待审记录 + 已收录友链） */
+  window.LINK_APPLY = <%- JSON.stringify(applications) %>;
+  /* 钓鱼区的随机文案池 */
+  window.FLINK_LINES = [
+    '三十年河东，三十年河西，莫欺我没有看过',
+    '来都来了，不点进去看看吗',
+    '世间所有的相遇，都是久别重逢',
+    '随缘一逛，说不定有惊喜',
+    '这位博主最近好像更新了',
+    '听说点进去的人后来都变强了',
+    '路过借个道，顺便看看',
+    '码字不易，且看且珍惜'
+  ];
+</script>

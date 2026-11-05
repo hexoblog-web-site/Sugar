@@ -1,0 +1,61 @@
+<%
+  /* 站长信息：字段全部在 _config.yml → aside.widgets 里 type: author 那一项 */
+  var cfg = lb_widget('author') || {};
+  var info = lb_author();
+  var name = info.name;
+  var desc = info.desc;
+  var descs = cfg.description || [];
+  var avatar = info.avatar;
+  var statusImg = info.status_img;
+  /* 卡片社交图标：author.social 优先，留空则复用全局 social */
+  var social = info.social;
+  /* 问候语：支持「时段对象」与「纯字符串」两种写法，统一成 { g, s, e } */
+  var fallback = cfg.sayhi || '你好啊！';
+  var raw = cfg.sayhi_list || [];
+  var slots = [];
+  var hasTime = false;
+  raw.forEach(function (it) {
+    if (typeof it === 'string') { slots.push({ g: it, s: null, e: null }); return; }
+    if (!it || !it.greeting) return;
+    var timed = (it.startTime !== undefined && it.startTime !== null);
+    if (timed) hasTime = true;
+    slots.push({
+      g: it.greeting,
+      s: timed ? Number(it.startTime) : null,
+      e: (it.endTime !== undefined && it.endTime !== null) ? Number(it.endTime) : null
+    });
+  });
+  if (!slots.length) slots = [{ g: fallback, s: null, e: null }];
+  var sayhiJson = JSON.stringify({ mode: hasTime ? 'time' : 'random', fallback: fallback, list: slots })
+    .replace(/"/g, '&quot;');
+  /* 兼容多行简介：数组合并成一段，保持与 anzhiyu 相同的单节点结构 */
+  var descHtml = Array.isArray(descs) ? descs.join('<br>') : (descs || '');
+  if (!descHtml && config.description) descHtml = config.description;
+%>
+<div class="card-widget card-info">
+  <div class="card-content">
+    <% if (cfg.sayhi !== false) { %>
+    <div class="author-info__sayhi" id="author-info__sayhi" data-sayhi="<%- sayhiJson %>" onclick="heo.changeSayHelloText()"><%= fallback %></div>
+    <% } %>
+    <div class="author-info-avatar">
+      <img class="avatar-img" src="<%- url_for(avatar) %>" alt="avatar">
+      <% if (statusImg) { %>
+      <div class="author-status"><img class="g-status" src="<%- url_for(statusImg) %>" alt="status"></div>
+      <% } %>
+    </div>
+    <div class="author-info__description"><%- descHtml %></div>
+    <div class="author-info__bottom-group">
+      <a class="author-info__bottom-group-left" href="<%- url_for(cfg.link || '/about/') %>">
+        <div class="author-info__name"><%= name %></div>
+        <div class="author-info__desc"><%= desc %></div>
+      </a>
+      <div class="card-info-social-icons is-center">
+        <% Object.keys(social).forEach(function (k) { var s = social[k]; var ext = /^https?:|^mailto:/i.test(s.url || ''); %>
+        <a class="social-icon" href="<%- ext ? s.url : url_for(s.url) %>"<% if (/^https?:/i.test(s.url || '')) { %> rel="external nofollow" target="_blank"<% } %> title="<%= k %>" heotip="<%= k %>">
+          <i class="heoblogIcon <%= s.icon %>"></i>
+        </a>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</div>

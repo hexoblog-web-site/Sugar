@@ -1,0 +1,39 @@
+<%
+  /* 独立页分发。
+     source/categories/index.md 写的是 type: "categories"，但 Hexo 给用户页面的
+     默认 layout 永远是 page（type 只是给生成器用的标记），
+     所以这里按 page.type 自己分一次，否则分类/标签索引会落进空白正文。 */
+  var ptype = String(page.type || '').toLowerCase();
+%>
+<% if (ptype === 'categories' || ptype === 'category') { %>
+  <%- partial('_partial/page/category-body') %>
+<% } else if (ptype === 'tags' || ptype === 'tag') { %>
+  <%- partial('_partial/page/tag-body') %>
+<% } else if (ptype === 'archives' || ptype === 'archive') { %>
+  <%- partial('_partial/page/archive-body') %>
+<% } else { %>
+  <div id="page">
+    <article class="page-card">
+      <% if (page.title) { %><h1 class="page-title"><%= page.title %></h1><% } %>
+      <div id="article-container" class="page-content">
+        <%- page.content %>
+      </div>
+    </article>
+
+    <% if (theme.comments.enable && page.comments !== false) { %>
+      <div class="post-comments card-widget">
+        <div class="item-headline"><i class="heoblogIcon icon-chat-1-fill"></i><span>评论</span></div>
+        <% if (theme.comments.use === 'twikoo' && theme.comments.twikoo.envId) { %>
+          <div id="twikoo-container"></div>
+        <% } else { %>
+          <div class="comments-placeholder">请在主题 <code>_config.yml</code> 中配置评论系统（如 twikoo 的 <code>envId</code>）。</div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+<% } %>
+
+<%# 分类 / 标签索引页对标 blog.zhheo.com：整宽铺开，不挂侧栏 %>
+<% if (lb_sidebar_cfg().enable !== false && ptype !== 'categories' && ptype !== 'tags') { %>
+  <%- partial('_partial/aside') %>
+<% } %>

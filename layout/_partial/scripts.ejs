@@ -1,0 +1,52 @@
+<% /* 配置必须先于脚本：脚本一加载就读 window.HEO_CONFIG */ %>
+<% /* 幻灯片：interval 只认数字（0 = 不自动播），不写默认 5000 */ %>
+<% var _swiper = ((theme.home.home_top || {}).swiper) || {};
+   var _swInterval = typeof _swiper.interval === 'number' ? _swiper.interval : 5000; %>
+<script>
+  window.HEO_CONFIG = {
+    searchPath: '<%- url_for(theme.search.path || "/search.xml") %>',
+    searchEnable: <%= theme.search.enable !== false %>,
+    searchPageSize: <%= parseInt(theme.search.page_size, 10) || 10 %>,
+    bannerInterval: <%= _swInterval %>,
+    bannerPause: <%= _swiper.pause_on_hover !== false %>,
+    bannerTint: <%= lb_banner_tint() %>,
+    start_date: '<%= lb_start_time() %>',
+    rememberMode: <%= lb_site('remember_mode', true) !== false %>,
+    <% /* 代码块工具条（js/partial/code.js 读这几个开关） */ %>
+    code: {
+      copy: <%= (theme.code && theme.code.copy) !== false %>,
+      lang: <%= (theme.code && theme.code.lang) !== false %>,
+      heightLimit: <%= parseInt((theme.code && theme.code.height_limit), 10) >= 0 ? parseInt(theme.code.height_limit, 10) : 420 %>
+    },
+    posts: [<% site.posts.sort('date', -1).each(function (p, i) { %><%= i ? ',' : '' %>{ "t": <%- JSON.stringify(p.title) %>, "u": "<%- url_for(p.path) %>", "c": <%- JSON.stringify((p.cover || p.top_img || p.thumbnail) ? url_for(p.cover || p.top_img || p.thumbnail) : "") %>, "d": "<%- date(p.date, 'MM/DD') %>", "k": <%- JSON.stringify((p.categories && p.categories.length) ? p.categories.first().name : "") %> }<% }); %>],
+    friends: [<% var fc = 0; (site.data.link || []).forEach(function (grp) { (grp.link_list || []).forEach(function (f) { %><%= fc++ ? ',' : '' %>{ "n": <%- JSON.stringify(f.name) %>, "u": <%- JSON.stringify(f.link) %>, "a": <%- JSON.stringify(f.avatar || '') %>, "d": <%- JSON.stringify(f.descr || '') %>, "t": <%- JSON.stringify(f.tag || '') %> }<% }); }); %>]
+  };
+</script>
+
+<% /* 第三方库放 source/lib/，由 Hexo 原样发布成 /lib/xxx.js，不进 bundle：
+     bundle 只装主题自己的脚本，库可以单独缓存、按页面加载。
+     二维码库只在文章页的分享海报里用，其他页面不引。 */ %>
+<% if (is_post()) { %>
+<script src="<%- url_for('/lib/qrcode.min.js') %>?v=<%= lb_asset_ver('/lib/qrcode.min.js') %>"></script>
+<% } %>
+
+<% /* 脚本只有一个请求：
+     scripts/liublog-perf.js 按固定顺序把下面这些文件拼成 /js/bundle.js
+       main.js  →  source/js/partial/*.js（板块脚本，字典序）  →  source/js/aside/*.js
+     源文件仍是各板块一份，改哪块只改哪个文件，构建时自动重新拼接。
+     顺序很重要：main.js 先建好 window.heo，板块脚本才挂得上去。
+     注意不能改成 head 里引：脚本要等 DOM 出来才能取节点，必须留在 </body> 之前。 */ %>
+<script src="<%- url_for('/js/bundle.js') %>?v=<%= lb_js_ver() %>"></script>
+
+<% if (theme.comments.enable && theme.comments.use === 'twikoo' && theme.comments.twikoo.envId) { %>
+  <script src="https://cdn.jsdelivr.net/npm/twikoo@1.6.39/dist/twikoo.all.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var el = document.getElementById('twikoo-container');
+      if (!el) return;
+      var opt = { envId: '<%= theme.comments.twikoo.envId %>', el: '#twikoo-container', path: '<%= page.path %>' };
+      <% if (theme.comments.twikoo.region) { %>opt.region = '<%= theme.comments.twikoo.region %>';<% } %>
+      twikoo.init(opt);
+    });
+  </script>
+<% } %>

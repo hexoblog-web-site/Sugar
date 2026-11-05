@@ -1,0 +1,36 @@
+<%
+  /* ================= 侧栏 =================
+     卡片顺序、开关、标题、图标、条数全部来自 _config.yml 的 sidebar_settings.widgets。
+
+     吸顶规则（关键）：从第一张「吸顶卡」开始，后面所有卡片都塞进同一个
+     .sticky_layout，中途夹一张不吸顶的卡（比如订阅卡）也不会另起容器。
+     原因：#aside-content .sticky_layout 统一 top:66px，两个容器同 top 会互相压住。
+     所以顺序可以随便排，只要求「不吸顶的卡」写在第一张吸顶卡前面。 */
+  var widgetList = lb_aside_widgets();
+  var items = widgetList.filter(function (w) {
+    return !(w.type === 'toc' && !is_post());   // 目录只在文章页出现
+  });
+  /* 第一张吸顶卡的下标：它之前的平铺，它和它之后的全部进同一个容器 */
+  var startSticky = -1;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].sticky) { startSticky = i; break; }
+  }
+  /* type → 模板，新增卡片类型时在这里补一行即可 */
+  var TPL = {
+    author: '_partial/aside/card-author',
+    rss: '_partial/aside/card-rss',
+    toc: '_partial/aside/card-toc',
+    recent: '_partial/aside/card-recent',
+    random: '_partial/aside/card-random',
+    tags: '_partial/aside/card-tags',
+    webinfo: '_partial/aside/card-webinfo',
+    archives: '_partial/aside/card-archives'
+  };
+%>
+<div class="aside-content" id="aside-content">
+  <% items.forEach(function (w, idx) { %>
+    <% if (idx === startSticky) { %><div class="sticky_layout"><% } %>
+    <% var tpl = TPL[w.type]; if (tpl) { %><%- partial(tpl) %><% } %>
+  <% }); %>
+  <% if (startSticky >= 0) { %></div><% } %>
+</div>

@@ -1,0 +1,68 @@
+<%
+  /* 标签页正文：单个标签（page.tag 有值）列文章，索引页列全部标签。
+     tag.ejs 与 tags.ejs 共用这里，避免两份模板各改各的。
+     索引页对标 blog.zhheo.com/tags/：大标题 + 统计药丸 + 每标签一张卡
+     （左边标签方块，右边最新 3 篇标题，卡片两列排布）。 */
+  var tagName = page.tag;
+  var tagTotal = 0;
+  if (tagName) {
+    var tq = site.tags.findOne({ name: tagName });
+    tagTotal = tq ? tq.length : page.posts.length;
+  }
+%>
+<% if (!tagName) { %>
+<div id="tag" class="tags-page">
+  <h1 class="equipment-page-title">查看不同领域的<%= site.tags.length %>个标签。</h1>
+
+  <div class="tag-page-stats">
+    <a class="tag-page-stat" href="<%- url_for('/tags/') %>" title="全站共 <%= site.tags.length %> 个标签">
+      <i class="ri-price-tag-3-fill"></i><b><%= site.tags.length %></b>
+    </a>
+    <a class="tag-page-stat" href="<%- url_for('/archives/') %>" title="全站共 <%= site.posts.length %> 篇文章">
+      <i class="ri-article-fill"></i><b><%= site.posts.length %></b>
+    </a>
+    <a class="tag-page-stat" href="<%- url_for('/categories/') %>" title="全站共 <%= site.categories.length %> 个分类">
+      <i class="ri-folders-fill"></i><b><%= site.categories.length %></b>
+    </a>
+  </div>
+
+  <div class="tag-list">
+    <% site.tags.sort('length', -1).each(function (t) { %>
+    <div class="tag-list-item">
+      <a class="tag-list-tag" href="<%- url_for(t.path) %>" title="<%= t.name %>">
+        <i class="heoblogIcon icon-price-tag-3-fill tag-list-tag-icon"></i>
+        <span class="tag-list-tag-name"><%= t.name %></span>
+        <span class="tag-list-tag-count"><%= t.length %></span>
+      </a>
+      <div class="tag-list-posts">
+        <% t.posts.sort('date', -1).limit(3).each(function (post) { %>
+        <a class="tag-list-post" href="<%- url_for(post.path) %>" title="<%= post.title %>">
+          <span class="tag-list-post-title"><%= post.title %></span>
+        </a>
+        <% }); %>
+        <% if (!t.length) { %><span class="tag-list-empty">这个标签还没有文章</span><% } %>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</div>
+<% } else { %>
+<div id="tag">
+  <div class="tag-head card-widget">
+    <div class="item-headline">
+      <i class="heoblogIcon icon-price-tag-3-fill"></i>
+      <span><%= tagName %></span>
+    </div>
+    <div class="tag-count">该标签下共 <b><%= tagTotal %></b> 篇文章</div>
+  </div>
+
+  <div id="recent-posts" class="recent-posts<%= lb_post_list().banner ? ' list-banner' : '' %>">
+    <% var idx = 0; %>
+    <% page.posts.sort('date', -1).each(function (post) { %>
+      <%- partial('_partial/home/post-card', { post: post, index: idx }) %>
+      <% idx++; %>
+    <% }); %>
+  </div>
+  <%- partial('_partial/pagination') %>
+</div>
+<% } %>

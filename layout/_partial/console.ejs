@@ -1,0 +1,142 @@
+<%
+  var cCount = theme.console.recent_count || 8;
+  var authorCfg = lb_author();
+  var avatar = authorCfg.avatar || theme.avatar || '';
+  var authorName = lb_site('site_name', '') || config.author || config.title;
+  var authorLink = authorCfg.link || '/about/';
+  var postTotal = site.posts.length;
+  var catTotal = site.categories.length;
+  var tagTotal = site.tags.length;
+%>
+<div id="console">
+  <div class="console-mask"></div>
+  <div class="console_content">
+    <div class="console-row console-row--top">
+      <div class="console-user">
+        <div class="console-user__card">
+          <% if (avatar) { %>
+          <a class="console-user__avatar-link" href="<%- url_for(authorLink) %>" title="关于我">
+            <img class="console-user__avatar" src="<%- url_for(avatar) %>" alt="<%= authorName %>">
+          </a>
+          <% } %>
+          <div class="console-user__meta">
+            <div class="console-user__name">Hi，随便逛逛吧</div>
+            <div class="console-user__sub">
+              <span>全站 <b><%= postTotal %></b> 篇文章</span>
+              <span><b><%= catTotal %></b> 个分类</span>
+              <span><b><%= tagTotal %></b> 个标签</span>
+            </div>
+          </div>
+          <div class="console-user__actions">
+            <a class="console-user__btn" href="<%- url_for('/archives/') %>">文章归档</a>
+            <a class="console-user__btn console-user__btn--primary" href="<%- url_for(authorLink) %>">关于我</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="console-row console-row--main">
+      <div class="console-card console-posts">
+        <div class="card-content">
+          <div class="author-content-item-tips">博客</div>
+          <div class="card-hor-content">
+            <span class="author-content-item-title">最近文章</span>
+            <a class="go_to_recent_comments" href="<%- url_for('/archives/') %>" title="最近文章" heotip="查看全部文章"><i class="heoblogIcon icon-arrow-right-circle-fill"></i></a>
+          </div>
+        </div>
+        <ul class="console-posts__list">
+          <% site.posts.sort('date', -1).limit(cCount).each(function (p) { %>
+            <li class="console-posts__item">
+              <a class="console-posts__link" href="<%- url_for(p.path) %>" title="<%= p.title %>">
+                <span class="console-posts__title"><%= p.title %></span>
+                <span class="console-posts__date"><%= date(p.date, 'MM/DD') %></span>
+              </a>
+            </li>
+          <% }); %>
+        </ul>
+      </div>
+
+      <div class="console-card console-posts">
+        <div class="card-content">
+          <div class="author-content-item-tips">随便看看</div>
+          <div class="card-hor-content">
+            <span class="author-content-item-title">分类导航</span>
+            <a class="go_to_recent_comments" href="<%- url_for('/categories/') %>" title="分类导航" heotip="查看全部分类"><i class="heoblogIcon icon-arrow-right-circle-fill"></i></a>
+          </div>
+        </div>
+        <ul class="console-posts__list">
+          <% site.categories.sort('length', -1).limit(cCount).each(function (c) { %>
+            <li class="console-posts__item">
+              <a class="console-posts__link" href="<%- url_for(c.path) %>">
+                <span class="console-posts__title"><%= c.name %></span>
+                <span class="console-posts__count"><%= c.length %></span>
+              </a>
+            </li>
+          <% }); %>
+        </ul>
+      </div>
+
+      <div class="console-card console-posts tags">
+        <div class="card-content">
+          <div class="author-content-item-tips">标签</div>
+          <div class="card-hor-content">
+            <span class="author-content-item-title">热门标签</span>
+            <a class="go_to_recent_comments" href="<%- url_for('/tags/') %>" title="热门标签" heotip="查看全部标签"><i class="heoblogIcon icon-arrow-right-circle-fill"></i></a>
+          </div>
+        </div>
+        <div class="card-tag-cloud">
+          <% site.tags.sort('length', -1).limit(24).each(function (t) { %>
+            <a href="<%- url_for(t.path) %>"><%= t.name %><sup><%= t.length %></sup></a>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+
+    <div class="button-group">
+      <div class="console-btn-item">
+        <button class="darkmode_switchbutton" type="button" title="切换主题" onclick="heo.toggleDarkMode()">
+          <i class="heoblogIcon icon-moon-clear-fill"></i>
+        </button>
+      </div>
+      <div class="console-btn-item">
+        <button class="asideSwitch" type="button" title="显示/隐藏侧栏" onclick="heo.toggleAside()">
+          <i class="heoblogIcon icon-side-bar-fill"></i>
+        </button>
+      </div>
+      <div class="console-btn-item">
+        <button class="keyboard-switch" type="button" title="键盘快捷键" onclick="heo.toggleKeyboard()">
+          <i class="heoblogIcon icon-keyboard-box-fill"></i>
+        </button>
+      </div>
+      <div class="console-btn-item">
+        <button class="console-close" type="button" title="关闭中控台" onclick="heo.toggleConsole()">
+          <i class="heoblogIcon icon-close-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (theme.console.keyboard_tips) { %>
+<div id="keyboard-tips">
+  <div class="keyboardTitle">键盘快捷键</div>
+  <div class="keybordList">
+    <div class="keybordItem">
+      <div class="keyGroup"><div class="key">/</div></div>
+      <div class="keyContent"><div class="content">打开搜索</div></div>
+    </div>
+    <div class="keybordItem">
+      <div class="keyGroup"><div class="key">Esc</div></div>
+      <div class="keyContent"><div class="content">关闭弹层</div></div>
+    </div>
+    <div class="keybordItem">
+      <div class="keyGroup"><div class="key">T</div></div>
+      <div class="keyContent"><div class="content">回到顶部</div></div>
+    </div>
+    <div class="keybordItem">
+      <div class="keyGroup"><div class="key">D</div></div>
+      <div class="keyContent"><div class="content">切换日间 / 夜间</div></div>
+    </div>
+  </div>
+</div>
+<% } %>

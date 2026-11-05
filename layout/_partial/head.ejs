@@ -1,0 +1,112 @@
+<%
+  /* 站点级配置统一走 site_settings（_config.yml 顶部那个节） */
+  var siteCfg = {
+    favicon: lb_site('favicon', ''),
+    logo: lb_site('site_logo', ''),
+    name: lb_site('site_name', ''),
+    mode: lb_site('theme_mode', 'light'),
+    remember: lb_site('remember_mode', true) !== false,
+    color: lb_site('color', {}) || {},
+    smooth: lb_site('smooth_scroll', true) !== false
+  };
+%><meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<title><%
+  if (is_home()) {
+    %><%= config.title %><% if (config.subtitle) { %> - <%= config.subtitle %><% } %><%
+  } else if (page.title) {
+    %><%= page.title %> - <%= config.title %><%
+  } else if (is_archive()) {
+    /* 归档是生成器自动出的页面，没有 front-matter，page.title 是空的 */
+    %>归档 - <%= config.title %><%
+  } else {
+    %><%= config.title %><%
+  }
+%></title>
+<% if (siteCfg.favicon) { %><link rel="icon" href="<%- url_for(siteCfg.favicon) %>"><% } %>
+<% if (page.keywords || config.keywords) { %><meta name="keywords" content="<%= page.keywords || config.keywords %>"><% } %>
+<% if (page.description || config.description) { %><meta name="description" content="<%= page.description || config.description %>"><% } %>
+<% if (config.author) { %><meta name="author" content="<%= config.author %>"><% } %>
+<%
+  /* --- SEO：canonical + Open Graph / Twitter 卡片 ---
+     canonical 必须用绝对地址，否则分页、归档、标签页会被搜索引擎当成重复内容。
+     og:image 优先文章封面，其次站点头像 / logo；没有就不输出（输出空值比没有更糟）。
+     分享摘要统一去 HTML 标签并截断，避免把整段正文塞进 meta。 */
+  /* 去掉 index.html 尾巴：/ 与 /index.html、/page/2/ 与 /page/2/index.html
+     若不归一，canonical 反而会制造重复内容 */
+  var canonicalPath = String(page.path || '').replace(/index\.html$/, '');
+  var canonicalUrl = full_url_for(canonicalPath || '/');
+  var shareDesc = String(page.description || page.excerpt || config.description || '')
+    .replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  var shareImg = page.cover || page.top_img || page.thumbnail ||
+    (is_post() ? (theme.post && theme.post.default_cover) : (lb_author().avatar || siteCfg.logo));
+  var shareImgUrl = shareImg ? full_url_for(shareImg) : '';
+  var shareTitle = page.title || config.title;
+%>
+<link rel="canonical" href="<%- canonicalUrl %>">
+<meta property="og:type" content="<%= is_post() ? 'article' : 'website' %>">
+<meta property="og:title" content="<%= shareTitle %>">
+<meta property="og:url" content="<%- canonicalUrl %>">
+<meta property="og:site_name" content="<%= config.title %>">
+<meta property="og:locale" content="zh_CN">
+<% if (shareDesc) { %><meta property="og:description" content="<%= shareDesc %>"><% } %>
+<% if (shareImgUrl) { %><meta property="og:image" content="<%- shareImgUrl %>"><% } %>
+<meta name="twitter:card" content="<%= shareImgUrl ? 'summary_large_image' : 'summary' %>">
+<meta name="twitter:title" content="<%= shareTitle %>">
+<% if (shareDesc) { %><meta name="twitter:description" content="<%= shareDesc %>"><% } %>
+<% if (shareImgUrl) { %><meta name="twitter:image" content="<%- shareImgUrl %>"><% } %>
+<meta name="theme-color" content="#f7f9fe">
+
+<link rel="alternate" href="<%- url_for('/atom.xml') %>" title="<%= config.title %>" type="application/atom+xml">
+
+<%#
+  样式只有一个请求：scripts/liublog-perf.js 读 source/css/style.css 的 @import 清单，
+  按那里的顺序拼成 /css/bundle.css。想知道「有哪些样式、什么顺序」只看那个文件，
+  这里不要列文件清单（列了就会和 style.css 对不上）。
+  版本号取拼接结果的 md5：样式没改动时 URL 不变，访客继续用本地缓存。
+%>
+<link rel="preload" as="font" type="font/woff" href="<%- url_for('/css/iconfont.woff') %>" crossorigin>
+<link rel="stylesheet" href="<%- url_for('/css/bundle.css') %>?v=<%= lb_css_ver() %>">
+
+<%# Font Awesome 89KB：只有正文真的用了 fa-* 图标时才加载（现在全站仅 1 篇文章用到） %>
+<% if (lb_need_fontawesome()) { %>
+<link rel="stylesheet" href="<%- url_for('/css/fontawesome.min.css') %>?v=<%= lb_asset_ver('/css/fontawesome.min.css') %>">
+<% } %>
+
+<script>
+  /* 主题色 + 明暗模式：必须在样式计算前写入，避免闪烁 */
+  (function () {
+    var mode = '<%= siteCfg.mode || "light" %>';
+    var remember = <%= siteCfg.remember %>;
+    var saved = null;
+    if (remember) { try { saved = localStorage.getItem('theme'); } catch (e) {} }
+    var t = saved || (mode === 'auto'
+      ? (new Date().getHours() >= 6 && new Date().getHours() < 18 ? 'light' : 'dark')
+      : mode);
+    document.documentElement.setAttribute('data-theme', t);
+    /* 地址栏颜色跟着实际模式走（meta 里的静态值只是首屏兜底） */
+    var mt = document.querySelector('meta[name="theme-color"]');
+    if (mt) mt.setAttribute('content', t === 'dark' ? '#17191d' : '#f7f9fe');
+    var c = t === 'dark'
+      ? '<%= siteCfg.color.dark || "#ffc848" %>'
+      : '<%= siteCfg.color.light || "#7454fc" %>';
+    var s = document.documentElement.style;
+    s.setProperty('--heo-theme', c);
+    s.setProperty('--heo-main', c);
+    s.setProperty('--heo-main-op', c + '23');
+    s.setProperty('--heo-main-op-deep', c + 'dd');
+    s.setProperty('--heo-main-op-light', c + '0d');
+    s.setProperty('--heo-main-none', c + '00');
+    <% /* 代码块顶上那三颗红黄绿点，_config.yml → code.mac_style: false 时关掉 */ %>
+    <% if (theme.code && theme.code.mac_style === false) { %>
+    document.documentElement.classList.add('no-code-mac');
+    <% } %>
+  })();
+</script>
+
+<% if (siteCfg.smooth) { %>
+<% /* 平滑滚动；用户系统开了「减少动态效果」时自动关掉 */ %>
+<style>html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}</style>
+<% } %>

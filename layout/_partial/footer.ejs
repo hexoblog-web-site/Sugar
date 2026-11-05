@@ -1,0 +1,122 @@
+<%
+  var f = lb_footer_cfg();   /* 读 footer_settings，旧的 footer 键名仍兼容 */
+  var owner = f.owner || {};
+  var runtime = f.runtime || {};
+  var badge = f.bdageitem || {};
+  var bar = f.socialBar || {};
+  var list = f.list || {};
+  var fbar = f.footerBar || {};
+  /* 建站时间：site_settings.start_time 优先，其次旧的 footer.runtime.launch_time */
+  var launchTime = lb_site('start_time', '') || runtime.launch_time || '';
+  var nowY = new Date().getFullYear();
+  var author = config.author || config.title || '本站';
+  var centerImg = bar.centerImg || lb_author().avatar || '/images/avatar.svg';
+  /* 随机友链：把 source/_data/link.yml 里所有 link_list 摊平，交给前端随机取 */
+  var friends = [];
+  (site.data.link || []).forEach(function (g) {
+    (g.link_list || []).forEach(function (l) { friends.push({ t: l.name, u: l.link }); });
+  });
+  function icon(it) {
+    return it.icon && it.icon.indexOf('icon') === 0
+      ? '<i class="heoblogIcon ' + it.icon + '"></i>'
+      : '<i class="' + (it.icon || 'heoblogIcon icon-link') + '"></i>';
+  }
+%>
+<footer id="footer">
+  <% if (bar.enable) { %>
+  <div id="footer_deal">
+    <% (bar.left || []).forEach(function (it) { var ext = /^https?:|^mailto:/i.test(it.link || ''); %>
+      <a class="deal_link" href="<%- ext ? it.link : url_for(it.link) %>" title="<%= it.title %>"<%- ext ? ' target="_blank" rel="external nofollow"' : '' %>><%- icon(it) %></a>
+    <% }); %>
+    <img class="footer_mini_logo" src="<%- url_for(centerImg) %>" title="返回顶部" alt="返回顶部" onclick="heo.scrollToDest(0, 500)">
+    <% (bar.right || []).forEach(function (it) { var ext = /^https?:|^mailto:/i.test(it.link || ''); %>
+      <a class="deal_link" href="<%- ext ? it.link : url_for(it.link) %>" title="<%= it.title %>"<%- ext ? ' target="_blank" rel="external nofollow"' : '' %>><%- icon(it) %></a>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <% if (runtime.enable) { %>
+  <div id="workboard" data-launch="<%= launchTime %>" data-work-img="<%- url_for(runtime.work_img) %>"
+       data-work-desc="<%= runtime.work_description %>" data-off-img="<%- url_for(runtime.offduty_img) %>"
+       data-off-desc="<%= runtime.offduty_description %>">
+    <img class="workSituationImg boardsign" src="<%- url_for(runtime.work_img) %>" alt="<%= runtime.work_description %>" title="<%= runtime.work_description %>">
+    <div id="runtimeTextTip"></div>
+  </div>
+  <% } %>
+
+  <% if (f.custom_text) { %><div class="footer_custom_text"><%- f.custom_text %></div><% } %>
+
+  <% if (list.enable) { %>
+  <div id="anzhiyu-footer">
+    <% (list.project || []).forEach(function (g) { %>
+    <div class="footer-group">
+      <div class="footer-title"><%= g.title %></div>
+      <div class="footer-links">
+        <% (g.links || []).forEach(function (it) { var ext = /^https?:/i.test(it.link || ''); %>
+        <a class="footer-item" href="<%- ext ? it.link : url_for(it.link) %>" title="<%= it.title %>"<%- ext ? ' target="_blank" rel="external nofollow"' : '' %>><%= it.title %></a>
+        <% }); %>
+      </div>
+    </div>
+    <% }); %>
+    <% if (list.randomFriends > 0) { %>
+    <div class="footer-group">
+      <div class="footer-title-group">
+        <div class="footer-title"><%= list.randomFriendsTitle || '随机友链' %></div>
+        <a class="random-friends-btn" href="javascript:void(0);" onclick="heo.randomFriends()" title="<%= list.randomFriendsTip || '换一批' %>">
+          <i class="heoblogIcon icon-refresh-line"></i>
+        </a>
+      </div>
+      <div class="footer-links" id="friend-links-in-footer" data-count="<%= list.randomFriends %>" data-friends="<%- JSON.stringify(friends).replace(/"/g, '&quot;') %>"></div>
+    </div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (badge.enable && (badge.list || []).length) { %>
+  <p id="ghbdages">
+    <% badge.list.forEach(function (it) { var ext = /^https?:/i.test(it.link || ''); %>
+    <a class="github-badge" href="<%- ext ? it.link : url_for(it.link) %>" title="<%= it.message %>" data-title="<%= it.message %>"<%- ext ? ' target="_blank" rel="external nofollow"' : '' %>><img src="<%- url_for(it.shields) %>" alt="<%= it.message %>"></a>
+    <% }); %>
+  </p>
+  <% } %>
+
+  <% if (fbar.enable) { %>
+  <div id="footer-bar">
+    <div class="footer-bar-links">
+      <div class="footer-bar-left">
+        <div id="footer-bar-tips">
+          <% if (owner.enable) { %>
+          <div class="copyright">&copy;<%= owner.since && owner.since != nowY ? owner.since + ' - ' : '' %><%= nowY %> By
+            <a class="footer-bar-link" href="<%- url_for(fbar.authorLink || '/') %>" title="<%= author %>"><%= author %></a>
+          </div>
+          <% } %>
+          <% if (f.custom_text) { %><div class="beian-group"><%- f.custom_text %></div><% } %>
+        </div>
+        <% if (fbar.subTitle && fbar.subTitle.enable) { %>
+        <div id="footer-type-tips"><span id="footer-bar-subtitle"
+          data-sub="<%- JSON.stringify(fbar.subTitle.sub || []).replace(/"/g, '&quot;') %>"
+          data-delay="<%= fbar.subTitle.startDelay || 300 %>"
+          data-speed="<%= fbar.subTitle.typeSpeed || 150 %>"
+          data-back="<%= fbar.subTitle.backSpeed || 50 %>"
+          data-loop="<%= fbar.subTitle.loop !== false %>"
+          data-effect="<%= fbar.subTitle.effect !== false %>"></span></div>
+        <% } %>
+      </div>
+      <div class="footer-bar-right">
+        <% (fbar.linkList || []).forEach(function (it) { var ext = /^https?:/i.test(it.link || ''); %>
+        <a class="footer-bar-link" href="<%- ext ? it.link : url_for(it.link) %>" title="<%= it.text %>"><%= it.text %></a>
+        <% }); %>
+        <% if (fbar.cc && fbar.cc.enable) { %>
+        <a class="footer-bar-link cc" href="<%- url_for(fbar.cc.link || '/copyright/') %>" title="知识共享署名-非商业性使用-相同方式共享 4.0">
+          <i class="heoblogIcon icon-copyright-line"></i>
+          <i class="heoblogIcon icon-creative-commons-by-line"></i>
+          <i class="heoblogIcon icon-creative-commons-nc-line"></i>
+          <i class="heoblogIcon icon-creative-commons-nd-line"></i>
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+  <div id="quit-box"></div>
+</footer>

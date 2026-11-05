@@ -1,0 +1,935 @@
+/* ==========================================================================
+ * post-copyright.css —— 文章底部「作者 / 版权」卡片
+ * --------------------------------------------------------------------------
+ * 对标 blog.anheyu.com 文章页的版权卡（app.anheyu 新版）：头像绝对定位骑在
+ * 卡片上沿、名字与简介居中、一排彩色按钮（打赏 / 订阅 / 分享）、最下面一行协议。
+ * 点「打赏作者」在按钮上方弹出二维码面板（手机端从底部升起）。
+ *
+ * 数值取自参考站样式表：卡片 80/30 外边距、34/12/20 内边距、圆角 12；
+ * 头像 66px、top:-33px、left:calc(50% - 33px)；按钮高 40、圆角 8、内边距 .6/1.5rem、
+ * 字重 700；协议行 12px、单行截断、链接虚线下划线。
+ *
+ * 三件套：
+ *   模板  layout/post.ejs 里的 .post-copyright 段
+ *   样式  source/css/post-copyright.css（本文件）
+ *   脚本  source/js/partial/post-copyright.js（打赏面板 / 系统分享）
+ *   配置  _config.yml → post.copyright
+ * ========================================================================== */
+
+#post .post-copyright {
+  position: relative;
+  margin: 80px 0 30px;
+  padding: 34px 12px 20px;
+  text-align: center;
+  background: #f1f3f8;
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 12px;
+  box-shadow: none;
+  transition: all 0.3s;
+}
+
+[data-theme='dark'] #post .post-copyright {
+  background: var(--heo-secondbg, #21232a);
+}
+
+/* 头像：绝对定位，正好一半探出卡片上沿；hover 内缩一圈主色 + 图片缩小 */
+#post .post-copyright__avatar {
+  position: absolute;
+  top: -33px;
+  left: calc(50% - 33px);
+  width: 66px;
+  height: 66px;
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 66px;
+  background: var(--heo-main);
+  box-shadow: 0 8px 12px -3px rgba(66, 90, 239, 0.3);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#post .post-copyright__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 66px;
+  transition: all 0.2s;
+}
+
+#post .post-copyright__avatar:hover {
+  box-shadow: inset 0 0 0 10px var(--heo-main);
+  transform: scale(1.05);
+}
+
+#post .post-copyright__avatar:hover img {
+  transform: scale(0.8);
+}
+
+#post .post-copyright__name {
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--heo-fontcolor, #363636);
+}
+
+#post .post-copyright__desc {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--heo-secondtext, rgba(60, 60, 67, 0.8));
+}
+
+/* ---------------- 按钮组 ---------------- */
+#post .post-copyright__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin-top: 8px;
+  user-select: none;
+}
+
+#post .post-copyright .pc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  /* 目标站实测 9.6px 24px；这里写 px 不写 rem —— 本站 1rem = 20px，
+     写 0.6rem 1.5rem 会变成 12px 30px，按钮比参考站宽一圈 */
+  padding: 9.6px 24px;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: normal;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+
+#post .post-copyright .pc-btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+/* hover 统一走站点的淡紫，和参考站的三个按钮一致（不是主题蓝） */
+#post .post-copyright .pc-btn:hover {
+  color: #fff;
+  background: #b4bfe2;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+#post .post-copyright .pc-btn--reward {
+  background: #d80020;
+}
+
+#post .post-copyright .pc-btn--subscribe {
+  background: #57bd6a;
+}
+
+#post .post-copyright .pc-btn--share {
+  background: #3e86f6;
+}
+
+/* ---------------- 打赏面板 ---------------- */
+#post .post-copyright .pc-reward {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* 面板展开时把按钮连同面板抬到遮罩之上，这样再点一次按钮就能收起 */
+#post .post-copyright .pc-reward.is-open {
+  z-index: 103;
+}
+
+#post .post-copyright .pc-reward-main {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  z-index: 102;
+  display: none;
+  width: fit-content;
+  padding: 0 0 15px;
+  transform: translateX(-50%);
+  animation: pc-slide-in 0.3s;
+}
+
+#post .post-copyright .pc-reward.is-open .pc-reward-main {
+  display: flex;
+}
+
+#post .post-copyright .pc-reward-all {
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  /* 目标站写作 1rem；本站 1rem=20px，这里按实测的 16px 写死 */
+  padding: 16px;
+  background: var(--heo-card-bg, #fff);
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+}
+
+#post .post-copyright .pc-reward-title {
+  color: #d80020;
+  font-weight: 700;
+  /* 文章正文的 line-height 会继承进来，目标站标题是 normal */
+  line-height: normal;
+}
+
+#post .post-copyright .pc-reward-group {
+  display: flex;
+  /* 目标站为 .625rem=10px；本站 1rem=20px，直接写 10px */
+  margin-top: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+#post .post-copyright .pc-reward-item {
+  display: inline-block;
+  padding: 0 8px;
+  text-align: center;
+  list-style-type: none;
+}
+
+/* 图片外面套了 <a>（点开看大图）。都按块级排，避免行内基线在图片下方留 10px 空隙 */
+#post .post-copyright .pc-reward-item a {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  line-height: 0;
+}
+
+#post .post-copyright .pc-reward-item .pc-qr {
+  display: block;
+  width: 130px;
+  height: 130px;
+  border: 2px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 8px;
+  background: #fff;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#post .post-copyright .pc-reward-item:first-child .pc-qr {
+  border-color: #57bd6a;
+}
+
+#post .post-copyright .pc-reward-item:last-child .pc-qr {
+  border-color: #3e86f6;
+}
+
+#post .post-copyright .pc-qr-desc {
+  width: 130px;
+  margin: 4px 0 8px;
+  padding-top: 0;
+  font-size: 14px;
+  /* 正文的 line-height:2 会继承进来，目标站这里是 normal */
+  line-height: normal;
+  color: var(--heo-secondtext, rgba(60, 60, 67, 0.8));
+}
+
+/* 「打赏者名单」入口：目标站 .rewardMainBtn，宽度 = 内容宽 - 16，两侧各留 8 */
+#post .post-copyright .pc-reward-list {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 16px);
+  margin: 8px;
+  padding: 8px 0;
+  color: var(--heo-fontcolor, #363636);
+  text-align: center;
+  text-decoration: none;
+  background: #f1f3f8;      /* 目标站 var(--muted) 的值，比主题 secondbg 略偏蓝 */
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+#post .post-copyright .pc-reward-list:hover {
+  color: #fff;
+  background-color: #d80020;
+  background-image: url('/lib/reward-hover.gif');
+  background-position: 50%;
+  background-size: cover;
+  border-color: #d80020;
+  box-shadow: 0 8px 12px -3px rgba(216, 0, 32, 0.3);
+  text-decoration: none;
+}
+
+#post .post-copyright .pc-reward-text {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: normal;
+}
+
+#post .post-copyright .pc-reward-dec {
+  font-size: 12px;
+  line-height: normal;
+  opacity: 0.8;
+}
+
+/* 面板打开时铺一层透明遮罩，点空白处收起（不压暗，和参考站一致） */
+#pc-reward-quit {
+  position: fixed;
+  inset: 0;
+  z-index: 101;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  background: transparent;
+}
+
+@keyframes pc-slide-in {
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------------- 协议说明 ---------------- */
+#post .post-copyright__notice {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  margin: 1rem 0 0.5rem;
+  font-size: 12px;
+  color: var(--heo-secondtext, rgba(60, 60, 67, 0.8));
+}
+
+#post .post-copyright__notice a {
+  padding: 0 0.2rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  color: var(--heo-fontcolor, #363636);
+  text-decoration: none;
+  border-bottom: dotted 2px var(--heo-main);
+  transition: all 0.2s;
+}
+
+#post .post-copyright__notice a:hover {
+  color: #fff;
+  background: var(--heo-main);
+  border-bottom-color: transparent;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------- 窄屏：面板从底部升起 ---------------- */
+@media screen and (max-width: 768px) {
+  #post .post-copyright {
+    margin: 60px 0 20px;
+    padding: 30px 12px 18px;
+  }
+
+  #post .post-copyright__avatar {
+    top: -30px;
+    left: calc(50% - 30px);
+    width: 60px;
+    height: 60px;
+  }
+
+  #post .post-copyright__name {
+    font-size: 18px;
+  }
+
+  #post .post-copyright__actions {
+    gap: 8px;
+  }
+
+  #post .post-copyright .pc-btn {
+    height: 36px;
+    padding: 0 10px;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  #post .post-copyright .pc-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* 一句话放不下时给两行，别在半截处截断 */
+  #post .post-copyright__notice {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  #post .post-copyright .pc-reward-main {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    padding: 0;
+    transform: none;
+    animation: pc-slide-up 0.3s;
+  }
+
+  #post .post-copyright .pc-reward.is-open .pc-reward-main {
+    display: block;
+  }
+
+  #post .post-copyright .pc-reward-all {
+    width: 100%;
+    max-height: 80vh;
+    /* 目标站 1.5rem 1rem；本站 1rem=20px，按实测 24px 16px 写 */
+    padding: 24px 16px;
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  #post .post-copyright .pc-reward-item .pc-qr,
+  #post .post-copyright .pc-qr-desc {
+    width: 140px;
+  }
+
+  #post .post-copyright .pc-qr-desc {
+    margin: 4px auto 8px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #post .post-copyright .pc-reward-item .pc-qr,
+  #post .post-copyright .pc-qr-desc {
+    width: 120px;
+  }
+
+  #post .post-copyright .pc-reward-item .pc-qr {
+    height: 120px;
+  }
+}
+
+@keyframes pc-slide-up {
+  0% { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+ * 订阅 / 分享弹窗
+ * --------------------------------------------------------------------------
+ * 模板  layout/post.ejs（#pc-sub-modal / #pc-share-modal）
+ * 脚本  source/js/partial/post-copyright.js（打开、tab、复制、海报）
+ * 结构  遮罩 + 卡片 + 头 + 内容，两个弹窗共用一套外框
+ * ========================================================================== */
+
+.pc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pc-modal[hidden] {
+  display: none;
+}
+
+.pc-modal-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  animation: pc-fade-in .2s ease;
+}
+
+.pc-modal-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 480px);
+  max-height: min(90vh, 720px);
+  background: var(--heo-card-bg, #fff);
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .16), 0 8px 10px -6px rgba(0, 0, 0, .1);
+  overflow: hidden;
+  animation: pc-dialog-in .28s cubic-bezier(.2, .8, .3, 1);
+}
+
+.pc-modal-box--share {
+  width: min(92vw, 720px);
+}
+
+.pc-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  /* 用 px 不用 rem：本站 1rem = 20px，rem 会让弹窗比参考站高一圈 */
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--heo-card-border, #e3e8f7);
+}
+
+.pc-modal-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--heo-fontcolor, #1c1c1e);
+}
+
+.pc-modal-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--heo-secondtext, #8b8b90);
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.pc-modal-x svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pc-modal-x:hover {
+  color: var(--heo-fontcolor, #1c1c1e);
+  background: var(--heo-secondbg, #f4f5f9);
+}
+
+.pc-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---------------- 订阅（1:1 对齐 blog.anheyu.com 的订阅弹窗，500×355） ----------------
+ * 目标站量到的数：卡片 500 宽 / 头 16·24 / 内容 16·24·24 / 说明行 15·24
+ * 邮箱框 300×42 / 验证码行 200+110 间距 12 / 订阅键 300×43 / 底部小字 12
+ * 全用 px：本站 1rem = 20px，用 rem 会整体放大一圈 */
+
+.pc-modal-box--sub {
+  width: 90%;
+  max-width: 500px;
+}
+
+.pc-sub-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px 24px;
+}
+
+.pc-sub-desc {
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 24px;
+  text-align: center;
+  color: var(--heo-secondtext, rgba(60, 60, 67, .8));
+}
+
+.pc-sub-form {
+  width: 300px;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pc-sub-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 42px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: normal;
+  color: var(--heo-fontcolor, #363636);
+  background: var(--heo-card-bg, #fff);
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 8px;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.pc-sub-input::placeholder {
+  color: #9ca3af;
+}
+
+.pc-sub-input:focus {
+  border-color: #b4bfe2;
+}
+
+.pc-sub-coderow {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.pc-sub-code {
+  width: 200px;
+  height: 43px;
+  flex: none;
+}
+
+
+.pc-sub-send {
+  flex: none;
+  width: 110px;
+  height: 43px;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #b4bfe2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.pc-sub-send:disabled {
+  cursor: default;
+  opacity: .6;
+}
+
+.pc-sub-submit {
+  width: 100%;
+  height: 43px;
+  margin-top: 24px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #b4bfe2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.pc-sub-submit:disabled {
+  cursor: default;
+  opacity: .6;
+}
+
+.pc-sub-tips {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--heo-secondtext, rgba(60, 60, 67, .8));
+}
+
+/* ---------------- 分享（尺寸对齐 blog.anheyu.com 的分享弹窗） ---------------- */
+
+.pc-share-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 16px;
+}
+
+/* 预览区：320×426，正好是 750×1000 海报等比缩下来 */
+.pc-poster-col {
+  flex: none;
+  width: 320px;
+}
+
+.pc-poster {
+  position: relative;
+  width: 320px;
+  height: 426px;
+  overflow: hidden;
+  background: #fff;
+  /* 海报是画出来的图，边框固定，不跟随暗色主题 */
+  border: 1px solid #e3e8f7;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+}
+
+.pc-poster-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* 生成中：没出图之前盖一层转圈 + 文案 */
+.pc-poster-loading {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #8b8b90;
+  background: #f7f8fb;
+}
+
+.pc-poster[data-loading] .pc-poster-loading {
+  display: flex;
+}
+
+.pc-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #dfe4f0;
+  border-top-color: #425aef;
+  border-radius: 50%;
+  animation: pc-spin .8s linear infinite;
+}
+
+@keyframes pc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 操作区：三组，组间 20 + 组下 24，和参考站一致 */
+.pc-share-col {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 8px 0;
+}
+
+.pc-share-section {
+  margin-bottom: 24px;
+}
+
+.pc-share-section:last-child {
+  margin-bottom: 0;
+}
+
+.pc-share-label {
+  margin: 0 0 9.6px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--heo-fontcolor, #363636);
+  text-align: center;
+}
+
+.pc-share-url {
+  box-sizing: border-box;
+  width: 100%;
+  height: 37px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--heo-fontcolor, #363636);
+  background: var(--heo-secondbg, #f1f3f8);
+  border: 1px solid var(--heo-card-border, #e3e8f7);
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.pc-share-links {
+  display: flex;
+  flex-direction: column;
+  gap: 9.6px;
+}
+
+.pc-share-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 43px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+
+.pc-share-link svg {
+  display: block;
+  flex: none;
+}
+
+.pc-share-link:hover {
+  opacity: .88;
+  text-decoration: none;
+}
+
+.pc-share-link--weibo { background: #e6162d; }
+.pc-share-link--qq { background: #12b7f5; }
+.pc-share-link--qzone { background: #fcee21; color: #333; }
+.pc-share-link--system { background: #425aef; }
+
+/* 下面这条别删：.pc-share-link 是 display:flex，会盖掉 [hidden] 的默认 display:none */
+.pc-share-link[hidden] {
+  display: none !important;
+}
+
+.pc-poster-dl {
+  width: 100%;
+  height: 43px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: #4a4a4a;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.pc-poster-dl:hover:not(:disabled) {
+  background: #3a3a3a;
+}
+
+.pc-poster-dl:disabled {
+  cursor: not-allowed;
+  opacity: .7;
+}
+
+
+/* ---------------- 暗色 ---------------- */
+
+[data-theme=dark] .pc-modal-box {
+  background: #1d1e22;
+  border-color: #3d3d3f;
+}
+
+[data-theme=dark] .pc-modal-head {
+  border-bottom-color: #3d3d3f;
+}
+
+[data-theme=dark] .pc-sub-input,
+[data-theme=dark] .pc-share-url {
+  background: #1d1e22;
+  border-color: #3d3d3f;
+  color: #f7f7fa;
+}
+
+[data-theme=dark] .pc-sub-desc,
+[data-theme=dark] .pc-sub-tips {
+  color: #a1a2b8;
+}
+
+[data-theme=dark] .pc-modal-x:hover {
+  background: #2a2a2c;
+}
+
+/* 打赏面板的「打赏者名单」入口：亮色写死了 #f1f3f8，暗色要单独给。
+   基础规则的 #post 前缀比分节高，这里得带上同样的前缀才盖得住 */
+[data-theme=dark] #post .post-copyright .pc-reward-list {
+  background: #21232a;
+  border-color: #3d3d3f;
+  color: #f7f7fa;
+}
+
+[data-theme=dark] .pc-poster {
+  border-color: #3a3a3e;
+}
+
+[data-theme=dark] .pc-poster-loading {
+  background: #2a2a2c;
+  color: #a8a8ae;
+}
+
+/* ---------------- 打开时锁滚动 ----------------
+ * 实际锁定由 JS 给 html 设 overflow:hidden 完成（见 post-copyright.js）。
+ * 这里不要写 body/html 的 overflow，写了会盖掉恢复逻辑，页面就会跳。 */
+
+/* ---------------- 移动端 ---------------- */
+
+@media screen and (max-width: 768px) {
+  .pc-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .pc-modal-box {
+    width: 100%;
+    max-height: 88vh;
+    border-radius: 16px 16px 0 0;
+    animation: pc-sheet-in .3s cubic-bezier(.2, .8, .3, 1);
+  }
+
+  .pc-modal-head {
+    padding: .875rem 1.25rem;
+  }
+
+  .pc-modal-body {
+    padding: 1.25rem;
+  }
+
+  .pc-share-body {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 16px;
+  }
+
+  .pc-poster-col {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .pc-poster {
+    width: min(320px, 100%);
+    height: auto;
+    aspect-ratio: 750 / 1000;
+  }
+
+  .pc-share-col {
+    width: 100%;
+    padding: 0;
+  }
+
+  /* 订阅弹窗在手机上仍是居中卡片（目标站如此），不做底部抽屉 */
+  .pc-modal--sub {
+    align-items: center;
+    padding: 0;
+  }
+
+  .pc-modal-box--sub {
+    width: 90%;
+    max-height: 90vh;
+    border-radius: 12px;
+    animation: pc-dialog-in .28s cubic-bezier(.2, .8, .3, 1);
+  }
+
+  .pc-modal--sub .pc-modal-head {
+    padding: 16px 24px;
+  }
+
+  .pc-modal--sub .pc-sub-body {
+    padding: 16px 24px 24px;
+  }
+}
+
+@keyframes pc-fade-in {
+  0% { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pc-dialog-in {
+  0% { opacity: 0; transform: scale(.95) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pc-sheet-in {
+  0% { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}

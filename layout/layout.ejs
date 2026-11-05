@@ -1,0 +1,58 @@
+<%
+  var bodyCls = 'page';
+  if (is_home()) bodyCls = 'homePage page';
+  else if (is_post()) bodyCls = 'post';
+  else if (is_archive()) bodyCls = 'archive';
+  else if (is_category()) bodyCls = 'category';
+  else if (is_tag()) bodyCls = 'tag';
+  else if (page.layout) bodyCls = page.layout;
+  var mainCls = 'layout' + (is_home() ? ' layout--home' : '');
+  /* 分类 / 标签索引页对标 blog.zhheo.com；关于页、友链页对标 blog.anheyu.com —— 都是整宽无侧栏 */
+  var ptype = String(page.type || '').toLowerCase();
+  var playout = String(page.layout || '').toLowerCase();
+  if (ptype === 'categories' || ptype === 'tags' || playout === 'about' || playout === 'links' || playout === 'fcircle' || ptype === 'link') mainCls += ' hide-aside';
+  /* 归档页对标 blog.zhheo.com/archives/：主列 + 300px 侧栏的两栏布局 */
+  if (is_archive()) mainCls += ' layout--category';
+  /* 主色联动：不配置 = 开启；只有显式写 false 才关（逻辑见 scripts/liublog-config.js） */
+  var tintOff = !lb_banner_tint();
+%>
+<!DOCTYPE html>
+<html lang="<%= config.language || 'zh-CN' %>"<% if (tintOff) { %> class="no-banner-tint"<% } %>>
+<head>
+  <%- partial('_partial/head') %>
+</head>
+<body class="<%= bodyCls %>">
+
+  <div id="web_bg"></div>
+
+  <%- partial('_partial/console') %>
+
+  <%- partial('_partial/sidebar') %>
+
+  <div id="body-wrap" class="<%= bodyCls %>">
+    <%- partial('_partial/nav') %>
+    <main id="content-inner" class="<%= mainCls %>">
+      <%# 语义标题：文章页/自定义页（关于、404）正文里自带 h1，这里只给
+          首页、归档、分类、标签、分页页补一个，避免整页没有主标题。
+          视觉上隐藏，不改任何排版。 %>
+      <%# layout='page' 是分类/标签这类自定义页面，它们正文里没有 h1；
+          about / 404 / 文章页自带 h1，不能再补一个。 %>
+      <% if (!is_post() && !is_archive() && (!page.layout || page.layout === 'page')) {
+           var h1Text = page.title ||
+             (is_category() ? '分类' : is_tag() ? '标签' : is_archive() ? '归档' : config.title);
+      %>
+      <h1 class="visually-hidden"><%= h1Text %></h1>
+      <% } %>
+      <%- body %>
+    </main>
+    <%- partial('_partial/footer') %>
+  </div>
+
+  <%- partial('_partial/rightside') %>
+
+  <%# 搜索弹层：模板 _partial/search.ejs · 样式 css/search.css · 脚本 js/partial/search.js %>
+  <%- partial('_partial/search') %>
+
+  <%- partial('_partial/scripts') %>
+</body>
+</html>

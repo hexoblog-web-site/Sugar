@@ -1,0 +1,67 @@
+<%
+  var cover = page.cover || page.top_img || theme.post.default_cover || '';
+  var cats = (page.categories && page.categories.length) ? page.categories.toArray() : [];
+  var wc = '';
+  var rd = '';
+  try { wc = wordcount(page.content || ''); } catch (e) { wc = ''; }
+  try { rd = min2read(page.content || ''); } catch (e) { rd = ''; }
+%>
+<% if (cover) { %>
+<div id="coverdiv" class="coverdiv" aria-hidden="true">
+  <img id="post-cover" class="nolazyload" src="<%- url_for(cover) %>" alt="" loading="eager" decoding="async">
+</div>
+<% } %>
+
+<div id="post-info">
+  <div id="post-firstinfo">
+    <div class="meta-firstline">
+      <span class="post-meta-original" title="该文章为原创文章，注意版权协议">原创</span>
+      <% if (cats.length) { %>
+      <span class="post-meta-categories">
+        <% cats.forEach(function (c) { %>
+        <a class="post-meta-categories" href="<%- url_for(c.path) %>" title="<%= c.name %>" heotip="查看更多 <%= c.name %> 分类的文章"><%= c.name %></a>
+        <% }); %>
+      </span>
+      <% } %>
+    </div>
+  </div>
+
+  <h1 class="post-title" id="post-title"><%= page.title %></h1>
+
+  <div id="post-meta">
+    <div class="meta-secondline">
+      <span class="post-meta-date" heotip="这篇文章创建于 <%= date(page.date, 'YYYY-MM-DD') %>">
+        <i class="heoblogIcon icon-calendar-todo-fill"></i>
+        <time datetime="<%= date_xml(page.date) %>" title="<%= date(page.date, 'YYYY-MM-DD') %>"><%= date(page.date, 'YYYY-MM-DD') %></time>
+      </span>
+      <% if (wc) { %>
+      <span class="post-meta-wordcount" heotip="全文字数">
+        <i class="heoblogIcon icon-file-word-fill"></i>
+        <span><%= wc %> 字</span>
+      </span>
+      <% } %>
+      <% if (rd) { %>
+      <span class="post-meta-position" heotip="预计阅读时间">
+        <i class="heoblogIcon icon-time-fill"></i>
+        <span><%= rd %></span>
+      </span>
+      <% } %>
+      <% if (page.updated && date(page.updated, 'YYYY-MM-DD') !== date(page.date, 'YYYY-MM-DD')) { %>
+      <span class="post-meta-updated" heotip="最后更新于 <%= date(page.updated, 'YYYY-MM-DD') %>">
+        <i class="heoblogIcon icon-refresh-line"></i>
+        <span>更新于 <%= date(page.updated, 'YYYY-MM-DD') %></span>
+      </span>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% if (cover) { %>
+<div class="post-cover-aside" id="post-cover-aside">
+  <a class="post-cover-aside-link" href="<%- url_for(cover) %>" target="_blank" rel="noopener nofollow" title="<%= page.title %>">
+    <img class="post-cover-aside-img" src="<%- url_for(cover) %>" alt="<%= page.title %>" loading="eager" decoding="async">
+  </a>
+</div>
+<% } %>
+
+<div class="post-radius-bottom"></div>

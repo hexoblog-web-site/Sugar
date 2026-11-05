@@ -1,0 +1,34 @@
+/* ==========================================================================
+   文章目录（aside 里的 #card-toc）—— 只补「滚动高亮」缺的那几块
+   ---------------------------------------------------------------------------
+   基础排版在 aside/card-toc.css 里已经有了，这里只加三件事：
+   1. 当前小节所在的父级要展开（原来 .toc-child 默认 display:none，
+      只有 .toc-item.active 的下一级才显示；选中项在第 3 级时，
+      它的父级没 active，整条就被折没了）；
+   2. 当前小节这一支不要模糊（.toc-link:not(.active) span 有 blur(1px)）；
+   3. 目录卡内的滚动条在暗色下别是亮的。
+   ========================================================================== */
+
+#aside-content #card-toc .toc-content .toc-item.is-open > .toc-child {
+  display: block;
+}
+
+/* 当前项往上的祖先链：保持展开，但不要继承「选中」的放大样式 */
+#aside-content #card-toc .toc-content .toc-item.is-ancestor > .toc-link {
+  opacity: 1;
+}
+
+#aside-content #card-toc .toc-content .toc-item.is-ancestor > .toc-link span {
+  opacity: .85;
+  filter: none;
+}
+
+/* 选中项本身：别被 blur 的那条规则带上 */
+#aside-content #card-toc .toc-content .toc-link.active span {
+  opacity: 1;
+  filter: none;
+}
+
+[data-theme='dark'] .toc-content::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 16%);
+}

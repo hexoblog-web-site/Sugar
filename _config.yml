@@ -1,0 +1,828 @@
+# ==========================================================================
+# liublog —— 由 blog.zhheo.com（Heo / heoblog）视觉风格改写而来的 Hexo 主题
+# 模板引擎 EJS，修改本文件后执行 hexo clean && hexo g 生效
+#
+# 本文件分节一览（从上到下）：
+#   site_settings  站点级设置：图标 / 站名 / 明暗与主题色 / 建站时间 / 文章列表样式 / 全局开关
+#   Navigation bar settings  导航栏：一个数组决定按钮顺序与左右位置（键名 nav）
+#   home                     首页：分类横条、幻灯片、新品框架
+#   essay                    即刻（首页顶部滚动短文条）
+#   Sidebar Settings         侧边栏：一个数组决定卡片顺序（键名 aside）
+#   social                   作者社交链接
+#   post                     文章页
+#   comments                 评论
+#   Footer Settings          页脚：社交图标 / 导航栏 / 徽标 / 运行状态 / 底部横条（键名 footer）
+#   search                   站内搜索
+#   code                     正文代码块
+#   console                  中控台抽屉
+# ==========================================================================
+
+# ==========================================================================
+# Site settings —— 站点级设置
+# --------------------------------------------------------------------------
+# 只放「跟站点本身有关、全站共用」的项：图标、站名、明暗模式、主题色、
+# 建站时间、文章列表长什么样、几个全局开关。
+# 带自己结构的模块（导航栏 / 首页 / 侧栏 / 页脚…）在下面各自成节，不塞进来。
+# ==========================================================================
+site_settings:
+  # ---------- 站点资源 ----------
+  # 站点图标（留空则不输出 link）
+  favicon: /images/favicon.svg
+  # 顶部导航左侧站点名（留空则使用站点 _config.yml 的 title）
+  site_name: ''
+  # 站点名旁边的 logo 图片（留空则只显示文字）
+  site_logo: ''
+
+  # ---------- 主题外观 ----------
+  # 默认模式：auto（按时间自动）/ light / dark
+  theme_mode: light
+  # 是否记忆用户手动切换的结果（localStorage）
+  remember_mode: true
+  # 主色（日间 / 夜间）
+  color:
+    light: '#425AEF'
+    dark: '#ffc848'
+
+  # ---------- 建站时间 ----------
+  # 唯一配置入口：侧栏「网站统计 → 运行天数」和页脚「本站居然运行了 x 天 x 小时」都读这个值
+  # 支持写法：'2024-07-10 08:30:00' / '2024-07-10' / '07/10/2024 00:00:00'
+  start_time: '2024-07-10 00:00:00'
+
+  # ---------- 文章列表样式 ----------
+  # 首页 / 分类页 / 标签页共用一个开关，卡片的宽窄与断点由 post-card.css、
+  # 列表样式的覆盖由 post-list.css 负责，这里只管「长成哪一版」。
+  post_list:
+    # card   卡片式：封面在上、标题在下，宽屏两列并排（默认）
+    # banner 横幅长条：一条一行，左图右文，摘要始终显示
+    style: card
+    # banner 样式下摘要保留多少字（超出以省略号截断）
+    excerpt_length: 96
+    # card 样式下封面是否左右交替（false 则全部靠左）
+    alternate_cover: true
+
+  # ---------- 全局开关 ----------
+  # 图片懒加载：false 时所有图片直接 src，不再挂 data-src
+  lazyload: true
+  # 平滑滚动（用户系统开了「减少动态效果」时自动关）
+  smooth_scroll: true
+
+# ==========================================================================
+# Navigation bar settings —— 导航栏设置
+# --------------------------------------------------------------------------
+# 本节包含：站名 / 九宫格应用菜单 / 居中下拉菜单 / 右侧按钮（搜索、随机文章、
+#           中控台、回到顶部）/ 自定义链接。全部写在 navigation_bar_settings.items 一个数组里。
+# 一个数组，从上到下 = 屏幕上从左到右，想挪位置直接整段剪切粘贴。
+# 每项用 align 指定落在哪个区域：left（左侧）| center（正中）| right（右侧），不写默认 left
+#
+# 字段说明（除 type 外都可以不写）：
+#   type    必填，取值：
+#             app_menu     九宫格应用菜单（分组内容就写在这一项的 groups 里）
+#             site_name    站点名（主题 site_name，留空则用站点 title）
+#             menu         居中的下拉菜单（菜单内容就写在这一项的 menus 里）
+#             random_post  随机文章
+#             search       站内搜索
+#             console      中控台抽屉
+#             totop        回到顶部
+#             darkmode     夜间模式开关（月亮 / 太阳）
+#             link         自定义链接（需写 name / url / icon）
+#             text         自定义文字（需写 name，不可点，可选 icon）
+#   align   left | center | right，默认 left
+#   enable  默认开，写 false 就隐藏这一项
+#   icon    图标类名（见 source/css/iconfont.css），不写用内置默认图标
+#   name    显示文字（link / text 必填）
+#   title   鼠标悬停提示，不写用默认文案
+#   url     跳转地址（link 必填；site_name 可自定义跳转）
+#   target  填 _blank 则新窗口打开
+navigation_bar_settings:
+  # ==========================================================================
+  # 导航条背景（style / background）
+  # --------------------------------------------------------------------------
+  # 只往导航条上铺一层底：底色 + 渐变 + 两张装饰图 + 投影。
+  # 布局、按钮、菜单、下拉、九宫格、吸顶动画全部沿用主题原样式，一个字都不动。
+  #   itlaoli  铺背景（白底 + 淡蓝渐变 + 上沿淡彩光晕 + 右上角浅蓝斜纹 + 柔和投影）
+  #   none     不铺背景，回到主题原来的透明导航（下面 background 全部失效）
+  style: itlaoli
+
+  # 背景细节：下面每一项都可以留空 —— 留空 = 用皮肤自带的默认值（写在注释里）。
+  # 想改哪一项就填哪一项，改完重启 hexo 即可，不用动 css。
+  # 带引号是必须的：CSS 值里有逗号、空格、括号，不加引号 yml 会解析错。
+  # 两张装饰图都在 themes/liublog/source/images/ 下，换图放同一目录再写相对路径即可，
+  # 写 `/images/xxx.png` 这种站点绝对路径也可以。
+  background:
+    # ---------- 底色 / 渐变 / 投影（三者按顺序叠加：底色 → 渐变 → 投影） ----------
+    color: ''                 # 底色，默认 '#ffffff'。例：'#f7fbff'；填 transparent 可露出页面底色
+    gradient: ''              # 渐变，默认 90° 白→淡蓝：linear-gradient(90deg,#fff,#fafdff,#eaf4ff,#dcebff)。填 none 关掉，只留底色
+    shadow: ''                # 投影，默认 '0 5px 40px 0 rgba(17,58,93,.1)'。例：'0 2px 12px rgba(0,0,0,.06)'；填 none 关掉
+
+    # ---------- 上沿光晕（header_bg.webp，贴着导航最上沿的一条淡彩，像 itlaoli） ----------
+    head_image: ''            # 图片，留空用 /images/header_bg.webp；填 none 关掉
+    head_opacity: ''          # 浓淡，默认 1（移动端自动 ×0.55）。例：0.6 更淡、1 保持原色
+    head_position: ''         # 位置，默认 'center -25px'（同 itlaoli，把图上沿裁掉 25px）。例：'center 0'
+    head_size: ''             # 尺寸，默认 'auto'（原始像素、横向平铺）。例：'100% 100%' 拉伸铺满
+
+    # ---------- 右上角斜纹（top-fr-bg.png，靠右、左缘渐隐，不挡点击） ----------
+    image: ''                 # 图片，留空用 /images/top-fr-bg.png；填 none 关掉
+    image_width: ''           # 占导航宽度的多少，默认 'min(50%, 680px)'（移动端 42%）。例：'40%' / '520px'
+    image_opacity: ''         # 浓淡，默认 0.62（移动端按比例再降）。例：0.4
+
+    # ---------- 夜间模式：留空 = 用皮肤自带的深色配色；图片类留空 = 夜间不显示 ----------
+    dark_color: ''            # 默认 '#2b2b2c'
+    dark_gradient: ''         # 默认 90° 深灰渐变：linear-gradient(90deg,#2e2e2f,#2b2c30,#262a31,#22262e)；填 none 只留底色
+    dark_shadow: ''           # 默认 '0 5px 40px 0 rgba(0,0,0,.35)'
+    dark_head_image: ''       # 夜间上沿光晕，默认不显示；填图片路径才会在夜间出现
+    dark_head_opacity: ''     # 夜间光晕浓淡，默认 1
+    dark_image: ''            # 夜间右上角斜纹，默认不显示
+    dark_image_width: ''      # 夜间斜纹宽度，默认 'min(50%, 680px)'
+    dark_image_opacity: ''    # 夜间斜纹浓淡，默认 0.62
+
+    # ---------- 常用改法（照抄到上面替换即可） ----------
+    # 1) 纯白导航、只要投影：gradient: 'none'   head_image: 'none'   image: 'none'
+    # 2) 只换配色：color: '#f7fbff'   gradient: 'linear-gradient(90deg,#f7fbff,#eaf3ff)'
+    # 3) 光晕更淡：head_opacity: 0.5     斜纹更淡：image_opacity: 0.3
+    # 4) 夜间也要光晕：dark_head_image: '/images/header_bg.webp'
+
+  # 站点 logo / 站名（可选，留空就用文字站名）
+  #   image / image_dark  图片路径，比如 /images/logo.png
+  #   height              图片高度（px）
+  #   tagline             站名下面那行小字，留空不显示
+  logo:
+    image: ''
+    image_dark: ''
+    height: 40
+    tagline: ''
+
+  items:
+    # ================= 左侧 =================
+    - type: app_menu
+      align: left
+      # 九宫格分组：一级 = 分组，二级 = 入口，两级字段一致
+      # 一级也可以不写 children 而写 source: posts / categories / tags 自动取内容（配 limit 限条数）
+      groups:
+        - name: 博客
+          icon: icon-play-list-2-line
+          # url: /archives/        # 取消注释后「博客」这行标题也可点
+          children:
+            - name: 首页
+              url: /
+              icon: icon-home
+            - name: 全部文章
+              url: /archives/
+              icon: icon-book-mark-fill
+            - name: 分类
+              url: /categories/
+              icon: icon-folder-5-fill
+            - name: 标签
+              url: /tags/
+              icon: icon-price-tag-3-fill
+        - name: 关于
+          icon: icon-shield-user-fill
+          children:
+            - name: 关于本站
+              url: /about/
+              icon: icon-contacts-fill
+            - name: 博客好物
+              url: /equipment/
+              icon: icon-gift-2-fill
+            - name: 友情链接
+              url: /links/
+              icon: icon-link
+            - name: 留言板
+              url: /memos/
+              icon: icon-chat-1-fill
+      more: {}                 # 九宫格底部的「更多」入口，留空 {} 则不显示
+
+    - type: site_name
+      align: left
+      # name: 老刘博客        # 留空则用主题 site_name / 站点 title
+      # url: /               # 点击站名跳哪里，默认首页
+
+    # ================= 中间 =================
+    - type: menu
+      align: center
+      # 有 children 渲染成下拉，没有就是普通链接
+      menus:
+        - name: 文库
+          url: /archives/
+          children:
+            - name: 全部文章
+              url: /archives/
+              icon: icon-book-mark-fill
+            - name: 分类列表
+              url: /categories/
+              icon: icon-folder-5-fill
+            - name: 标签列表
+              url: /tags/
+              icon: icon-price-tag-3-fill
+        - name: 专栏
+          url: /categories/
+          children:
+            - name: 关于本站
+              url: /about/
+              icon: icon-contacts-fill
+            - name: 博客好物
+              url: /equipment/
+              icon: icon-gift-2-fill
+            - name: 友情链接
+              url: /links/
+              icon: icon-link
+            - name: 留言板
+              url: /memos/
+              icon: icon-chat-1-fill
+        - name: 动态
+          url: /memos/
+
+    # ================= 右侧 =================
+    - type: random_post
+      align: right
+    - type: search
+      align: right
+    - type: console
+      align: right
+      # icon: icon-dashboard-fill    # 平时显示的图标
+      # icon_close: icon-guanbi      # 打开中控台后显示的图标（默认 ✕）
+    - type: totop
+      align: right
+
+    # 加一个站外入口照这样写在对应位置：
+    # - type: link
+    #   align: right
+    #   name: GitHub
+    #   icon: icon-github-line
+    #   url: https://github.com/
+    #   target: _blank
+
+
+# ---------- 首页 ----------
+home:
+  # 顶部分类横条
+  category_bar: true
+  # 横条前的固定入口（图标只能用 category-bar 目录下已有的 4 个 svg：featured / hot / must-read / all-posts）
+  category_bar_fixed:
+    - name: 精选
+      url: /
+      icon: featured
+      color: '#2f6bff'
+      tip: 回到首页
+    - name: 全部文章
+      url: /archives/
+      icon: all-posts
+      color: '#ff8f1f'
+      tip: 按时间浏览全部文章
+    - name: 分类
+      url: /categories/
+      icon: hot
+      color: '#ff4d4f'
+      tip: 按分类浏览
+    - name: 标签
+      url: /tags/
+      icon: must-read
+      color: '#16c2c2'
+      tip: 按标签浏览
+  # 横条上额外固定的分类（按此顺序排在最前）
+  category_bar_pinned:
+    - manim
+    - 博客设置
+    - geogebra
+  # ---------- 首页顶部通栏：左「幻灯片」+ 右「新品框架」 ----------
+  # 首页每页文章数不在这里配：由站点 _config.yml 的 index_generator.per_page 决定，
+  # 幻灯片会读同一个值来避开列表已经展示的文章（两处配会打架，出现同一批文章）。
+  # 两块平行，各自一个 enable，互不影响：
+  #   都不写 = 两块都开
+  #   关掉右边只剩幻灯片（幻灯片铺满整行）
+  #   关掉左边只剩右框（居中，1200px 以下整块收起）
+  #   两个都关 = 这条通栏整个不渲染，首页直接从「即刻」开始
+  home_top:
+    # ---- 左：精品推荐（幻灯片）----
+    # 两部分：上面是几张会自己轮播的大图，下面一行标题 + 简介 + 圆点 + 箭头。
+    #
+    # 显示哪几张，两种来源，不用加开关：
+    #   items 有内容 → 精品推荐：按 items 写的顺序显示，写几条显示几条
+    #   items 留空   → 兜底：自动取带封面的最新文章（条数看 count，且避开下面列表）
+    #
+    # 精品推荐每条的字段：
+    #   link         必填，站内文章路径（/articles/xxx.html）或外链
+    #                —— 写站内文章时，标题 / 简介 / 封面都会自动从文章里取
+    #   title        标题，不写用文章原标题
+    #   description  简介，鼠标移到轮播上才浮出来；不写用文章摘要
+    #   image        封面，不写用文章封面（cover 是同一个字段，叫哪个都行）
+    #                外链查不到文章，封面必须自己给一张
+    #   target       新窗口打开？true / false。不写就按链接判断：站内当前窗口，站外新窗口
+    #   color        这张的主色（整页顶部染色用），不写用默认 #7454fc
+    # 标题和封面都凑不出来的条目会被跳过 —— 轮播上出现一张空白帧比少一张难看。
+    swiper:
+      enable: true
+      count: 4                        # 自动模式显示几条（配了 items 就不看它）
+      interval: 5000                  # 每条停留多少毫秒自动切下一张；填 0 = 不自动播放
+      pause_on_hover: true            # 鼠标停在轮播上时暂停，方便看简介
+      label: 全站推荐                  # 左上角那个小标签的文案；留空则不显示
+      excerpt_length: 80              # 自动模式下简介从正文抽，最多留多少字
+      tint: true                      # 主色联动：整页顶部染色 / 柔光 / 侧栏作者卡跟着当前封面主色变
+      items: []
+      # 精品推荐这么写（只写一条 link 也能显示，标题 / 简介 / 封面会自动补）：
+      # items:
+      #   - title: "年兽的传说：春节的由来"      # 标题，不写用文章原标题
+      #     description: "这列写文章介绍"        # 简介，鼠标移上去才浮出来
+      #     link: "/articles/3ccc38b7.html"      # 站内文章路径
+      #     image: "/medias/xxx.jpg"             # 封面，不写就用文章封面
+      #     target: false                        # false = 当前窗口，true = 新窗口
+      #   - title: "站外的一个项目"
+      #     description: "外链要自己写标题和封面"
+      #     link: "https://example.com/"
+      #     image: "/medias/project.jpg"
+      #     target: true
+      #     color: '#7454fc'
+    # ---- 右：新品框架 ----
+    # 一张封面把下面 6 张文章卡整个盖住：鼠标滑过封面淡出、露出文章，移开盖回来；
+    # 只有滑到右下角按钮上时封面不动，按钮才点得着。
+    # 封面本身是内联 SVG（浅绿到浅粉的渐变 + 手写 hello），不读配置文件里的图片，
+    # 所以这里没有 image 项 —— 想换封面得改模板 home/home-top.ejs。
+    # 封面下面那几篇显示什么，两种来源，不需要额外开关：
+    #   items 有内容 → 按 items 显示（只写 link 就行，标题和封面自动从文章里取）
+    #   items 留空   → 自动取：从「不在首页第一页、也没被左边幻灯片用掉」的文章里
+    #                  按时间倒序挑（有封面的排前面），条数看 count
+    # 之所以避开首页第一页：列表本身就是最新那 14 篇，推荐位再从最新的取，
+    # 上面 6 张小卡和下面列表就是同一批，往下滚等于什么都没翻。
+    # 幻灯片同理先取、右框取剩下的，所以 列表 / 幻灯片 / 右框 三处不会重样。
+    new_frame:
+      enable: true
+      name: 新品框架                        # 封面左下角那行小字（安知鱼原版就是这个）
+      title: Theme-AnZhiYu                  # 封面左下角的大标题，留空就只显示小字
+      count: 6                              # 封面下面放几篇（6 = 3×2 刚好铺满，多了会被裁掉）
+      # 封面去重：同一张封面只上一次（本站 manim.jpg 一张图被 69 篇复用，
+      # 不去重会六格同图）。关掉就是单纯按时间取最新几篇，允许重复封面。
+      cover_dedupe: true
+      button: 更多推荐                      # 封面右下角按钮文案
+      link: /archives/                      # 按钮点去哪（填外链就新窗口打开）；留空则退化成「展开」按钮
+      # 手动模式：想指定哪几篇就写几条，title / image 不写就自动用文章自己的；
+      # target 不写就按链接判断（站内当前窗口，站外新窗口）
+      items: []
+      # items:
+      #   - link: /articles/xxxx.html
+      #   - link: /articles/yyyy.html
+      #     title: 换个标题显示
+      #     cover: /medias/other.jpg
+
+# ---------- 即刻（首页顶部滚动短文条） ----------
+# 位置固定：导航栏下方、幻灯片上方，整条通栏。对应三件套 home/essay.ejs + essay.css + essay.js
+# 数据有两个来源，站点数据优先：
+#   1) source/_data/essay.yml —— 安知鱼主题同款格式
+#        - home_essay: true
+#          essay_list:
+#            - content: 一句话
+#              date: 2026-11-02
+#              image: /medias/xx.jpg      # 可选，有条目会显示成「[图片]」
+#   2) 下面的 items —— 没建上面那份数据文件时用这份
+# 只取最近 10 条，每条停留 interval 毫秒后往上滚一条，鼠标移上去暂停。
+essay:
+  enable: true
+  # 点左侧「即刻」图标、右侧箭头跳去哪；留空 = 不跳转（还没建 /essay/ 页面时先空着）
+  link: ''
+  # 条数上限：再多也只放这么多条（默认 10）
+  count: 10
+  # 每条停留多少毫秒后往上滚一条，鼠标移上去暂停
+  interval: 3000
+  # 示例内容：改成你自己的即刻。上面有 essay.yml 时这份不生效
+  items:
+    - content: 这里写第一条即刻，随便说点什么
+    - content: 每条停留 3 秒后自动往上滚，鼠标移上去会暂停
+    - content: 没有 essay.yml 时就滚这三条，建了那份文件就滚你的
+
+# ==========================================================================
+# Friends Lite —— 朋友圈页设置（/fcircle/）
+# --------------------------------------------------------------------------
+# 字段命名与安知鱼主题保持一致（tips / title / bottom_left / bottom_right /
+# bottom_right_link / top_background / error_img / private_api_url /
+# page_turning_number），几个主题之间可以对着改、直接抄。
+#
+# 横幅文字落在哪：
+#   ┌──────────────────────────────┐
+#   │ tips                     │  ← 左上角小字
+#   │ title                    │  ← 大标题
+#   │                          │
+#   │ bottom_left   [bottom_right] │  ← 左下角描述 / 右下角按钮
+#   └──────────────────────────────┘
+friends_lite:
+  # 关掉后访问 /fcircle/ 直接跳 404
+  enable: true
+  # ---------- 横幅 ----------
+  tips: 友链
+  title: 朋友圈
+  bottom_left: 订阅友链最新文章
+  bottom_right: 友情链接
+  bottom_right_link: /links/
+  # 横幅背景图：留空 = 主色渐变；填 /images/xxx.webp（放主题 source/images 或站点 source/images）也可填完整外链
+  top_background: ''
+  # 背景图上的黑色遮罩浓度 0~1，只有配了图才生效
+  overlay: 0.4
+  # ---------- 数据 ----------
+  # 头像 404 / 加载失败时的占位图，留空用 /images/avatar.svg
+  error_img: ''
+  # 朋友圈后端，脚本请求 {private_api_url}all.json
+  private_api_url: https://quanzi.liublog.cn/
+  # 每页条数：首屏 + 每次点「加载更多」
+  page_turning_number: 24
+  # ---------- 区块标题 ----------
+  dice_title: 🎣 钓鱼
+  dice_link_text: 全部友链
+  list_title: 🐟 朋友圈
+
+# ==========================================================================
+# Sidebar Settings —— 侧边栏设置
+# --------------------------------------------------------------------------
+# 本节包含：站长信息 / 订阅入口 / 文章目录 / 近期热门 / 随机推荐 / 标签 / 网站统计。
+# 侧栏所有卡片都写在 sidebar_settings.widgets 里：
+#   * 数组顺序 = 页面从上到下的顺序，想换位置直接剪切粘贴
+#   * 每张卡都有 enable 开关，写 false 直接隐藏，不用删配置
+#   * 一处改全局生效，不用去翻模板
+#
+# 每张卡通用字段：
+#   type    必填：
+#             author   站长信息（卡片内容字段见下）
+#             rss      订阅 / RSS 入口
+#             toc      文章目录（只在文章页出现）
+#             recent   近期热门（置顶优先，其余按时间倒序）
+#             random   随机推荐（每次刷新随机抽）
+#             tags     标签云
+#             webinfo  网站统计
+#             archives 按年份归档（默认没启用，要用就在 widgets 里加一项 type: archives）
+#   enable  默认开，写 false 关闭这张卡
+#   title   卡片标题
+#   icon    标题前的图标类名（见 source/css/iconfont.css）
+#   count   调用条数（recent / random / tags 有效）
+#
+# 吸顶规则：从第一张「吸顶卡」（目录 / 近期热门 / 随机推荐 / 标签 / 网站统计）开始，
+#   往下的卡片整体进入同一个吸顶区；排在它前面的卡片（站长信息、订阅入口）随页面滚走。
+#   所以卡片随便排，中间的订阅卡不会把侧栏切成两段。
+#
+# 卡片代码命名（三处同名，改一张卡只碰这三个文件）：
+#   layout/_partial/aside/card-<type>.ejs    结构
+#   source/css/aside/card-<type>.css         样式
+#   source/js/aside/card-<type>.js           脚本（没有脚本就不建）
+# 例外：近期热门与随机推荐共用同一套列表体，结构与样式在 card-postlist.ejs / .css
+# 新增卡片：模板放进 aside/ 按上面的名字命名，样式丢进 source/css/aside/、脚本丢进
+# source/js/aside/ 即可自动接入，不用改 bundle 列表或 scripts.ejs
+sidebar_settings:
+  enable: true
+  widgets:
+    # ---------- 站长信息 ----------
+    - type: author
+      enable: true
+      # 按小时段问候，未命中用 sayhi 兜底；点击胶囊切下一句
+      sayhi: 你好啊！
+      sayhi_list:
+        - greeting: 晚安😴，早点休息呀
+          startTime: 0
+          endTime: 5
+        - greeting: 早上好👋，祝你今天好心情
+          startTime: 6
+          endTime: 9
+        - greeting: 上午好👋，状态正好
+          startTime: 10
+          endTime: 11
+        - greeting: 中午好👋，记得吃午饭🍚
+          startTime: 12
+          endTime: 13
+        - greeting: 下午好👋，来杯咖啡提提神☕
+          startTime: 14
+          endTime: 18
+        - greeting: 晚上好👋，好好放松一下😌
+          startTime: 19
+          endTime: 23
+      avatar: /images/avatar.jpg
+      status_img: ''          # 头像右下角徽标，留空不显示
+      description:            # 悬停头像时才显示，支持多行
+        - 把<b>做课件的手艺</b>，和<b>搭博客的折腾</b>，都写在这里。
+        - 数学课件 · GeoGebra · Manim · 建站记录
+      name: ''                # 留空用站点 author / title
+      desc: ''                # 留空用站点 subtitle
+      link: /about/           # 点击名字跳转
+      social: {}              # 留空复用下面全局 social
+
+    # ---------- 文章目录（仅文章页） ----------
+    - type: toc
+      enable: true
+
+    # ---------- 近期热门 ----------
+    - type: recent
+      enable: true
+      title: 近期热门
+      icon: icon-fire-fill
+      count: 5
+      more: /archives/        # 标题右侧「更多」的跳转，留空则不显示
+      more_text: 更多         # 「更多」两个字想换说法就改这里
+
+    # ---------- 订阅 / RSS ----------
+    - type: rss
+      enable: true
+      title: 订阅更新
+      link: /atom.xml
+
+    # ---------- 随机推荐 ----------
+    - type: random
+      enable: true
+      title: 随机推荐
+      icon: icon-dice-line
+      count: 5
+      more: /archives/
+      more_text: 换一批       # 随机卡默认换个说法
+
+    # ---------- 标签 ----------
+    - type: tags
+      enable: true
+      title: 标签
+      icon: icon-price-tag-3-fill
+      count: 6
+      more: /tags/
+      more_text: 全部标签
+
+    # ---------- 网站统计 ----------
+    - type: webinfo
+      enable: true
+      title: 网站统计
+      icon: icon-dashboard-2-fill
+      start_date: ''          # 留空则用主题顶部 start_time
+      post_count: true        # 文章总数
+      category_count: true    # 分类数
+      tag_count: true         # 标签数
+      runtime: true           # 运行天数
+
+# ---------- 作者社交链接 ----------
+# 只保留真实可跳转的入口；有 GitHub / Bilibili 等账号时按同样格式追加即可
+social:
+  RSS:
+    icon: icon-rss-fill
+    url: /atom.xml
+  友链:
+    icon: icon-link
+    url: /links/
+  邮箱:
+    icon: icon-mail-line
+    url: mailto:76321057@qq.com
+  关于:
+    icon: icon-contacts-fill
+    url: /about/
+# 示例：有站外账号时取消注释并改成你自己的地址
+#  Github:
+#    icon: icon-github-line
+#    url: https://github.com/你的用户名
+#  Bilibili:
+#    icon: icon-bilibili-line
+#    url: https://space.bilibili.com/你的UID
+
+# ---------- 文章页 ----------
+post:
+  # 目录（TOC）
+  toc: true
+  # 正文默认封面（文章未设置 cover 时）
+  default_cover: ''
+  # 字数统计 / 阅读时长（需安装 hexo-wordcount）
+  wordcount: true
+  # 文章底部版权卡：头像 + 站名/副标题 + 打赏·订阅·分享 + 一行协议说明
+  # 整块不想要就写 copyright: false；只改文案/按钮就动下面这几行
+  copyright:
+    enable: true              # 总开关，false 等于 copyright: false
+    about: '/about/'          # 点头像去哪儿
+    reward: true              # 「打赏作者」按钮，写 false 隐藏
+    # 打赏二维码（按钮上方弹出）。写图片路径，或 { img, name } 带说明
+    # 图片放在 站点根/source/images/reward/ 下，路径以 /images/reward/ 开头
+    # 一张都不填时「打赏作者」按钮自动隐藏
+    reward_images:
+      - img: '/images/reward/wechat.png'
+        name: 微信
+      - img: '/images/reward/alipay.png'
+        name: 支付宝
+    # 打赏面板顶部那行红字
+    reward_title: 感谢你赐予我前进的力量
+    # 面板底部「打赏者名单」入口（整块不想要写 enable: false）
+    reward_list:
+      enable: true
+      url: '/about/'          # 名单放在哪一页，填站内路径或完整链接
+      text: 打赏者名单
+      desc: 因为你们的支持让我意识到写文章的价值
+    # 「订阅」按钮：点开是「订阅博客更新」弹窗，一栏：邮箱 + 验证码 + 订阅
+    # 版式照 blog.anheyu.com（500×355），静态站自己发不了信，所以两个地址要站长填
+    #   false      不显示按钮
+    #   true       显示弹窗，但点了只会提示「还没接服务」
+    #   对象写法   接自己的发信接口 / 第三方表单
+    subscribe:
+      enable: true
+      # 订阅提交地址（邮箱 + 验证码）。留空则弹窗照常显示，点「订阅」只提示未配置。
+      # 常见服务的填法：
+      #   follow.it     https://follow.it/<你的站点标识>
+      #   Buttondown    https://buttondown.email/api/emails/embed-subscribe/<用户名>
+      #   Mailchimp     复制它给的 <form action="...list-manage.com/..."> 里的整条地址
+      endpoint: ''
+      # 发验证码的地址。留空就复用 endpoint，并额外带一个 action=code 参数。
+      # 只接第三方表单（没有验证码能力）时，把弹窗里的验证码行当装饰即可 —— 那边一般只认邮箱。
+      code_endpoint: ''
+      method: post            # post：fetch 静默提交（推荐）| get：拼在 URL 上
+      field: email            # 邮箱字段名，多数服务就是 email
+      code_field: code        # 验证码字段名
+      success_text: 订阅成功，请去邮箱确认
+    # 「分享」按钮：点开是「分享海报」弹窗 —— 左边就是最终海报（750×1000）
+    # 海报按 blog.anheyu.com 的算法在 canvas 上画：封面 750×420、标题 48、摘要 26、
+    # 分割线 y=800、头像 50 + 站名 26 + 副标题 18 + 二维码 120
+    #   改版式：source/js/partial/post-copyright.js 里的 renderPoster()
+    #   改弹窗尺寸/配色：source/css/post-copyright.css 里的 .pc-poster / .pc-share-*
+    share: true
+    cc_name: 'CC BY-NC-SA 4.0'                             # 协议名称
+    cc_url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'   # 协议链接
+  # 上一篇 / 下一篇
+  prev_next: true
+  # 文章元信息展示项
+  meta:
+    date: true
+    categories: true
+    tags: true
+    wordcount: true
+
+# ---------- 评论 ----------
+comments:
+  enable: false
+  # 目前支持 twikoo
+  use: twikoo
+  twikoo:
+    envId: ''
+    region: ''
+    path: location.pathname
+
+# ==========================================================================
+# Footer Settings —— 页脚设置
+# --------------------------------------------------------------------------
+# 从下往上依次是：社交图标条 → 右下角运行状态小人 → 徽标 → 多栏导航（含随机友链）
+#                → 底部横条（版权 / 打字机副标题 / 协议图标）
+# 所有开关默认全开，不想要哪块把 enable 改 false 即可
+footer_settings:
+  # 版权信息
+  owner:
+    enable: true
+    since: 2024
+  # 备案号等自定义文本（支持 HTML）
+  custom_text: ''
+  # 站点运行状态：右下角小人 + 「本站居然运行了 x 天」；18 点后自动换下班图
+  runtime:
+    enable: true
+    # 起算时间：留空则使用主题顶部的 start_time（一般不用单独填）
+    launch_time: ''
+    work_img: /images/footer/work.svg
+    work_description: 正在做课件，勿扰～
+    offduty_img: /images/footer/rest.svg
+    offduty_description: 下班啦，明天见～
+  # 徽标（shields 图片放在 source/images/footer/）
+  bdageitem:
+    enable: true
+    list:
+      - link: https://hexo.io/
+        shields: /images/footer/badge-hexo.svg
+        message: 博客框架为 Hexo
+      - link: /about/
+        shields: /images/footer/badge-theme.svg
+        message: 本站使用 liublog 主题
+      - link: https://github.com/
+        shields: /images/footer/badge-github.svg
+        message: 本站项目由 GitHub 托管
+      - link: http://creativecommons.org/licenses/by-nc-sa/4.0/
+        shields: /images/footer/badge-cc.svg
+        message: 本站采用 CC BY-NC-SA 4.0 许可协议
+  # 顶部社交图标：中间是回顶头像，左右各一组
+  socialBar:
+    enable: true
+    centerImg: ''
+    left:
+      - title: 邮箱
+        link: mailto:76321057@qq.com
+        icon: icon-mail-line
+      - title: RSS
+        link: /atom.xml
+        icon: icon-rss-fill
+      - title: 友链
+        link: /links/
+        icon: icon-link
+      - title: 关于
+        link: /about/
+        icon: icon-contacts-fill
+    right:
+      - title: GitHub
+        link: https://github.com/
+        icon: icon-github-line
+      - title: Bilibili
+        link: https://space.bilibili.com/
+        icon: icon-bilibili-line
+      - title: 微博
+        link: https://weibo.com/
+        icon: icon-weibo-fill
+      - title: 版权
+        link: /copyright/
+        icon: icon-copyright-line
+  # 页脚导航栏；最后一栏是随机友链，数据取自 source/_data/link.yml
+  list:
+    enable: true
+    # 随机友链那一栏：显示条数；标题与「换一批」的悬停提示都可在下面改
+    randomFriends: 2
+    randomFriendsTitle: 随机友链
+    randomFriendsTip: 换一批
+    project:
+      - title: 文库
+        links:
+          - title: 全部文章
+            link: /archives/
+          - title: 分类
+            link: /categories/
+          - title: 标签
+            link: /tags/
+      - title: 专栏
+        links:
+          - title: 关于本站
+            link: /about/
+          - title: 博客好物
+            link: /equipment/
+          - title: 留言板
+            link: /memos/
+      - title: 友链
+        links:
+          - title: 友情链接
+            link: /links/
+          - title: 朋友圈
+            link: /fcircle/
+      - title: 协议
+        links:
+          - title: 隐私政策
+            link: /privacy/
+          - title: Cookies
+            link: /cookies/
+          - title: 版权声明
+            link: /copyright/
+  # 底部横条
+  footerBar:
+    enable: true
+    authorLink: /about/
+    cc:
+      enable: true
+      link: /copyright/
+    linkList:
+      - link: /memos/
+        text: 留言
+      - link: /atom.xml
+        text: 订阅
+      - link: /about/
+        text: 关于
+      - link: /links/
+        text: 友链
+    # 打字机副标题；source: 0 用本地 sub，1/2/3 依次是一言 / 一句 / 今日诗词
+    subTitle:
+      enable: true
+      effect: true
+      startDelay: 300
+      typeSpeed: 150
+      backSpeed: 50
+      loop: true
+      source: 0
+      sub:
+        - 生活明朗，万物可爱，人间值得，未来可期。
+        - 把做课件的手艺，和搭博客的折腾，都写在这里。
+
+# ---------- 功能 ----------
+# 本地搜索（前端面板）
+# 索引文件由站点插件 hexo-generator-searchdb 生成，主题不代劳：
+#   npm i hexo-generator-searchdb
+#   站点 _config.yml 里加：
+#     search:
+#       path: search.xml
+#       field: post
+#       content: true
+# 主题这边只负责面板样式、快捷键和分页，下面 path 要与插件输出路径一致。
+search:
+  enable: true
+  # 索引文件地址；前端按这个地址取，改这里要和插件的 path 一起改
+  path: /search.xml
+  # 搜索结果每页显示多少条（超过就分页，结果区不再出现滚动条）
+  # 面板高度约 780px，建议 8 ~ 12 之间；填得太大仍会内部滚动
+  page_size: 10
+
+# RSS 订阅源（/atom.xml）由站点插件 hexo-generator-feed 生成，主题不代劳：
+#   npm i hexo-generator-feed
+# 装好后版权卡的「订阅」与页脚 RSS 图标即可用。
+
+# ---------- 正文代码块 ----------
+# 对应三件套：css/highlight.css + js/partial/code.js + 本节配置
+# 外观是安知鱼 highlight_theme: mac 那一套（深色块 + 三颗窗口点 + 右上角复制）
+code:
+  # 右上角复制按钮
+  copy: true
+  # 左上角语言名（bash / js / yaml ...）
+  lang: true
+  # 顶部三颗红黄绿窗口点
+  mac_style: true
+  # 代码超过多少像素高时折叠，点底部按钮展开；填 0 表示不折叠
+  height_limit: 420
+
+# 说明：代码是否上色由站点 _config.yml 的 highlight.enable / syntax_highlighter 决定，
+# 主题只负责把它画成什么样（上面 code 一节），这里不再重复开关。
+
+# 说明：图片懒加载、平滑滚动在顶部 site_settings 里，不在这里重复。
+
+# 控制台抽屉（仿 heoblog 的 console）
+console:
+  enable: true
+  recent_count: 8
+  keyboard_tips: true

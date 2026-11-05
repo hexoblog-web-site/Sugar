@@ -1,0 +1,130 @@
+<%
+  /* 幻灯片（顶部通栏的左半边）
+   * 三件套：本文件 + css/home-swiper.css + js/partial/home-swiper.js
+   *
+   * 显示哪几张，两种来源，不需要额外开关：
+   *   home_top.swiper.items 有内容 → 精品推荐，按 items 顺序显示，写几条显示几条
+   *                                 （只写 link 也行，标题 / 简介 / 封面自动从文章补）
+   *   items 留空                  → 兜底：自动取带封面的最新文章，条数看 count
+   * 选文规则统一在 scripts/liublog-home-pick.js，右框（新品框架）会避开这里用掉的。
+   */
+  var sw = (theme.home.home_top || {}).swiper || {};
+  /* 全局懒加载开关（site_settings.lazyload: false 时全部直接 src） */
+  var noLazy = lb_site('lazyload', true) === false;
+
+  var exLen = parseInt(sw.excerpt_length, 10);
+  if (!(exLen > 0)) exLen = 80;
+
+  /* 简介：悬停时才浮出来的那两行字，取文章简介 / 摘要 / 正文开头 */
+  function lb_excerpt(p) {
+    if (!p) return '';
+    var s = p.description || p.excerpt || p.content || '';
+    s = strip_html(String(s)).replace(/\s+/g, ' ').trim();
+    return s.length > exLen ? s.slice(0, exLen) + '…' : s;
+  }
+
+  var banners = [];
+  /* 精品推荐条目（yml 的 home_top.swiper.items）：链接能对上文章时，
+     标题 / 简介 / 封面都会自动补齐，所以只写 link 也算一条 */
+  var manualItems = lb_swiper_items();
+
+  if (manualItems.length) {
+    /* 手动模式：按 yml 写的顺序显示，一张都不自动取。
+       缺标题或缺封面的条目在 helper 里已经丢掉了 —— 轮播上出现一张
+       没字没图的空白帧，比少一张难看。 */
+    manualItems.forEach(function (it) {
+      banners.push({
+        title: it.title,
+        link: /^https?:/i.test(String(it.link)) ? it.link : url_for(it.link),
+        cover: url_for(it.cover),
+        color: it.color || '#7454fc',
+        excerpt: it.description || lb_excerpt(it.post),
+        /* yml 里写了 target 就听它，没写按内外链判断（helper 里算好） */
+        newTab: !!it.newTab
+      });
+    });
+  } else {
+    /* 自动模式取哪几张交给 lb_home_pick：它从「不在首页第一页」的文章里按
+       时间倒序挑（封面必须有、相同封面只算一张），所以幻灯片和下面的列表
+       不会重样；右框再避开幻灯片用掉的这几张，三处都不重。
+       见 scripts/liublog-home-pick.js */
+    lb_home_pick('swiper').forEach(function (p) {
+      banners.push({
+        title: p.title,
+        link: url_for(p.path),
+        cover: url_for(lb_post_cover(p)),
+        color: p.main_color || '#7454fc',
+        excerpt: lb_excerpt(p),
+        newTab: false            // 自动模式全是站内文章，当前窗口跳
+      });
+    });
+  }
+
+  /* 左上角小标签：不写用「全站推荐」，写空字符串则不显示 */
+  var swLabel = sw.label === undefined ? '全站推荐' : String(sw.label);
+%>
+<% if (sw.enable !== false && banners.length) { %>
+<div id="home_swiper" class="home-swiper">
+  <div class="home-swiper-content">
+    <div class="home-swiper-left">
+      <div class="home-swiper-banner">
+        <% banners.forEach(function (b, i) { %>
+        <div class="home-swiper-banner-item<%= i === 0 ? ' active' : '' %> has-banner-cover"
+             data-index="<%= i %>" data-link="<%= b.link %>" data-title="<%= b.title %>"
+             data-excerpt="<%= b.excerpt || '' %>"
+             data-target="<%= b.newTab ? '1' : '' %>"
+             data-banner-color="<%= b.color %>" onclick="heo.handlePostClick('<%= b.link %>', event, <%= b.newTab ? 'true' : 'false' %>)">
+          <div class="home-swiper-cover">
+            <%# 只有第一张进首屏：src + eager + 高优先级；其余挂 data-src，等页面空闲或切到该张时再下（省 100KB 首屏） %>
+            <%# site_settings.lazyload: false 时全部直接 src，不做 data-src 占位 %>
+            <% if (i === 0 || noLazy) { %>
+            <img class="home-swiper-cover-img" src="<%= b.cover %>" alt="<%= b.title %>"
+                 loading="eager" fetchpriority="high" decoding="async" width="740" height="400">
+            <% } else { %>
+            <img class="home-swiper-cover-img" data-src="<%= b.cover %>" alt="<%= b.title %>"
+                 loading="lazy" decoding="async" width="740" height="400">
+            <% } %>
+          </div>
+          <div class="home-swiper-mask"></div>
+        </div>
+        <% }); %>
+      </div>
+
+      <div class="home-swiper-title">
+        <%# 摘要：默认收起，鼠标移到轮播上才浮出来（对齐安知鱼 banner 的 hover 观感） %>
+        <div class="home-swiper-excerpt"><%= banners[0].excerpt || '' %></div>
+        <a href="<%= banners[0].link %>"<% if (banners[0].newTab) { %> target="_blank" rel="noopener"<% } %> onclick="heo.handlePostClick('<%= banners[0].link %>', event, <%= banners[0].newTab ? 'true' : 'false' %>)"><%= banners[0].title %></a>
+        <div class="home-swiper-title-bottom">
+          <div class="home-swiper-title-left">
+            <%# 标签文案可配（home_top.swiper.label），写空就不占位 %>
+            <% if (swLabel) { %>
+            <div class="home-swiper-title-tag">
+              <i class="banner-icon heoblogIcon icon-star"></i><%= swLabel %>
+            </div>
+            <% } %>
+            <%# 只有一张时圆点没有意义，不渲染 %>
+            <% if (banners.length > 1) { %>
+            <div class="home-swiper-indicators">
+              <% banners.forEach(function (b, i) { %>
+              <span class="home-swiper-indicator<%= i === 0 ? ' active' : '' %>" data-index="<%= i %>" onclick="heo.goBanner(<%= i %>, event)"></span>
+              <% }); %>
+            </div>
+            <% } %>
+          </div>
+          <%# 单张时也没有「下一条」可翻 %>
+          <% if (banners.length > 1) { %>
+          <div class="home-swiper-banner-arrows">
+            <button class="home-swiper-banner-arrow prev" type="button" aria-label="上一条" onclick="heo.stepHomeCenterBanner(-1, event)">
+              <i class="heoblogIcon icon-arrow-left-s-line"></i>
+            </button>
+            <button class="home-swiper-banner-arrow next" type="button" aria-label="下一条" onclick="heo.stepHomeCenterBanner(1, event)">
+              <i class="heoblogIcon icon-arrow-right-s-line"></i>
+            </button>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>

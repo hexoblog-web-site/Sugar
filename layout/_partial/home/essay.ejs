@@ -1,0 +1,78 @@
+<%
+  /* 即刻（首页顶部滚动短文条）
+   *
+   * 三件套：
+   *   模板  layout/_partial/home/essay.ejs   （本文件）
+   *   样式  source/css/essay.css
+   *   脚本  source/js/partial/essay.js
+   *
+   * 移植自安知鱼主题：layout/includes/bbTimeList.pug + css/_extra/essay_page/home_essay_bar.css
+   * 结构与类名沿用安知鱼（#bbTimeList / #bber-talk / .li-style / .bber-logo / .bber-gotobb），
+   * 方便以后对照原版；滚动实现换成本主题自己的（不引 Swiper，省一个 40KB 依赖）。
+   *
+   * 数据两个来源，站点数据优先：
+   *   1) source/_data/essay.yml —— 安知鱼同款格式，已有就直接读
+   *        - home_essay: true
+   *          essay_list:
+   *            - content: 一句话
+   *              date: 2026-11-02
+   *              image: 可选
+   *   2) 主题 _config.yml → essay.items —— 没建上面的数据文件时用这份
+   * 取最近几条由 essay.count 决定（默认 10，与安知鱼一致）。
+   */
+  var cfg = theme.essay || {};
+  var list = [];
+
+  function pushItem(it) {
+    if (!it || !it.content) return;
+    list.push({
+      content: it.content,
+      link: it.link || '',
+      /* 安知鱼的做法：带图/带视频的条目前面挂个标记，这里保留 */
+      mark: it.image ? ' [图片]' : (it.video ? ' [视频]' : '')
+    });
+  }
+
+  var groups = (site.data && site.data.essay) || [];
+  groups.forEach(function (group) {
+    if (!group || group.home_essay === false) return;
+    (group.essay_list || []).forEach(pushItem);
+  });
+  if (!list.length) {
+    (cfg.items || []).forEach(pushItem);
+  }
+  var count = parseInt(cfg.count, 10);
+  if (!(count > 0)) count = 10;
+  list = list.slice(0, count);
+
+  var barLink = cfg.link ? url_for(cfg.link) : '';
+  var interval = Number(cfg.interval) || 3000;
+%>
+<% if (cfg.enable !== false && list.length) { %>
+<div id="bbTimeList" class="bbTimeList" data-interval="<%= interval %>">
+  <% if (barLink) { %>
+  <a class="bber-logo" href="<%= barLink %>" title="即刻短文">即刻</a>
+  <% } else { %>
+  <span class="bber-logo" title="即刻短文">即刻</span>
+  <% } %>
+
+  <div id="bbtalk" class="essay-bar">
+    <div id="bber-talk">
+      <% list.forEach(function (it) { %>
+        <% var text = it.content + it.mark; %>
+        <% if (it.link) { %>
+        <a class="li-style" href="<%= url_for(it.link) %>" title="<%= text %>"><%= text %></a>
+        <% } else { %>
+        <span class="li-style" title="<%= text %>"><%= text %></span>
+        <% } %>
+      <% }); %>
+    </div>
+  </div>
+
+  <% if (barLink) { %>
+  <a class="bber-gotobb heoblogIcon icon-arrow-right-s-line" href="<%= barLink %>" title="查看全部即刻" aria-label="查看全部即刻"></a>
+  <% } else { %>
+  <i class="bber-gotobb heoblogIcon icon-arrow-right-s-line" title="即刻短文" aria-hidden="true"></i>
+  <% } %>
+</div>
+<% } %>

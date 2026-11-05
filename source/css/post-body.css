@@ -1,0 +1,34 @@
+/* ============================================================================
+ * post-body.css —— 文章正文排版
+ * ----------------------------------------------------------------------------
+ * 归属：文章页 #article-container 内部（标题缩进、链接底色、列表符号、代码块悬停、
+ *       标签链接、引用、表格等）。首页不渲染 #article-container，所以这块样式
+ *       只在文章页生效。
+ * 来源：原先混在 home.css 的 @media (hover:hover) 里，2026-11-03 迁出。
+ * 全部为 :hover 状态，必须保留 @media (hover:hover) 包裹（触屏设备不触发）。
+ * ========================================================================= */
+
+@media (hover:hover) {
+  #article-container figure.highlight .caption a:hover,#article-container figure.highlight figcaption a:hover{border-bottom-color:var(--hl-color)}
+  #article-container a:hover{text-decoration:none;background:var(--heo-main);border-width:0;color:var(--heo-white);border-radius:4px}
+  #article-container h2:hover{padding-left:1.5rem}
+  #article-container h3:hover{padding-left:1.4rem}
+  #article-container h4:hover{padding-left:1.3rem}
+  #article-container h5:hover,#article-container h6:hover{padding-left:1.2rem}
+  #article-container ol li:hover::before,#article-container ul li:hover::before{transform:rotate(360deg)}
+  #article-container ul>li:not(.tab)::before{top:calc(.2em + 1em - .21em);width:.42em;height:.42em;border-radius:.42em;background:var(--heo-lighttext);content:"";line-height:.42em;box-shadow:0 0 0 .22em color-mix(in srgb,var(--heo-lighttext) 30%,transparent)}
+  #article-container .btn-beautify:hover{text-decoration:none}
+  #article-container .btn-beautify.outline:hover{color:#fff!important}
+  #article-container .tabs>.nav-tabs>.tab:not(.active) button:hover{border-top:2px solid var(--tab-button-hover-bg)}
+  #article-container h1:hover:before,#article-container h2:hover:before,#article-container h3:hover:before,#article-container h4:hover:before,#article-container h5:hover:before,#article-container h6:hover:before{color:var(--heo-lighttext)}
+  #article-container h1:hover,#article-container h2:hover,#article-container h3:hover,#article-container h4:hover,#article-container h5:hover,#article-container h6:hover{padding-left:1.3rem}
+  #article-container .tabs>.nav-tabs>.tab:not(.active) button:hover{background:var(--heo-main);color:var(--heo-white);transition:var(--t);border:var(--style-border-hover-always)}
+  #article-container .tag-Link:hover{border:var(--style-border-hover)}
+  #article-container .tag-Link:hover .tag-link-bottom .tag-link-right .tag-link-sitename,#article-container .tag-Link:hover .tag-link-tips{color:var(--heo-white);opacity:.6}
+  #article-container .headerlink:hover{background:var(--heo-none)!important;opacity:1;border-bottom:none!important;box-shadow:none!important;color:var(--heo-lighttext)!important;text-decoration:none}
+  #article-container ol li:hover:before,#article-container ul li:hover:before{transform:rotate(0)}
+  #article-container figure.highlight table::-webkit-scrollbar-thumb:hover{background:var(--heo-lighttext)}
+  #article-container .code-expand-btn:hover{background:var(--heo-main)}
+  #article-container .code-expand-btn:hover i{color:var(--heo-white)}
+  #article-container h1:hover{padding-left:0}
+}

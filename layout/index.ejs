@@ -1,0 +1,46 @@
+<%# 即刻：首页顶部短文条，位置固定在导航栏下方、幻灯片上方
+    模板 home/essay.ejs · 样式 css/essay.css · 脚本 js/partial/essay.js %>
+<%- partial('_partial/home/essay') %>
+
+<%# 顶部通栏：幻灯片 + 新品框架
+    放在 .home-layout-row 外面，才能横跨整页（左栏 + 侧栏的总宽），
+    横过来之后侧栏（个人信息卡）自然下移到文章列表旁边。
+    这里用 <section> 而不是 <div>：主题里一堆 `.layout>div:first-child:not(...)`
+    会给首个 div 套上卡片背景和内边距、压成 calc(100% - 300px)，
+    换成 section 就绕开了这些选择器，不用去改那几条老规则。
+    模板 home/home-top.ejs（内部再调 home/home-swiper.ejs）· 样式 css/home-top.css
+    · 脚本 js/partial/home-top.js（只负责触屏展开那块遮罩）
+    只在首页第一页出现：翻到第 2 页及以后不再渲染。 %>
+<% if ((page.current || 1) === 1) { %>
+<%- partial('_partial/home/home-top') %>
+<% } %>
+
+<div class="home-layout-row">
+  <div class="home_barAndPosts">
+    <div id="home_top_blur" class="home-top-blur">
+      <div id="home_top_blur_bg" class="home-top-blur-bg"></div>
+    </div>
+
+    <%# 分类横条（含「精选」）：放在文章列表正上方，属于列表头部，所以进左栏 %>
+    <% if (theme.home.category_bar) { %>
+      <%- partial('_partial/home/category-bar') %>
+    <% } %>
+
+    <div id="recent-posts" class="recent-posts<%= lb_post_list().banner ? ' list-banner' : '' %>">
+      <% var idx = 0; %>
+      <% page.posts.each(function (post) { %>
+        <%- partial('_partial/home/post-card', { post: post, index: idx }) %>
+        <% idx++; %>
+      <% }); %>
+      <% if (!page.posts.length) { %>
+        <div class="empty-tips">还没有发布任何文章</div>
+      <% } %>
+    </div>
+
+    <%- partial('_partial/pagination') %>
+  </div>
+
+  <% if (lb_sidebar_cfg().enable !== false) { %>
+    <%- partial('_partial/aside') %>
+  <% } %>
+</div>

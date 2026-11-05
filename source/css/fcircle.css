@@ -1,0 +1,577 @@
+/* ==========================================================================
+   朋友圈页 —— 对标 blog.anheyu.com/fcircle
+   结构：.fcircle > .fc-banner 横幅 → .moments-list（钓鱼 / 卡片流 / 加载更多 / 统计栏）
+   数值取自参考站实测（1400 视口）：横幅 1352×300、卡片 440×160、网格 3 列
+   钓鱼与标题的通用样式复用 link.css（同一组件），这里只覆盖朋友圈页更小的字号
+   ========================================================================== */
+
+/* ---------- 页面容器 ---------- */
+/* 参考站内容区 1352 = 1400 - 24×2，主题默认给 30px，这里收紧到 24px */
+body.fcircle #content-inner.layout {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* #content-inner 是 flex 行容器，主题给首列预留过 300px 侧栏宽度，这里自己吃掉整宽 */
+#content-inner > .fcircle {
+  display: block;
+  flex: 1 1 auto;
+  width: 100% !important;
+  min-width: 0;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+  align-self: flex-start;
+}
+
+/* ---------- 顶部横幅 ---------- */
+.fc-banner {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  background: #163bf2;
+  border-radius: 12px;
+}
+
+.fc-banner-inner {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 32px;
+  background-position: left 37%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+
+/* 图片上压一层黑罩（浓度由 _data/fcircle.yml 的 banner.overlay 控制，默认 40%），白字才稳 */
+.fc-banner-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(0, 0, 0, var(--fc-overlay, .4));
+}
+
+/* 没配图时用主色渐变兜底：两团径向光 + 斜向渐变，避免一整块死蓝 */
+.fc-banner--plain .fc-banner-inner {
+  background-image:
+    radial-gradient(70% 120% at 82% 8%, rgba(255, 255, 255, .18), rgba(255, 255, 255, 0) 60%),
+    radial-gradient(90% 140% at 6% 96%, rgba(6, 18, 160, .85), rgba(6, 18, 160, 0) 62%),
+    linear-gradient(112deg, #0a1bb2 0%, #163bf2 36%, #3f57f0 66%, #8296ff 100%);
+}
+
+.fc-banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.fc-banner-tips {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.fc-banner-title {
+  display: block;
+  margin: 0 0 16px;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.fc-banner-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-banner-desc {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fc-banner-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  background: rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 25px;
+  text-decoration: none;
+  transition: all .3s;
+}
+
+.fc-banner-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .32);
+  border-color: rgba(255, 255, 255, .5);
+}
+
+.fc-banner-button-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- 区块标题（朋友圈 / 钓鱼 共用） ---------- */
+/* link.css 里钓鱼标题是 24px（友链页如此），朋友圈页是 16px，这里按页覆盖 */
+.fcircle .random-post-container .title-section .title-left h2,
+.fcircle .title-section--plain .title-left h2 {
+  margin: 9.6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 2;
+}
+
+.fcircle .title-section--plain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.fcircle .title-section--plain .title-left {
+  display: flex;
+  align-items: center;
+}
+
+/* 参考站这一栏标题是常规字重，行高也比钓鱼那栏小（21px vs 32px） */
+.fcircle .title-section--plain .title-left h2 {
+  font-weight: 400;
+  line-height: 21px;
+}
+
+/* 「全部友链」 */
+.fcircle .random-post-all {
+  display: inline-block;
+  padding: 0;
+  color: var(--heo-fontcolor);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 2;
+  background: none;
+  border: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.fcircle .random-post-all:hover {
+  color: var(--heo-main);
+}
+
+/* 钓鱼区占位文案 */
+.fc-dice-loading {
+  color: var(--heo-secondtext);
+}
+
+/* ---------- 卡片网格 ---------- */
+.moments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8px;
+}
+
+.moment-item {
+  width: 33.3333%;
+  min-width: 0;
+}
+
+.moment-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  margin: 8px;
+  padding: 16px;
+  overflow: hidden;
+  background: var(--heo-card-bg);
+  border: 1px solid var(--heo-card-border);
+  border-radius: 8px;
+  box-shadow: var(--heo-shadow-border);
+  box-sizing: border-box;
+  transition: transform .3s, box-shadow .3s, border-color .3s;
+}
+
+.moment-card:hover {
+  border-color: #163bf2;
+  box-shadow: 0 8px 12px -3px rgba(22, 59, 242, .14);
+  transform: translateY(-3px);
+}
+
+.moment-title {
+  display: -webkit-box;
+  margin: 0 0 8px;
+  overflow: hidden;
+  color: var(--heo-fontcolor);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  word-break: break-all;
+}
+
+.moment-title:hover {
+  color: #163bf2;
+}
+
+.moment-summary {
+  display: -webkit-box !important;
+  max-height: 39px;
+  margin: 0 0 10px;
+  overflow: hidden;
+  color: var(--heo-secondtext);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  word-break: break-word;
+}
+
+.moment-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.moment-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  background: var(--heo-secondbg);
+  border-radius: 50%;
+}
+
+.moment-author {
+  display: flex;
+  align-items: center;
+  max-width: 45%;
+  padding: 8px;
+  overflow: hidden;
+  color: var(--heo-fontcolor);
+  font-size: 11.2px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: rgba(153, 153, 153, .17);
+  border: 0;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.moment-author:hover {
+  color: #fff;
+  background: #163bf2;
+}
+
+.moment-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: var(--heo-fontcolor);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.moment-time svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+/* 只看某位博主时的清除按钮 */
+.fc-filter-chip {
+  padding: 4px 12px;
+  color: #163bf2;
+  font-size: 13px;
+  line-height: 1.5;
+  background: rgba(22, 59, 242, .08);
+  border: 1px solid rgba(22, 59, 242, .2);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.fc-filter-chip:hover {
+  color: #fff;
+  background: #163bf2;
+}
+
+/* ---------- 骨架屏 ---------- */
+.moment-card.fc-skeleton {
+  background: var(--heo-card-bg);
+}
+
+.fc-sk {
+  display: block;
+  background: linear-gradient(90deg, var(--heo-secondbg) 25%, rgba(153, 153, 153, .12) 37%, var(--heo-secondbg) 63%);
+  background-size: 400% 100%;
+  border-radius: 4px;
+  animation: fc-shimmer 1.4s ease infinite;
+}
+
+.fc-sk-title {
+  width: 70%;
+  height: 15px;
+  margin-bottom: 12px;
+}
+
+.fc-sk-line {
+  width: 100%;
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+.fc-sk-line--short {
+  width: 55%;
+}
+
+@keyframes fc-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ---------- 空态 / 错误态 ---------- */
+.fc-empty {
+  padding: 40px 0;
+  color: var(--heo-secondtext);
+  font-size: 14px;
+  text-align: center;
+}
+
+.fc-empty button {
+  margin-left: 8px;
+  padding: 4px 14px;
+  color: #163bf2;
+  font-size: 13px;
+  background: rgba(22, 59, 242, .08);
+  border: 1px solid rgba(22, 59, 242, .2);
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* ---------- 加载更多 ---------- */
+.moments-more-container {
+  display: flex;
+  justify-content: center;
+}
+
+.moments-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40%;
+  height: 30px;
+  margin-top: 16px;
+  padding: 0;
+  color: var(--heo-fontcolor);
+  background: var(--heo-card-bg);
+  border: 1px solid var(--heo-card-border);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-border);
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.moments-more-btn:hover {
+  color: #163bf2;
+  border-color: #163bf2;
+}
+
+.moments-more-btn[disabled] {
+  opacity: .45;
+  cursor: default;
+}
+
+.moments-more-btn[hidden] {
+  display: none;
+}
+
+/* ---------- 统计栏 ---------- */
+.moments-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 8px 8px 8px 0;
+  color: var(--heo-secondtext);
+  font-size: 13px;
+  line-height: 26px;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 8px 8px 8px 0;
+}
+
+.footer-info {
+  display: flex;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+}
+
+.info-item .label {
+  margin-right: 4px;
+}
+
+.info-item .value {
+  color: var(--heo-fontcolor);
+  font-weight: 600;
+}
+
+.footer-setting {
+  margin-top: 4px;
+}
+
+.update-time {
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.footer-sort {
+  margin-top: 8px;
+}
+
+/* 排序开关：86×30 蓝色胶囊，左边文案右边滑块 */
+.moments-sort-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 86px;
+  height: 30px;
+  padding: 4px 4px 4px 12px;
+  background: #1677ff;
+  border: 1px solid #1677ff;
+  border-radius: 15px;
+  box-shadow: 0 0 0 1px rgba(22, 119, 255, .12);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background .3s, border-color .3s, box-shadow .3s;
+}
+
+.fc-switch-label {
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color .3s;
+}
+
+.fc-switch-thumb {
+  width: 22px;
+  height: 22px;
+  margin-left: auto;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 35, 11, .2);
+  transition: margin .3s;
+}
+
+.moments-sort-switch[aria-checked="false"] {
+  background: var(--heo-secondbg);
+  border-color: var(--heo-card-border);
+  box-shadow: none;
+}
+
+.moments-sort-switch[aria-checked="false"] .fc-switch-label {
+  color: var(--heo-secondtext);
+}
+
+.moments-sort-switch[aria-checked="false"] .fc-switch-thumb {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* ---------- 暗色 ---------- */
+[data-theme="dark"] .moments-sort-switch[aria-checked="true"] {
+  box-shadow: 0 0 0 1px rgba(22, 119, 255, .28);
+}
+
+/* ---------- 响应式 ---------- */
+@media screen and (max-width: 1200px) {
+  .moment-item {
+    width: 50%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  body.fcircle #content-inner.layout {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .fc-banner,
+  .fc-banner-inner {
+    height: 300px;
+  }
+
+  .fc-banner-inner {
+    padding: 24px;
+  }
+
+  .fc-banner-title {
+    font-size: 24px;
+  }
+
+  .moment-item {
+    width: 100%;
+  }
+
+  .moments-more-btn {
+    width: 80%;
+  }
+
+  .fc-banner-button {
+    padding: 8px 18px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .fcircle .random-post-container .random-post-content {
+    padding: 14px 16px;
+  }
+
+  .fc-banner-title {
+    margin-bottom: 8px;
+  }
+
+  .moment-author {
+    max-width: 40%;
+  }
+}

@@ -1,0 +1,50 @@
+<%
+  /* 归档正文：按年分组 + 时间轴。archive.ejs（生成器）与 type: archive 的页面共用。 */
+  var groups = [];
+  var map = {};
+  page.posts.sort('date', -1).each(function (p) {
+    var y = date(p.date, 'YYYY');
+    if (!map[y]) { map[y] = { year: y, posts: [] }; groups.push(map[y]); }
+    map[y].posts.push(p);
+  });
+  var total = page.posts.length;
+  /* 归档总览 / 按年 / 按月：用全站数据统计，不能用分页后的 page.posts.length */
+  if (!page.year) {
+    total = site.posts.length;
+  } else {
+    var yKey = String(page.year) + '-' + (page.month ? String(page.month).padStart(2, '0') : '');
+    total = site.posts.filter(function (p) {
+      var d = date(p.date, 'YYYY-MM');
+      return page.month ? d === yKey : date(p.date, 'YYYY') === String(page.year);
+    }).length;
+  }
+%>
+<div id="archive">
+  <div class="archive-head card-widget">
+    <div class="item-headline">
+      <i class="heoblogIcon icon-calendar-todo-fill"></i>
+      <span><%= page.year ? (page.year + ' 年' + (page.month ? ' ' + page.month + ' 月' : '')) : '归档' %></span>
+    </div>
+    <div class="archive-count">共 <b><%= total %></b> 篇文章</div>
+  </div>
+
+  <% groups.forEach(function (g) { %>
+    <div class="archive-group">
+      <div class="archive-year"><%= g.year %></div>
+      <ul class="archive-list">
+        <% g.posts.forEach(function (p) { %>
+          <li class="archive-item">
+            <time class="archive-date" datetime="<%= date_xml(p.date) %>"><%= date(p.date, 'MM-DD') %></time>
+            <a class="archive-title" href="<%- url_for(p.path) %>" title="<%= p.title %>"><%= p.title %></a>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  <% }); %>
+
+  <% if (!groups.length) { %>
+    <div class="empty-tips">这个时间范围内还没有文章</div>
+  <% } %>
+
+  <%- partial('_partial/pagination') %>
+</div>

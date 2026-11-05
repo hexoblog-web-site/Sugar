@@ -1,0 +1,77 @@
+/* card-rss.css —— 侧栏「订阅更新」卡片
+ *
+ * 三件套：
+ *   模板  layout/_partial/aside/card-rss.ejs
+ *   样式  source/css/aside/card-rss.css        （本文件）
+ *   脚本  无（整张卡就是一个点击跳转块，跳转写在模板的 onclick 上）
+ *
+ * 这张卡是「绿底窄条」，跟其余白底卡片长得不一样，所以外观全部收在这里。
+ *
+ * 历史：模板原来套用的是友链/微信卡的 id（card-wechat），内层类名也是 wechat-card-*，
+ * 壳子样式散在 aside-legacy.css、内层样式散在 heoblogmain.css 里。现在统一改成
+ * rss 命名，一个卡 = 一个模板 + 一个样式文件。
+ *
+ * 内层保持「裸类选择器」，与原来的 .wechat-card-* 特指度一致，
+ * 不会反过来压住 #aside-content 下的通用 img / i 规则。
+ */
+
+#aside-content .card-widget#card-rss {
+  background: linear-gradient(135deg, #a2d662 0, #56ab2f 100%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 24px;
+  cursor: pointer;
+  border: none;
+  height: 60px;
+  overflow: hidden;
+}
+
+.rss-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.rss-card-icon {
+  display: block;
+  color: var(--heo-white);
+  height: 26px;
+  width: auto;
+}
+
+.rss-card-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--heo-white);
+}
+
+.rss-card-arrow {
+  background: var(--heo-white-op);
+  color: var(--heo-white);
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 32px;
+  box-sizing: border-box;
+  transition: var(--t);
+  position: relative;
+  z-index: 2;
+}
+
+@media (hover: hover) {
+  #aside-content .card-widget#card-rss:hover .rss-card-arrow {
+    background: var(--heo-white);
+    transform: scale(1.1);
+    color: var(--heo-green);
+  }
+}

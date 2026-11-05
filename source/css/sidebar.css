@@ -1,0 +1,451 @@
+/* sidebar.css
+ *
+ * 首页「sidebar」板块的样式。
+ *
+ * 拆分自下列文件（拆分脚本已归档到 hexo/_tools/archive/，本文件从现在起手改）：
+ *   source/css/heoblogmain.css          64 条
+ *   source/css/home.css                  2 条
+ *   source/css/heoblogmw768.css          5 条
+ *
+ * 改这个板块的样式请只改本文件；对应模板 layout/_partial/sidebar.ejs。
+ */
+
+/* ===== 来自 source/css/heoblogmain.css ===== */
+#sidebar #sidebar-menus .menus_items .site-page,
+#sidebar #sidebar-menus .site-data .data-item .data-item-link>a>div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.sidebar-open {
+  background: var(--heo-background)!important;
+}
+#sidebar #sidebar-menus {
+  position: fixed;
+  inset: 0;
+  z-index: 1004;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  background: var(--heo-background);
+  padding: env(safe-area-inset-top,0) 0 calc(env(safe-area-inset-bottom,0px) + 24px);
+  touch-action: manipulation;
+  scrollbar-width: none;
+}
+#sidebar #sidebar-menus a.site-page {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#sidebar #sidebar-menus::-webkit-scrollbar {
+  display: none;
+}
+#sidebar #sidebar-menus.open {
+  display: flex;
+}
+#sidebar #sidebar-menus .sidebar-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: calc(env(safe-area-inset-top,0px) + 16px) 16px 12px;
+  background: var(--heo-background);
+  flex-shrink: 0;
+}
+#sidebar #sidebar-menus .sidebar-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+#sidebar #sidebar-menus .sidebar-navbar-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+#sidebar #sidebar-menus .sidebar-navbar-title {
+  font-size: 1.4em;
+  line-height: 1;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#sidebar #sidebar-menus .sidebar-close-button {
+  color: var(--heo-secondtext);
+  font-size: 1.4em;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50px;
+  transition: var(--t);
+}
+#sidebar #sidebar-menus .app-menu-list-groups {
+  padding: 0 16px;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list-title {
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  line-height: 3;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list .app-menu-item {
+  width: calc(50% - 4px);
+  flex: none;
+  min-width: 0;
+  margin: 0;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list:has(>.app-menu-item:only-child) .app-menu-item {
+  width: auto;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list .app-menu-item .app-menu-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+#sidebar #sidebar-menus .app-menu-button {
+  display: none;
+}
+#sidebar #sidebar-menus>.author-avatar {
+  padding: 1.3rem 1.5rem 0;
+  text-align: center;
+}
+#sidebar #sidebar-menus>.author-avatar img {
+  width: 110px;
+  height: 110px;
+  border-radius: 70px;
+  transition: var(--t-500);
+}
+#sidebar #sidebar-menus .site-data {
+  display: flex;
+  width: auto;
+  justify-content: space-between;
+  margin: 12px 16px 12px;
+  padding: 8px 16px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+#sidebar #sidebar-menus .site-data .data-item {
+  display: flex;
+  justify-content: flex-start;
+}
+#sidebar #sidebar-menus .site-data .data-item .data-item-link .length-num {
+  color: var(--heo-fontcolor);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+#sidebar #sidebar-menus .site-data .data-item .data-item-link .headline {
+  color: var(--heo-secondtext);
+  font-size: 12px;
+  line-height: 1;
+}
+#sidebar #sidebar-menus .site-data .data-item .data-item-link>a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+#sidebar #sidebar-menus hr {
+  margin: 1rem auto;
+}
+#sidebar #sidebar-menus .menus_items {
+  padding: 0 16px;
+}
+#sidebar #sidebar-menus .menus_items .site-page {
+  position: relative;
+  display: block;
+  padding: 0;
+  color: var(--heo-fontcolor);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+}
+#sidebar #sidebar-menus .app-menu-list-groups .app-menu-list .app-menu-item,
+#sidebar #sidebar-menus .menus_item_child .site-page.child,
+#sidebar #sidebar-menus .sidebar-menu-item a.menu-child,
+#sidebar a.app-menu-bottom-btn {
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 99px;
+}
+#sidebar #sidebar-menus .menus_item>.site-page {
+  display: flex;
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  line-height: 3;
+}
+@media (hover:hover) {
+  #sidebar #sidebar-menus .menus_item>.site-page:hover {
+    color: var(--heo-lighttext);
+  }
+  #sidebar #sidebar-menus .app-menu-list-groups .app-menu-list .app-menu-item:hover,
+  #sidebar #sidebar-menus .menus_item_child .site-page.child:hover,
+  #sidebar #sidebar-menus .sidebar-menu-item a.menu-child:hover,
+  #sidebar a.app-menu-bottom-btn:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg);
+  }
+}
+
+#sidebar #sidebar-menus .menus_items .expand {
+  position: absolute;
+  top: .78em;
+  right: .4rem;
+  transition: transform .3s ease 0s;
+}
+#sidebar #sidebar-menus .menus_items .expand.hide {
+  transform: rotate(90deg)!important;
+}
+#sidebar #sidebar-menus .menus_items .menus_item_child {
+  margin: -4px;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+#sidebar #sidebar-menus .menus_item_child .site-page.child {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+#sidebar #sidebar-menus .menus_item_child li {
+  width: calc(50% - 8px);
+  margin: 4px;
+}
+#sidebar #sidebar-menus .menus_item_child .site-page.child span {
+  line-height: 1;
+  margin-top: 8px;
+  font-size: 14px;
+}
+#sidebar #sidebar-menus span.sidebar-menu-item-title {
+  font-size: 12px;
+  color: var(--heo-secondtext);
+  padding: 0 16px;
+  line-height: 3;
+  width: 100%;
+  display: flex;
+}
+#sidebar #sidebar-menus .sidebar-menu-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+#sidebar #sidebar-menus .sidebar-menu-item a.menu-child {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 8px;
+  padding: 6px 8px;
+  flex-wrap: wrap;
+}
+#sidebar #sidebar-menus .sidebar-menu-item a.menu-child i {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#sidebar #sidebar-menus .webinfo {
+  padding: 0 16px;
+  display: flex;
+  white-space: nowrap;
+  flex-direction: column;
+}
+#sidebar #sidebar-menus .webinfo .webinfo-item {
+  justify-content: space-between;
+}
+#sidebar #sidebar-menus .power-item-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+#sidebar #sidebar-menus .power-list {
+  padding: 0;
+}
+#sidebar #sidebar-menus .power-list .power-item .power-item-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 999px;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+#sidebar #sidebar-menus .power-list .power-item .power-item-link .power-item-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+#sidebar #sidebar-menus #card-wechat-sidebar {
+  background: linear-gradient(135deg,#a2d662 0,#56ab2f 100%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 24px;
+  cursor: pointer;
+  border: var(--style-border-always);
+  border-radius: 8px;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+  margin: 0 16px 12px;
+}
+#sidebar #sidebar-menus #card-skill-sidebar {
+  position: relative;
+  background: linear-gradient(135deg,#e65b47 0,#d94a36 50%,#c94a38 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  border: var(--style-border-always);
+  border-radius: 8px;
+  height: 60px;
+  margin: 0 16px;
+  overflow: hidden;
+}
+#sidebar #sidebar-menus #card-skill-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,#eb6b57 0,#e65b47 50%,#d94a36 100%);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+#sidebar #sidebar-menus #card-skill-sidebar:hover::before {
+  opacity: 1;
+}
+#sidebar #sidebar-menus #card-skill-sidebar .skill-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+#sidebar #sidebar-menus #card-skill-sidebar .skill-icon {
+  width: 92px;
+  height: 92px;
+  border-radius: 0;
+  object-fit: cover;
+  position: absolute;
+  top: -15px;
+  left: -29px;
+}
+#sidebar #sidebar-menus #card-skill-sidebar .skill-text {
+  margin-left: 80px;
+  margin-bottom: 3px;
+  line-height: 1.38;
+  color: #fff;
+}
+#sidebar #sidebar-menus #card-skill-sidebar .skill-text-desc {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: .8;
+}
+#sidebar #sidebar-menus #card-skill-sidebar .skill-text-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+#sidebar {
+  background: var(--heo-maskbg);
+}
+#sidebar a.app-menu-bottom-btn {
+  margin: 0;
+  padding: 0 8px;
+  margin-top: 8px;
+}
+#sidebar a.app-menu-bottom-btn span {
+  color: var(--heo-fontcolor);
+}
+#sidebar a.app-menu-bottom-btn:hover span {
+  color: var(--heo-card-bg);
+}
+#sidebar .app-menu-bottom-btn img {
+  display: none;
+}
+@media (hover:hover) {
+  #sidebar #sidebar-menus>.author-avatar img:hover {
+    transform: rotate(360deg);
+  }
+  #sidebar #sidebar-menus .power-list .power-item .power-item-link a:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg)!important;
+    box-shadow: var(--heo-shadow-theme);
+    border-radius: 999px;
+  }
+}
+
+/* ===== 来自 source/css/home.css ===== */
+@media (hover:hover) {
+  #sidebar #sidebar-menus>.author-avatar img:hover {
+    transform: rotate(360deg);
+  }
+  #sidebar #sidebar-menus .power-list .power-item .power-item-link a:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg)!important;
+    box-shadow: var(--heo-shadow-theme);
+    border-radius: 999px;
+  }
+}
+
+/* ===== 来自 source/css/heoblogmw768.css ===== */
+@media screen and (max-width:767px) {
+  #sidebar #sidebar-menus .webinfo .webinfo-item {
+    font-size: 14px;
+  }
+  #sidebar #sidebar-menus .menus_items .site-page {
+    font-weight: 400;
+  }
+}
+
+@media (hover:hover) {
+  #sidebar #sidebar-menus .sidebar-menu-item a.menu-child:hover {
+    background: var(--heo-lighttext);
+    color: var(--heo-card-bg);
+  }
+}
+
+@media screen and (max-width:767px) {
+  #sidebar-menus>div.author-avatar {
+    display: none;
+  }
+}
+
+@media (hover:none),(pointer:coarse) {
+  #sidebar #sidebar-menus .menus_item>.site-page:hover {
+    background: 0 0!important;
+    color: inherit;
+  }
+}

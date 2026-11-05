@@ -1,0 +1,136 @@
+<%
+  /* 朋友圈（友链朋友圈）—— 对标 blog.anheyu.com/fcircle
+     配置在主题 _config.yml 的 friends_lite 段（命名跟安知鱼主题一致）
+     结构：横幅 → 钓鱼（随机一篇）→ 朋友圈卡片流 → 加载更多 → 统计栏
+     卡片由 js/partial/fcircle.js 请求接口后渲染（静态页无法在构建期拿到跨域数据）
+  */
+  var fl = theme.friends_lite || {};
+  var fcEnabled = fl.enable !== false;
+
+  var fcBase = page.api || fl.private_api_url || 'https://quanzi.liublog.cn/';
+  // 与安知鱼一致：private_api_url 填的是目录（如 https://quanzi.liublog.cn/），自动补 all.json；
+  // 直接写 .json 完整地址也认
+  var fcApi = /\.json(\?.*)?$/i.test(fcBase) ? fcBase : fcBase.replace(/\/+$/, '') + '/all.json';
+  var fcImage = page.banner || fl.top_background || '';
+  var fcOverlay = (fl.overlay === 0 || fl.overlay) ? fl.overlay : 0.4;
+  var fcTips = fl.tips || '友链';
+  var fcTitle = fl.title || '朋友圈';
+  var fcDesc = fl.bottom_left || '订阅友链最新文章';
+  var fcBtnText = fl.bottom_right || '友情链接';
+  var fcDiceTitle = fl.dice_title || '🎣 钓鱼';
+  var fcDiceLinkText = fl.dice_link_text || '全部友链';
+  var fcListTitle = fl.list_title || '🐟 朋友圈';
+  var fcPageSize = fl.page_turning_number || 24;
+  var fcAvatar = fl.error_img || '/images/avatar.svg';
+
+  var fcLinkUrl = url_for('/links/');
+  var fcBtnHref = fl.bottom_right_link ? url_for(fl.bottom_right_link) : fcLinkUrl;
+  var fcBannerStyle = (fcImage ? 'background-image:url(\'' + fcImage + '\');' : '') + '--fc-overlay:' + fcOverlay + ';';
+%>
+<% if (!fcEnabled) { %>
+<script>location.replace('/404.html');</script>
+<% } else { %>
+<div class="fcircle">
+
+  <%# ---------- 顶部横幅 ---------- %>
+  <div class="fc-banner<%= fcImage ? '' : ' fc-banner--plain' %>">
+    <div class="fc-banner-inner" style="<%= fcBannerStyle %>">
+      <div class="fc-banner-content">
+        <div class="fc-banner-head">
+          <div class="fc-banner-tips"><%= fcTips %></div>
+          <h1 class="fc-banner-title"><%= fcTitle %></h1>
+        </div>
+        <div class="fc-banner-bottom">
+          <div class="fc-banner-desc"><%= fcDesc %></div>
+          <a class="fc-banner-button" href="<%- fcBtnHref %>">
+            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="fc-banner-button-icon" width="20" height="20" viewBox="-2 -2 24 24">
+              <path fill="currentColor" d="M13.828 7.172a.997.997 0 0 0-1-1h-6a1 1 0 1 0 0 2h3.586l-3.95 3.95a1 1 0 0 0 1.415 1.414l3.95-3.95v3.586a1 1 0 0 0 2 0v-6zM10 20C4.477 20 0 15.523 0 10S4.477 0 10 0s10 4.477 10 10s-4.477 10-10 10"/>
+            </svg>
+            <span><%= fcBtnText %></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="moments-list">
+
+    <%# ---------- 钓鱼：随机捞一篇文章 ---------- %>
+    <div class="random-post-container">
+      <div class="title-section">
+        <div class="title-left">
+          <h2><%= fcDiceTitle %></h2>
+          <button type="button" class="random-post-start" id="fc-dice" aria-label="刷新钓鱼文章">
+            <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="16" height="16" viewBox="0 0 512 512">
+              <path fill="currentColor" d="M463.5 224h8.5c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2S461.9 48.1 455 55l-41.6 41.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2S334.3 224 344 224z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="title-right">
+          <a class="random-post-all" href="<%- fcLinkUrl %>"><%= fcDiceLinkText %></a>
+        </div>
+      </div>
+      <div class="random-post-content" id="fc-random">
+        <div class="fc-dice-loading">正在捞一篇…</div>
+      </div>
+    </div>
+
+    <%# ---------- 卡片流 ---------- %>
+    <div class="title-section title-section--plain">
+      <div class="title-left">
+        <h2><%= fcListTitle %></h2>
+      </div>
+      <div class="title-right">
+        <button type="button" class="fc-filter-chip" id="fc-filter-clear" hidden></button>
+      </div>
+    </div>
+
+    <div class="moments-grid" id="fc-grid">
+      <%# 首屏骨架，避免请求回来前整页塌下去 %>
+      <% for (var i = 0; i < 6; i++) { %>
+      <div class="moment-item"><div class="moment-card fc-skeleton"><span class="fc-sk fc-sk-title"></span><span class="fc-sk fc-sk-line"></span><span class="fc-sk fc-sk-line fc-sk-line--short"></span></div></div>
+      <% } %>
+    </div>
+
+    <div class="fc-empty" id="fc-empty" hidden></div>
+
+    <div class="moments-more-container">
+      <button type="button" class="moments-more-btn" id="fc-more" aria-label="加载更多">
+        <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18" viewBox="0 0 448 512">
+          <path fill="currentColor" d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7l137.4-137.3c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/>
+        </svg>
+      </button>
+    </div>
+
+    <%# ---------- 统计栏 ---------- %>
+    <div class="moments-footer">
+      <div class="footer-content">
+        <div class="footer-info">
+          <div class="info-item"><span class="label">订阅</span><span class="value" id="fc-friends">--</span></div>
+          <div class="info-item"><span class="label">活跃</span><span class="value" id="fc-active">--</span></div>
+          <div class="info-item"><span class="label">日志</span><span class="value" id="fc-articles">--</span></div>
+        </div>
+        <div class="footer-setting">
+          <span class="update-time" id="fc-updated">更新于：--</span>
+        </div>
+        <div class="footer-sort">
+          <button type="button" class="moments-sort-switch" id="fc-sort" role="switch" aria-checked="true" aria-label="朋友圈排序切换">
+            <span class="fc-switch-label">发布时间</span>
+            <span class="fc-switch-thumb"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  window.FC_CONFIG = {
+    api: <%- JSON.stringify(fcApi) %>,
+    pageSize: <%- JSON.stringify(fcPageSize) %>,
+    linkUrl: <%- JSON.stringify(fcLinkUrl) %>,
+    avatar: <%- JSON.stringify(fcAvatar) %>
+  };
+</script>
+<% } %>

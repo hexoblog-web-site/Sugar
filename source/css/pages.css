@@ -1,0 +1,340 @@
+/* ==========================================================================
+   归档 / 分类 / 标签 三个列表页
+   —— 这三页原来只有 EJS 没有样式，渲出来是一条条裸文本。
+      这里按侧栏卡片的观感（白底、12px 圆角、极轻投影）补一整套。
+   ========================================================================== */
+
+#archive,
+#category,
+#tag {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ---------- 顶部标题卡 ---------- */
+#archive .archive-head,
+#category .category-head,
+#tag .tag-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 26px;
+  background: var(--heo-card-bg);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-black);
+}
+
+#archive .archive-head .item-headline,
+#category .category-head .item-headline,
+#tag .tag-head .item-headline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--heo-fontcolor);
+}
+
+#archive .archive-head .item-headline i,
+#category .category-head .item-headline i,
+#tag .tag-head .item-headline i {
+  font-size: 1.1em;
+  color: var(--heo-main);
+}
+
+#archive .archive-count,
+#category .category-count,
+#tag .tag-count {
+  flex: none;
+  font-size: .82rem;
+  color: var(--heo-secondtext);
+  white-space: nowrap;
+}
+
+#archive .archive-count b,
+#category .category-count b,
+#tag .tag-count b {
+  color: var(--heo-main);
+  font-size: 1rem;
+  margin: 0 2px;
+}
+
+/* ---------- 归档：年份分组 + 时间轴 ---------- */
+#archive .archive-group {
+  padding: 6px 26px 16px;
+  background: var(--heo-card-bg);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-black);
+}
+
+#archive .archive-year {
+  padding: 14px 0 8px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: .02em;
+  color: var(--heo-fontcolor);
+  font-variant-numeric: tabular-nums;
+}
+
+#archive .archive-list {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 2px;
+  list-style: none;
+}
+
+/* 竖线：靠左侧贯穿整年，圆点挂在上面 */
+#archive .archive-list::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--heo-card-border);
+}
+
+#archive .archive-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px 8px 26px;
+  border-radius: 8px;
+  transition: var(--t);
+}
+
+#archive .archive-item::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--heo-card-bg);
+  box-shadow: 0 0 0 2px var(--heo-card-border) inset;
+  transition: var(--t);
+}
+
+#archive .archive-item:hover {
+  background: color-mix(in srgb, var(--heo-main) 6%, transparent);
+}
+
+#archive .archive-item:hover::before {
+  background: var(--heo-main);
+  box-shadow: 0 0 0 2px var(--heo-main) inset, 0 0 0 4px color-mix(in srgb, var(--heo-main) 14%, transparent);
+}
+
+#archive .archive-date {
+  flex: 0 0 54px;
+  font-size: .8rem;
+  line-height: 1.6;
+  color: var(--heo-secondtext);
+  font-variant-numeric: tabular-nums;
+}
+
+#archive .archive-title {
+  min-width: 0;
+  font-size: .94rem;
+  line-height: 1.6;
+  color: var(--heo-fontcolor);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: var(--t);
+}
+
+#archive .archive-item:hover .archive-title {
+  color: var(--heo-main);
+}
+
+#archive .empty-tips {
+  padding: 40px 0;
+  text-align: center;
+  font-size: .9rem;
+  color: var(--heo-secondtext);
+}
+
+/* ---------- 分类索引：卡片网格 ---------- */
+#category .category-cloud {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+#category .category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--heo-card-bg);
+  border: var(--style-border-always);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-border);
+  text-decoration: none;
+  transition: var(--t);
+}
+
+#category .category-item:hover {
+  transform: translateY(-2px);
+  border-color: transparent;
+  box-shadow: var(--heo-shadow-main);
+}
+
+#category .category-name {
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--heo-fontcolor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: var(--t);
+}
+
+#category .category-item:hover .category-name {
+  color: var(--heo-main);
+}
+
+#category .category-num {
+  flex: none;
+  min-width: 26px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--heo-main) 10%, transparent);
+  color: var(--heo-main);
+  font-size: .76rem;
+  font-weight: 600;
+  line-height: 1.7;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 标签索引：胶囊云 ---------- */
+#tag .card-widget {
+  padding: 22px;
+  background: var(--heo-card-bg);
+  border-radius: 12px;
+  box-shadow: var(--heo-shadow-black);
+}
+
+#tag .card-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  max-height: none;
+  overflow: visible;
+}
+
+#tag .card-tag-cloud a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--heo-background);
+  border: var(--style-border-always);
+  color: var(--heo-fontcolor);
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: var(--t);
+}
+
+#tag .card-tag-cloud a:hover {
+  background: var(--heo-main) !important;
+  border-color: transparent;
+  color: var(--heo-card-bg) !important;
+  box-shadow: var(--heo-shadow-main);
+  transform: translateY(-1px);
+}
+
+#tag .card-tag-cloud a sup {
+  opacity: .55;
+  font-size: .72em;
+  font-weight: 600;
+}
+
+#tag .card-tag-cloud a:hover sup {
+  opacity: .8;
+}
+
+/* ---------- 窄屏 ---------- */
+@media screen and (max-width: 768px) {
+  #archive .archive-head,
+  #category .category-head,
+  #tag .tag-head {
+    padding: 16px 18px;
+  }
+
+  #archive .archive-group {
+    padding: 4px 16px 12px;
+  }
+
+  #archive .archive-year {
+    font-size: 1.25rem;
+  }
+
+  #archive .archive-item {
+    padding-left: 22px;
+  }
+
+  #archive .archive-date {
+    flex-basis: 46px;
+  }
+
+  #category .category-cloud {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  #category .category-item {
+    padding: 14px 16px;
+  }
+
+  #tag .card-widget {
+    padding: 16px;
+  }
+}
+
+/* ---------- 关于页：卡片内边距 ---------- */
+/* .about-section / .about-hero 只有白底没有内边距，图标和正文直接贴到卡片边框上。
+   统一按侧栏卡片的 22/26 补，标题行改成 flex，图标和文字之间留 8px。 */
+.about-page .card-widget {
+  padding: 22px 26px;
+}
+
+.about-page .about-hero {
+  padding: 24px 26px;
+}
+
+.about-page .about-section .item-headline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--heo-fontcolor);
+}
+
+.about-page .about-section .item-headline i {
+  font-size: 1.1em;
+  color: var(--heo-main);
+}
+
+@media screen and (max-width: 768px) {
+  .about-page .card-widget { padding: 18px; }
+  .about-page .about-hero { padding: 20px 18px; }
+}

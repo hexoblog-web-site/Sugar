@@ -1,0 +1,8 @@
+/* card-webinfo.css
+ *
+ * 侧栏「网站统计」卡（card-webinfo.ejs）。
+ *
+ * 由 source/css/aside.css 拆分而来；改侧栏请只改本目录下的对应卡片文件，theme 的 bundle 会自动拼接。
+ */
+#aside-content .card-webinfo .webinfo .webinfo-item{display:flex;-webkit-box-align:center;align-items:center;padding:.1rem .5rem 0}
+#aside-content .card-webinfo .webinfo .webinfo-item div:first-child{-webkit-box-flex:1;flex:1 1 0%;padding-right:1rem}

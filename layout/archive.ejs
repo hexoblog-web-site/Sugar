@@ -1,0 +1,101 @@
+<%
+  /* 归档页：对标 blog.zhheo.com/archives/ 的「站内全部文章」版式
+     - 大标题 + 分类胶囊栏 + 年份筛选 + 文章列表（151×80 缩略图）+ 分页
+     - 年份切换走 /archives/YYYY/ 的归档子页（静态站最稳，视觉与目标站一致） */
+  var posts = page.posts.sort('date', -1);
+
+  /* 年份列表：全站统计，按年份倒序 */
+  var years = [];
+  var ymap = {};
+  site.posts.sort('date', -1).each(function (p) {
+    var y = date(p.date, 'YYYY');
+    if (!ymap[y]) { ymap[y] = 0; years.push(y); }
+    ymap[y]++;
+  });
+
+  var curYear = page.year ? String(page.year) : '';
+  var curMonth = page.month ? String(page.month) : '';
+
+  /* 标题：归档首页 / 年份 / 月份 */
+  var pageTitle = '站内全部文章。';
+  if (curYear) pageTitle = curYear + ' 年' + (curMonth ? ' ' + curMonth + ' 月' : '') + '文章。';
+
+  var cats = site.categories.sort('length', -1);
+%>
+<div class="archives-page">
+<h1 class="archives-title"><%= pageTitle %></h1>
+
+<div class="archives-bar">
+  <div class="archives-bar-items">
+    <%# 归档页不论总览还是年份子页，都属于「全部文章」，保持选中 %>
+    <div class="archives-bar-item is-select">
+      <a href="<%- url_for('/archives/') %>">
+        <span class="archives-bar-icon"><i class="heoblogIcon icon-file-list-fill"></i></span>
+        <span>全部文章</span>
+      </a>
+    </div>
+    <% cats.each(function (c) { %>
+    <div class="archives-bar-item">
+      <a href="<%- url_for(c.path) %>"><%= c.name %></a>
+    </div>
+    <% }); %>
+  </div>
+  <div class="archives-bar-more-group">
+    <a class="archives-bar-more" href="<%- url_for('/categories/') %>">
+      <i class="heoblogIcon icon-youxiangshuangjiantou"></i>
+      <span>更多</span>
+    </a>
+  </div>
+</div>
+
+<div class="archives-row">
+  <div class="archives-main">
+    <div class="archives-shell">
+
+      <div class="archives-toolbar">
+        <div class="archives-periods">
+          <a class="archives-period<%= !curYear ? ' is-active' : '' %>" href="<%- url_for('/archives/') %>">全部</a>
+          <% years.forEach(function (y) { %>
+          <a class="archives-period<%= curYear === y ? ' is-active' : '' %>" href="<%- url_for('/archives/' + y + '/') %>"><%= y %></a>
+          <% }); %>
+        </div>
+      </div>
+
+      <div class="archives-list">
+        <% posts.each(function (p, i) { %>
+        <a class="archives-item" href="<%- url_for(p.path) %>">
+          <div class="archives-thumb">
+            <% if (p.cover) { %>
+            <img class="archives-thumb-img" src="<%- url_for(p.cover) %>" alt="<%= p.title %>" loading="lazy">
+            <% } %>
+            <span class="archives-thumb-fallback"><%= i + 1 %></span>
+          </div>
+          <div class="archives-item-main">
+            <div class="archives-item-title"><%= p.title %></div>
+            <div class="archives-item-meta">
+              <% if (p.categories && p.categories.length) { %>
+              <span class="archives-item-cat"><%= p.categories.first().name %></span>
+              <span class="archives-item-divider">/</span>
+              <% } %>
+              <span class="archives-item-date"><%- date(p.date, 'YYYY年M月D日') %></span>
+            </div>
+          </div>
+          <div class="archives-item-arrow"><i class="heoblogIcon icon-arrow-right-s-line"></i></div>
+        </a>
+        <% }); %>
+      </div>
+
+      <% if (!posts.length) { %>
+      <div class="archives-empty">这个时间范围内还没有文章</div>
+      <% } %>
+
+      <div class="archives-pagination">
+        <%- partial('_partial/pagination') %>
+      </div>
+
+    </div>
+  </div>
+
+  <%- partial('_partial/aside') %>
+</div>
+</div>

@@ -1,0 +1,18 @@
+<nav class="post-nav">
+  <% if (page.prev) { %>
+    <a class="post-nav-item prev" href="<%- url_for(page.prev.path) %>" title="<%= page.prev.title %>">
+      <span class="post-nav-label"><i class="heoblogIcon icon-arrow-left-s-line"></i>上一篇</span>
+      <span class="post-nav-title"><%= page.prev.title %></span>
+    </a>
+  <% } else { %>
+    <span class="post-nav-item prev disabled"><span class="post-nav-label">没有更早的文章了</span></span>
+  <% } %>
+  <% if (page.next) { %>
+    <a class="post-nav-item next" href="<%- url_for(page.next.path) %>" title="<%= page.next.title %>">
+      <span class="post-nav-label">下一篇<i class="heoblogIcon icon-arrow-right-s-line"></i></span>
+      <span class="post-nav-title"><%= page.next.title %></span>
+    </a>
+  <% } else { %>
+    <span class="post-nav-item next disabled"><span class="post-nav-label">没有更新的文章了</span></span>
+  <% } %>
+</nav>

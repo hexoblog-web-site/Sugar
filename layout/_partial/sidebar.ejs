@@ -1,0 +1,97 @@
+<div id="sidebar">
+  <div id="sidebar-menus">
+    <div class="sidebar-navbar">
+      <div class="sidebar-navbar-left">
+        <% if (lb_site('site_logo', '')) { %>
+          <img class="sidebar-navbar-icon" src="<%- url_for(lb_site('site_logo', '')) %>" alt="<%= config.title %>">
+        <% } else { %>
+          <span class="sidebar-navbar-icon-text"><%= (config.title || '').charAt(0) %></span>
+        <% } %>
+        <div id="sidebar-title" class="sidebar-navbar-title"><%= config.title %></div>
+      </div>
+      <span class="sidebar-close-button" onclick="heo.closeSidebar()">
+        <i class="heoblogIcon icon-close-fill"></i>
+      </span>
+    </div>
+
+    <div class="site-data">
+      <div class="data-item is-center">
+        <div class="data-item-link"><a href="<%- url_for('/archives/') %>">
+          <div class="headline">文章</div>
+          <div class="length-num"><%= site.posts.length %></div>
+        </a></div>
+      </div>
+      <div class="data-item is-center">
+        <div class="data-item-link"><a href="<%- url_for('/categories/') %>">
+          <div class="headline">分类</div>
+          <div class="length-num"><%= site.categories.length %></div>
+        </a></div>
+      </div>
+      <div class="data-item is-center">
+        <div class="data-item-link"><a href="<%- url_for('/tags/') %>">
+          <div class="headline">标签</div>
+          <div class="length-num"><%= site.tags.length %></div>
+        </a></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <span class="sidebar-menu-item-title">菜单</span>
+    <div class="menus_items sidebar-menus-items">
+      <% const smenu = lb_nav_menu() || []; %>
+      <% smenu.forEach(function (item) { %>
+        <% if (!item) { return; } %>
+        <% if (item.children && item.children.length) { %>
+          <div class="menus_item has-child">
+            <button class="site-page" type="button"><span><%= item.name %></span><i class="heoblogIcon icon-arrow-down-s-line expand"></i></button>
+            <ul class="menus_item_child">
+              <% item.children.forEach(function (cv) { %>
+                <li><a class="site-page child" href="<%- url_for(cv.url || '#') %>"><span><%= cv.name %></span></a></li>
+              <% }); %>
+            </ul>
+          </div>
+        <% } else { %>
+          <div class="menus_item"><a class="site-page" href="<%- url_for(item.url || '#') %>"><span><%= item.name %></span></a></div>
+        <% } %>
+      <% }); %>
+      <div class="menus_item">
+        <a class="site-page darkmode_switchbutton" href="javascript:;" onclick="heo.toggleTheme()">
+          <i class="heoblogIcon icon-moon-clear-fill"></i><span>切换主题</span>
+        </a>
+      </div>
+    </div>
+
+    <% var sbTags = lb_widget('tags'); var sbWebinfo = lb_widget('webinfo'); %>
+    <% if (sbTags.type && sbTags.enable !== false) { %>
+      <span class="sidebar-menu-item-title">标签</span>
+      <div class="card-widget card-tags">
+        <div class="card-tag-cloud">
+          <%- tagcloud(site.tags, { min_font: 14, max_font: 22, amount: 30, orderby: 'length' }) %>
+        </div>
+      </div>
+    <% } %>
+
+    <span class="sidebar-menu-item-title">站点信息</span>
+    <div class="webinfo">
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-file-word-fill"></i><div class="item-name">文章总数</div></div>
+        <div class="item-count"><%= site.posts.length %></div>
+      </div>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-folder-5-fill"></i><div class="item-name">分类数</div></div>
+        <div class="item-count"><%= site.categories.length %></div>
+      </div>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-price-tag-3-fill"></i><div class="item-name">标签数</div></div>
+        <div class="item-count"><%= site.tags.length %></div>
+      </div>
+      <% if (sbWebinfo.runtime !== false) { %>
+        <div class="webinfo-item">
+          <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-time-fill"></i><div class="item-name">运行天数</div></div>
+          <div class="item-count" id="sidebar-runtime" data-runtime-start="<%= lb_start_time() %>">-</div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

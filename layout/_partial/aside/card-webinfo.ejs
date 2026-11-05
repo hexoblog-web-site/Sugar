@@ -1,0 +1,45 @@
+<%
+  /* 网站统计：配置见 _config.yml 的 sidebar_settings.widgets 里 type: webinfo
+     下面几个开关不写默认开启，写 false 才关闭 */
+  var cfg = lb_widget('webinfo');
+  var title = cfg.title || '网站统计';
+  var icon = cfg.icon || 'icon-dashboard-2-fill';
+  var showPosts = cfg.post_count !== false;
+  var showCats = cfg.category_count !== false;
+  var showTags = cfg.tag_count !== false;
+  var showRuntime = cfg.runtime !== false;
+  /* 建站时间：卡片里的 start_date 优先，其次 site_settings.start_time */
+  var startTime = cfg.start_date || lb_site('start_time', '');
+%>
+<div class="card-widget card-webinfo">
+  <div class="item-headline">
+    <i class="heoblogIcon <%= icon %>"></i>
+    <span><%= title %></span>
+  </div>
+  <div class="webinfo">
+    <% if (showPosts) { %>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-file-word-fill"></i><div class="item-name">文章总数</div></div>
+        <div class="item-count"><%= site.posts.length %></div>
+      </div>
+    <% } %>
+    <% if (showCats) { %>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-folder-5-fill"></i><div class="item-name">分类数</div></div>
+        <div class="item-count"><%= site.categories.length %></div>
+      </div>
+    <% } %>
+    <% if (showTags) { %>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-price-tag-3-fill"></i><div class="item-name">标签数</div></div>
+        <div class="item-count"><%= site.tags.length %></div>
+      </div>
+    <% } %>
+    <% if (showRuntime) { %>
+      <div class="webinfo-item">
+        <div class="webinfo-item-title"><i class="heoblogIcon item-icon icon-time-fill"></i><div class="item-name">运行天数</div></div>
+        <div class="item-count" id="webinfo-runtime" data-start="<%= startTime %>">-</div>
+      </div>
+    <% } %>
+  </div>
+</div>

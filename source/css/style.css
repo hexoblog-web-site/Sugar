@@ -1,0 +1,99 @@
+/* ============================================================================
+ * style.css —— 样式唯一入口
+ * ----------------------------------------------------------------------------
+ * 这份清单是「源文件」和「产物」之间唯一的真相：
+ *   构建时 scripts/liublog-perf.js 解析下面的 @import 行，按顺序拼接成 /css/bundle.css
+ *   浏览器只会拿到那一个合并文件，不会真的按 @import 去逐个下载
+ *
+ * 所以：
+ *   - 加一张卡片 = 在这里加一行 @import，产物自动跟上
+ *   - 删一张卡片 = 在这里删一行，并把对应文件删掉
+ *   - 顺序 = 层叠优先级，从「通用」到「具体」到「覆盖」，不要随意打乱
+ *
+ * 千万不要在 head.ejs 里直接引这个文件，否则就退化成 N 个串行请求。
+ * ========================================================================= */
+
+/* ---------------------------------------------------------------------------
+ * 1. 基础层：全站公共样式
+ *    布局骨架、文章页正文、表单、按钮、工具类这些「哪个页面都要用」的部分。
+ *    板块级样式已经全部拆到下面第 2 节，这一层只负责打底。
+ * ------------------------------------------------------------------------- */
+@import url('heoblogmain.css');
+
+/* ---------------------------------------------------------------------------
+ * 2. 布局板块
+ *    一个板块 = 三件套同名文件，改哪块只开哪三个文件，不会误伤别的板块：
+ *      xxx.ejs   layout/_partial/…/xxx.ejs
+ *      xxx.css   source/css/xxx.css        （本清单里的一行）
+ *      xxx.js    source/js/partial/xxx.js  （有交互才有，没交互就没有这文件）
+ *    顺序 = 层叠优先级，越靠后越能压住前面的；下面按「外 → 内」排。
+ * ------------------------------------------------------------------------- */
+@import url('footer.css');        /* footer.ejs          页脚              脚本: footer.js */
+@import url('rightside.css');     /* rightside.ejs       右悬浮工具条      脚本: rightside.js */
+@import url('pagination.css');    /* pagination.ejs      列表分页器        脚本: 无 */
+@import url('category-bar.css');  /* home/category-bar   分类横条          脚本: category-bar.js */
+@import url('post-card.css');     /* home/post-card      文章卡片          脚本: post-card.js */
+@import url('sidebar.css');       /* sidebar.ejs         抽屉侧栏          脚本: sidebar.js */
+@import url('home-swiper.css');   /* home/home-swiper    全站推荐轮播      脚本: home-swiper.js */
+@import url('nav.css');           /* nav.ejs             顶部导航栏        脚本: nav.js */
+@import url('essay.css');         /* home/essay          即刻短文条        脚本: essay.js */
+@import url('home.css');          /* index.ejs           首页骨架          脚本: 无 */
+@import url('post-body.css');     /* post.ejs            正文排版          脚本: 无 */
+@import url('home-top.css');      /* home/home-top      首页顶部两列      脚本: 无 */
+@import url('highlight.css');     /* post.ejs            正文代码块        脚本: code.js */
+
+/* ---------------------------------------------------------------------------
+ * 3. 侧栏
+ *    aside-base.css   侧栏骨架：容器、吸顶、卡片外壳、标题行（所有卡共用）
+ *    card-<类型>.css  每张卡一份，命名与 layout/_partial/aside/card-<类型>.ejs 一一对应
+ *    顺序：骨架 → 各卡片（按文件名排序，方便对照）
+ *    没有模板的卡片样式不放在这里，见 hexo/_stash/aside-unused.css
+ * ------------------------------------------------------------------------- */
+@import url('aside/aside-base.css');
+@import url('aside/card-archives.css');
+@import url('aside/card-author.css');
+@import url('aside/card-postlist.css');
+@import url('aside/card-rss.css');
+@import url('aside/card-tags.css');
+@import url('aside/card-toc.css');
+@import url('aside/card-webinfo.css');
+
+/* ---------------------------------------------------------------------------
+ * 4. 中控台 / 图标字体
+ * ------------------------------------------------------------------------- */
+@import url('console.css');
+@import url('iconfont.css');
+@import url('remixicon.subset.css'); /* 分类页统计条等少量 ri- 图标（按需子集） */
+
+/* ---------------------------------------------------------------------------
+ * 5. 响应式（宽 → 窄，必须放在基础样式之后才能覆盖）
+ * ------------------------------------------------------------------------- */
+@import url('heoblogmw1300.css');
+@import url('heoblogmw1200.css');
+@import url('heoblogmw768.css');
+
+/* ---------------------------------------------------------------------------
+ * 6. 补充
+ * ------------------------------------------------------------------------- */
+@import url('theme-extra.css');
+@import url('search.css');
+@import url('pages.css');
+@import url('toc.css');
+@import url('related.css');
+@import url('post-copyright.css'); /* post.ejs          文末版权卡        脚本: partial/post-copyright.js */
+@import url('category-page.css'); /* page/category-body 分类索引页       脚本: 无 */
+@import url('tags-page.css');     /* page/tag-body      标签索引页       脚本: 无 */
+@import url('about.css');         /* about.ejs          关于页           脚本: partial/about.js */
+@import url('archives.css');      /* archive.ejs        归档页           脚本: 无 */
+@import url('link.css');          /* links.ejs          友情链接页       脚本: partial/link.js */
+@import url('fcircle.css');     /* fcircle.ejs       朋友圈页          脚本: partial/fcircle.js */
+/* 列表样式切换（card / banner）：必须排在 post-card.css 与各断点文件之后才压得住 */
+@import url('post-list.css');    /* home/post-card      列表两种样式      脚本: 无 */
+
+/* ---------------------------------------------------------------------------
+ * 7. 覆盖层（改自己的样式请只写 custom.css，别动上面的文件）
+ *    liublog-fix 主题内部的兜底修正
+ *    custom.css  用户自定义，永远排最后，能压住上面所有规则
+ * ------------------------------------------------------------------------- */
+@import url('liublog-fix.css');
+@import url('custom.css');

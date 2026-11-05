@@ -1,0 +1,40 @@
+/* card-tags.css
+ *
+ * 侧栏「标签云」卡（card-tags.ejs），含手机端抽屉里的同名标签云。
+ *
+ * 由 source/css/aside.css 拆分而来；改侧栏请只改本目录下的对应卡片文件，theme 的 bundle 会自动拼接。
+ */
+#sidebar #sidebar-menus .card-tag-cloud{margin:0 16px;padding:0;display:flex;flex-direction:row;flex-wrap:wrap;max-height:none;overflow:visible}
+#sidebar #sidebar-menus .card-tag-cloud::after{display:none}
+#sidebar #sidebar-menus .card-tag-cloud a{color:var(--heo-fontcolor)!important;padding:2px 8px 2px 12px;margin:0;border-radius:999px;border:var(--style-border-always);background:var(--heo-card-bg);font-size:14px!important;transition:var(--t)}
+@media (hover:hover){
+#sidebar #sidebar-menus .card-tag-cloud a:hover{background:var(--heo-lighttext);color:var(--heo-card-bg)!important}
+#sidebar #sidebar-menus .card-tag-cloud a:hover sup{color:var(--heo-card-bg);opacity:1}
+}
+#sidebar #sidebar-menus .card-tag-cloud a sup{opacity:.6;margin-left:4px}
+#aside-content .card-home-tags .card-tag-cloud{display:flex;flex-wrap:wrap;gap:4px;padding:.3rem .1rem .2rem;max-height:none;overflow:visible}
+#aside-content .card-home-tags .card-tag-cloud::after{display:none}
+#aside-content .card-home-tags .card-tag-cloud a{display:inline-flex;align-items:center;padding:4px 10px;border:var(--style-border-always);background:var(--heo-secondbg);font-size:.68rem!important}
+#aside-content .card-home-tags .card-tag-cloud a .tagsPageCount{margin-left:4px;font-size:.7rem;opacity:.6;line-height:1}
+#aside-content .card-tag-cloud a[href*="/tags/%E5%B9%B2%E8%B4%A7/"],#aside-content .card-tag-cloud a[href*="/tags/%E6%95%99%E7%A8%8B/"],#aside-content .card-tag-cloud a[href*="/tags/%E8%AE%BE%E8%AE%A1/"],#aside-content .card-tag-cloud a[href*="/tags/Sketch/"]{color:var(--heo-fontcolor)!important;font-weight:500}
+#aside-content .card-tag-cloud a sup{opacity:.6;margin-left:2px}
+.card-allinfo .card-tag-cloud{max-height:360px;overflow:hidden;position:relative;display:flex;flex-direction:row;flex-wrap:wrap;gap:4px}
+.card-tag-cloud.all-tags{max-height:none}
+.card-allinfo .card-tag-cloud::after{content:"";position:absolute;bottom:0;left:0;right:0;height:150px;background-image:linear-gradient(to top,var(--heo-card-bg),transparent);pointer-events:none}
+.card-allinfo .card-tag-cloud.all-tags::after{display:none}
+#aside-content .card-tag-cloud a{color:var(--heo-fontcolor)!important;padding:0 calc(.3rem + 4px) 0 calc(.3rem + 2px);font-size:.8rem!important;border-radius:999px;cursor:pointer}
+.console-card.tags .card-tag-cloud{display:flex;flex-wrap:wrap;overflow-y:scroll;gap:6px}
+.console-card.tags .card-tag-cloud::-webkit-scrollbar-track{background-color:transparent}
+.console-card.tags .card-tag-cloud::-webkit-scrollbar-thumb{background-color:var(--heo-main-op)}
+.console-card.tags .card-tag-cloud::-webkit-scrollbar{width:8px}
+.console-card.tags .card-tag-cloud a{color:var(--heo-fontcolor)!important;padding:2px 8px;border-radius:999px;background:var(--heo-card-bg);border:var(--style-border);font-size:14px!important;font-weight:700}
+.console-card.tags .card-tag-cloud a sup{opacity:.6}
+@media (hover:hover){
+#aside-content .card-tag-cloud a:hover{background:var(--heo-lighttext);color:var(--heo-card-bg)!important;box-shadow:var(--heo-shadow-theme);border-radius:999px}
+.console-card.tags .card-tag-cloud a:hover{background:var(--heo-lighttext);color:var(--heo-card-bg)!important;box-shadow:var(--heo-shadow-main)}
+}
+
+/* ---------- 以下从 liublog-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
+/* 侧栏标签云：# 与标签名之间补一点间距（inline-flex 下空格会被折叠） */
+#aside-content .card-home-tags .card-tag-cloud a .tags-punctuation{margin-right:2px;line-height:1}
+#aside-content .card-home-tags .card-tag-cloud a{line-height:1.6;white-space:nowrap}

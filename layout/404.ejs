@@ -1,0 +1,12 @@
+<div id="error-wrap">
+  <div class="error-content">
+    <%# 左侧插图：原主题是 .error-img 的背景图，这里带上 url_for 以支持子目录部署 %>
+    <div class="error-img" style="background-image:url('<%- url_for('/images/404.png') %>')"></div>
+    <div class="error-info">
+      <h1 class="error_title">404</h1>
+      <div class="error_subtitle">页面没有找到</div>
+      <p class="error_desc">你访问的页面可能已被移动或删除。</p>
+      <a class="error-back" href="<%- url_for('/') %>"><i class="heoblogIcon icon-home"></i>返回首页</a>
+    </div>
+  </div>
+</div>

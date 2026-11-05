@@ -1,0 +1,155 @@
+/* essay.css —— 首页「即刻」短文条
+ *
+ * 三件套：
+ *   模板  layout/_partial/home/essay.ejs
+ *   样式  source/css/essay.css      （本文件）
+ *   脚本  source/js/partial/essay.js
+ *
+ * 移植自安知鱼主题 source/css/_extra/essay_page/home_essay_bar.css：
+ *   结构与类名保持原样（#bbTimeList / #bbtalk / #bber-talk / .li-style /
+ *   .bber-logo / .bber-gotobb），变量换成本主题的 --heo-* / --style-*。
+ *   唯一没搬的是 Swiper 依赖——原来那 40KB 只用来做「一条一条往上滚」，
+ *   这里改成 #bber-talk 的 transform 位移，行为一致。
+ *
+ * 尺寸：整条高 50px，内部轨道可视区 30px（一次只看一条）。
+ */
+
+/* ---------- 外框 ---------- */
+#bbTimeList {
+  /* 和 #home_swiper 一样要压住 #home_top_blur（position:absolute + z-index:0 的顶部柔光），
+     否则整条会被那层背景色盖住，看着像没渲染 */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: .5rem 1rem;
+  border: var(--style-border-always);
+  border-radius: 12px;
+  background: var(--heo-card-bg);
+  box-shadow: var(--heo-shadow-border);
+  color: var(--heo-fontcolor);
+  transition: var(--t);
+  animation: slide-in .6s 0s backwards;
+}
+
+#bbTimeList:hover {
+  border: var(--style-border-hover);
+  box-shadow: var(--heo-shadow-main);
+}
+
+/* ---------- 左侧「即刻」字样 ----------
+   原来用 heoblogIcon 的 \e00c（即刻旧版方标），两个方块并排看着像重复图形，
+   换成纯文字：字号跟正文一致、加粗、略宽字距，高度与右侧箭头对齐 */
+#bbTimeList .bber-logo {
+  flex: 0 0 auto;
+  margin-right: 1rem;
+  font-size: 15px;
+  line-height: 30px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  transition: var(--t);
+}
+
+a.bber-logo {
+  cursor: pointer;
+  color: inherit;
+}
+
+#bbTimeList .bber-logo:hover,
+#bbTimeList .bber-gotobb:hover {
+  color: var(--heo-theme);
+}
+
+/* ---------- 中间滚动轨道 ---------- */
+#bbtalk {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  overflow: hidden;
+}
+
+#bber-talk {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+  will-change: transform;
+}
+
+/* 每条一行，超长省略号；高度由这里定，脚本按实测高度算位移 */
+#bber-talk .li-style {
+  display: block;
+  flex: 0 0 auto;
+  height: 30px;
+  line-height: 30px;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+  transition: var(--t);
+}
+
+a.li-style {
+  cursor: pointer;
+}
+
+#bber-talk .li-style:hover {
+  color: var(--heo-theme);
+}
+
+/* ---------- 右侧箭头 ---------- */
+#bbTimeList .bber-gotobb {
+  flex: 0 0 auto;
+  margin-left: 1rem;
+  line-height: 30px;
+  transition: var(--t);
+}
+
+a.bber-gotobb {
+  cursor: pointer;
+  color: inherit;
+}
+
+/* 没配跳转地址时是纯图标，别给点的手感 */
+i.bber-gotobb {
+  cursor: default;
+  opacity: .45;
+}
+
+/* ---------- 窄屏 ---------- */
+@media screen and (max-width: 767px) {
+  #bbTimeList {
+    padding: .5rem .75rem;
+    margin: 0;
+  }
+
+  #bbTimeList .bber-logo {
+    margin-right: .75rem;
+    font-size: 14px;
+  }
+
+  #bbTimeList .bber-gotobb {
+    margin-left: .6rem;
+  }
+
+  #bber-talk .li-style {
+    font-size: 14px;
+    text-align: left;
+  }
+}
+
+/* 系统开了「减少动态效果」就不滚动，静态显示第一条 */
+@media (prefers-reduced-motion: reduce) {
+  #bber-talk {
+    transition: none;
+  }
+}

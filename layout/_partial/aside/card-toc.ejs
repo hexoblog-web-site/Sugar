@@ -1,0 +1,17 @@
+<%
+  /* 目录卡：配置见 _config.yml 的 sidebar_settings.widgets 里 type: toc
+     只在文章页出现（aside.ejs 里判断 is_post()） */
+  var cfg = lb_widget('toc');
+  var title = cfg.title || '目录';
+  var icon = cfg.icon || 'icon-clipboard-fill';
+  var depth = Number(cfg.depth) > 0 ? Number(cfg.depth) : 3;
+%>
+<div class="card-widget card-toc" id="card-toc">
+  <div class="item-headline">
+    <i class="heoblogIcon <%= icon %>"></i>
+    <span><%= title %></span>
+  </div>
+  <div class="toc-content">
+    <%- toc(page.content, { list_number: false, max_depth: depth }) %>
+  </div>
+</div>
