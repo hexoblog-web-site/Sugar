@@ -16,7 +16,7 @@ layout/            EJS 模板
   about.ejs        关于
   links.ejs        友链（/links/）
   fcircle.ejs      朋友圈（/fcircle/）
-  essay.ejs        即刻短文（/essay/）
+  memos.ejs        微语（/memos/）
   _partial/        头、脚、侧栏卡片等局部
 
 source/css/        样式，按页面拆分；style.css 里 @import 汇总
@@ -25,7 +25,7 @@ source/images/     主题图片
 scripts/           Hexo 脚本
   sugar-config.js  模板 helper（导航、侧栏、作者信息）
   sugar-perf.js    把 css/js 打包成 bundle.css / bundle.js
-_config.yml        主题配置（含 friends_lite 朋友圈段、essay.page 即刻短文段）
+_config.yml        主题配置（含 friends_lite 朋友圈段、memos 微语段）
 ```
 
 ## 使用
@@ -40,15 +40,24 @@ npx hexo server
 
 | 位置 | 管什么 |
 |---|---|
-| `_config.yml` | 导航、首页、侧栏、文章页、评论、页脚、代码块、朋友圈（`friends_lite`）、即刻短文页（`essay.page`） |
+| `_config.yml` | 导航、首页、侧栏、文章页、评论、页脚、代码块、朋友圈（`friends_lite`）、微语页（`memos`） |
 | 站点 `source/_data/about.yml` | 关于页内容 |
 | 站点 `source/_data/link.yml` | 友链数据（分组 + 站点） |
-| 站点 `source/_data/vignette.yml` | 即刻短文页数据（`/essay/`） |
+| 站点 `source/_data/vignette.yml` | 微语页数据（`/memos/`） |
 | 站点 `source/_data/link_apply.yml` | 友链申请记录（可选） |
 
 ## 更新记录
 
 ### 2026-11-06
+
+- **即刻短文页整体迁到「微语」`/memos/`**：路由 `/essay/` → `/memos/`，页面名「即刻短文」→「微语」。
+  模板 / 样式 / 脚本 / 分页生成器一并改名（`memos.ejs`、`memos-page.css`、`memos-page.js`、
+  `sugar-memos-pager.js`），类名 `.essay-*` 全量换成 `.memos-*`。body 的 class 由 `page.layout`
+  直接得出，所以选择器 `body.essay` 必须同步改成 `body.memos`，否则整页样式全丢；
+  分页数据字段 `essay_pager` → `memos_pager`（模板与 head 的 `rel=prev/next` 两处都要改）。
+  配置从 `essay.page` 独立成顶层 `memos:` 段（`essay:` 只剩首页那条滚动条的字段，`link` 指 `/memos/`），
+  导航「动态」与「专栏 / 页脚」原本的「留言板 / 留言」统一改称「微语」——这四处以前都指向
+  那个没有模板的空壳页，现在才真正落到页面上
 
 - **新增装备页 `/equipment/`**：1:1 复刻 `blog.anheyu.com/equipment`，内容取自该页并落到
   `source/_data/equipment.yml`（1 个板块 / 2 个分组 / 8 件装备），配图本地化到

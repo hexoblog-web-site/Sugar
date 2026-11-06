@@ -1,7 +1,7 @@
 /* ==========================================================================
-   即刻短文页 —— 布局对标 blog.anheyu.com/essay
+   微语页 —— 布局对标 blog.anheyu.com/essay
    --------------------------------------------------------------------------
-   结构：.essay-page > .fc-banner 横幅 → .essay-list 单列卡片 → 静态分页 → 评论
+   结构：.memos-page > .fc-banner 横幅 → .memos-list 单列卡片 → 静态分页 → 评论
 
    与参考站唯一的差别在这里：参考站是 3 列网格（440px 一张），本页改成单列列表。
    卡片的视觉数值全部照抄参考站实测：
@@ -12,12 +12,12 @@
    ========================================================================== */
 
 /* ---------- 页面容器：与朋友圈页同一套骨架 ---------- */
-body.essay #content-inner.layout {
+body.memos #content-inner.layout {
   padding-left: 24px;
   padding-right: 24px;
 }
 
-#content-inner > .essay-page {
+#content-inner > .memos-page {
   display: block;
   /* 宽度和 flex 一律不写：交给主题的 .layout>div:first-child 规则
      （width: calc(100% - 300px)），这样主列和侧栏的分配与文章页完全一致。
@@ -34,7 +34,7 @@ body.essay #content-inner.layout {
 }
 
 /* ---------- 列表 ---------- */
-.essay-list {
+.memos-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -43,7 +43,7 @@ body.essay #content-inner.layout {
   list-style: none;
 }
 
-.essay-item {
+.memos-item {
   position: relative;
   padding: 16px 20px 8px;
   background: var(--heo-card-bg);
@@ -53,21 +53,21 @@ body.essay #content-inner.layout {
   transition: border-color .3s, box-shadow .3s, transform .3s;
 }
 
-.essay-item:hover {
+.memos-item:hover {
   border-color: #163bf2;
   box-shadow: 0 10px 20px -6px rgba(22, 59, 242, .16);
   transform: translateY(-2px);
 }
 
 /* ---------- 头像 / 作者 ---------- */
-.essay-head {
+.memos-head {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
 
-.essay-avatar {
+.memos-avatar {
   flex-shrink: 0;
   width: 40px;
   height: 40px;
@@ -76,14 +76,14 @@ body.essay #content-inner.layout {
   background: var(--heo-secondbg);
 }
 
-.essay-byline {
+.memos-byline {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.essay-author {
+.memos-author {
   color: var(--heo-fontcolor);
   font-size: 14px;
   font-weight: 600;
@@ -93,7 +93,7 @@ body.essay #content-inner.layout {
   text-overflow: ellipsis;
 }
 
-.essay-date {
+.memos-date {
   color: var(--heo-secondtext);
   font-size: 12px;
   line-height: 16px;
@@ -101,7 +101,7 @@ body.essay #content-inner.layout {
 }
 
 /* ---------- 标题 / 正文 ---------- */
-.essay-title {
+.memos-title {
   margin: 12px 0 8px;
   max-width: 960px;
   color: var(--heo-fontcolor);
@@ -111,7 +111,7 @@ body.essay #content-inner.layout {
   letter-spacing: .01em;
 }
 
-.essay-text {
+.memos-text {
   /* 固定两行高：内容短也占满两行，卡片高度整齐；超长自动省略。
      行高 1.9 → 两行 3.8em，改行高要同步改下面的 min/max-height。 */
   display: -webkit-box !important;
@@ -127,47 +127,47 @@ body.essay #content-inner.layout {
   word-break: break-word;
 }
 
-.essay-text p {
+.memos-text p {
   margin: 0 0 8px;
 }
 
-.essay-text p:last-child {
+.memos-text p:last-child {
   margin-bottom: 0;
 }
 
-.essay-text a {
+.memos-text a {
   color: #163bf2;
   text-decoration: none;
   border-bottom: 1px dotted rgba(22, 59, 242, .45);
 }
 
-.essay-text a:hover {
+.memos-text a:hover {
   border-bottom-style: solid;
 }
 
 /* ---------- 图片：两图一屏 + 按钮翻页 ---------- */
-/* 一屏固定 2 张，多出来的用 translateX 翻过去（结构见 layout/essay.ejs）。
+/* 一屏固定 2 张，多出来的用 translateX 翻过去（结构见 layout/memos.ejs）。
    4 张 = 2 屏；3 张 = 2 屏（末屏单张留左格）；2 张 = 1 屏不出按钮。 */
-.essay-gallery {
+.memos-gallery {
   position: relative;
   /* 图片不跟正文行宽对齐，铺满整张卡片 */
   max-width: 100%;
   margin-top: 14px;
 }
 
-.essay-gallery-viewport {
+.memos-gallery-viewport {
   overflow: hidden;
   border-radius: 8px;
   /* 横向手势留给翻页，纵向仍归页面滚动 */
   touch-action: pan-y;
 }
 
-.essay-gallery-track {
+.memos-gallery-track {
   display: flex;
   transition: transform .42s cubic-bezier(.4, 0, .2, 1);
 }
 
-.essay-gallery-page {
+.memos-gallery-page {
   flex: 0 0 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -175,11 +175,11 @@ body.essay #content-inner.layout {
 }
 
 /* 只有 1 张图时撑满整行，不留半格空白 */
-.essay-gallery--single .essay-gallery-page {
+.memos-gallery--single .memos-gallery-page {
   grid-template-columns: 1fr;
 }
 
-.essay-img {
+.memos-img {
   display: block;
   position: relative;
   overflow: hidden;
@@ -191,7 +191,7 @@ body.essay #content-inner.layout {
 /* 鼠标滑过图片时，图片底部浮出这条说说的正文 */
 /* 不用 -webkit-line-clamp：主题会把 display:-webkit-box 规范成 flow-root，
    行数就控制不住（第二行会被裁一半）。改成固定高度 + 底部对齐，两行刚好装下。 */
-.essay-img-cap {
+.memos-img-cap {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -215,41 +215,41 @@ body.essay #content-inner.layout {
   pointer-events: none;
 }
 
-.essay-img:hover .essay-img-cap,
-.essay-img:focus-visible .essay-img-cap {
+.memos-img:hover .memos-img-cap,
+.memos-img:focus-visible .memos-img-cap {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* 分页圆点固定在图片区右下角，右列那张图的文字要给它让位 */
-.essay-gallery:not(.essay-gallery--single) .essay-img:last-child .essay-img-cap {
+.memos-gallery:not(.memos-gallery--single) .memos-img:last-child .memos-img-cap {
   padding-right: 84px;
 }
 
 /* 触屏没有 hover，不显示，免得挡住图片 */
 @media (hover: none) {
-  .essay-img-cap {
+  .memos-img-cap {
     display: none !important;
   }
 }
 
-.essay-gallery .essay-img {
+.memos-gallery .memos-img {
   height: 280px;
 }
 
-.essay-img img {
+.memos-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform .4s;
 }
 
-.essay-img:hover img {
+.memos-img:hover img {
   transform: scale(1.04);
 }
 
 /* 翻页按钮：鼠标悬停整块时浮现，触屏设备常显 */
-.essay-gallery-nav {
+.memos-gallery-nav {
   position: absolute;
   top: 50%;
   z-index: 2;
@@ -270,31 +270,31 @@ body.essay #content-inner.layout {
   transition: opacity .25s, background-color .25s;
 }
 
-.essay-gallery-nav--prev {
+.memos-gallery-nav--prev {
   left: 10px;
 }
 
-.essay-gallery-nav--next {
+.memos-gallery-nav--next {
   right: 10px;
 }
 
-.essay-gallery-nav:hover {
+.memos-gallery-nav:hover {
   background: rgba(20, 22, 35, .72);
 }
 
-.essay-gallery:hover .essay-gallery-nav,
-.essay-gallery-nav:focus-visible {
+.memos-gallery:hover .memos-gallery-nav,
+.memos-gallery-nav:focus-visible {
   opacity: 1;
 }
 
 @media (hover: none) {
-  .essay-gallery-nav {
+  .memos-gallery-nav {
     opacity: 1;
   }
 }
 
 /* 圆点：靠右下角放，避开两张图的接缝和画面主体 */
-.essay-gallery-dots {
+.memos-gallery-dots {
   position: absolute;
   right: 12px;
   bottom: 12px;
@@ -306,7 +306,7 @@ body.essay #content-inner.layout {
   background: rgba(20, 22, 35, .55);
 }
 
-.essay-gallery-dots i {
+.memos-gallery-dots i {
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -314,7 +314,7 @@ body.essay #content-inner.layout {
   transition: width .25s, background-color .25s;
 }
 
-.essay-gallery-dots i.is-active {
+.memos-gallery-dots i.is-active {
   width: 16px;
   border-radius: 4px;
   background: #fff;
@@ -322,7 +322,7 @@ body.essay #content-inner.layout {
 
 /* ---------- 图片灯箱：点图看大图 ---------- */
 /* 挂在 body 下，和卡片列表互不影响；遮罩固定深色，不随主题变 */
-.essay-lightbox {
+.memos-lightbox {
   position: fixed;
   inset: 0;
   z-index: 10000;
@@ -335,7 +335,7 @@ body.essay #content-inner.layout {
   transition: opacity .26s ease, visibility .26s;
 }
 
-.essay-lightbox.is-open {
+.memos-lightbox.is-open {
   opacity: 1;
   visibility: visible;
 }
@@ -361,7 +361,7 @@ body.essay #content-inner.layout {
   transition: opacity .22s ease, transform .32s cubic-bezier(.4, 0, .2, 1);
 }
 
-.essay-lightbox.is-open .elb-img {
+.memos-lightbox.is-open .elb-img {
   transform: scale(1);
 }
 
@@ -406,7 +406,7 @@ body.essay #content-inner.layout {
 }
 
 /* 只有一张图时不出左右按钮 */
-.essay-lightbox.is-single .elb-nav {
+.memos-lightbox.is-single .elb-nav {
   display: none;
 }
 
@@ -487,7 +487,7 @@ body.essay #content-inner.layout {
 
 /* ---------- 分隔线 + 底部信息条 ---------- */
 /* 主题在正文里把 hr 设成了 display:none，这里要显式改回块级，否则上下间距全没 */
-.essay-item .essay-hr {
+.memos-item .memos-hr {
   display: block;
   height: 1px;
   margin: 16px 0;
@@ -496,14 +496,14 @@ body.essay #content-inner.layout {
   overflow: hidden;
 }
 
-.essay-bottom {
+.memos-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-bottom: 8px;
 }
 
-.essay-info {
+.memos-info {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -511,7 +511,7 @@ body.essay #content-inner.layout {
 }
 
 /* 胶囊：数值照抄参考站（rgba(153,153,153,.17) / 20px 圆角 / 11.2px 字 / 4px 8px 内衬） */
-.essay-pill {
+.memos-pill {
   display: flex;
   align-items: center;
   gap: 3.2px;
@@ -524,13 +524,13 @@ body.essay #content-inner.layout {
   white-space: nowrap;
 }
 
-.essay-pill svg {
+.memos-pill svg {
   flex-shrink: 0;
   opacity: .85;
 }
 
 /* ---------- 点赞 ---------- */
-.essay-like {
+.memos-like {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -545,40 +545,40 @@ body.essay #content-inner.layout {
   transition: color .25s, background-color .25s, transform .25s;
 }
 
-.essay-like:hover {
+.memos-like:hover {
   color: #ff5252;
   background: rgba(255, 82, 82, .08);
 }
 
-.essay-like:active {
+.memos-like:active {
   transform: scale(.92);
 }
 
-.essay-like[aria-pressed="true"] {
+.memos-like[aria-pressed="true"] {
   color: #ff5252;
 }
 
-.essay-like[aria-pressed="true"] svg {
-  animation: essay-like-pop .32s ease;
+.memos-like[aria-pressed="true"] svg {
+  animation: memos-like-pop .32s ease;
 }
 
-@keyframes essay-like-pop {
+@keyframes memos-like-pop {
   0% { transform: scale(1); }
   45% { transform: scale(1.28); }
   100% { transform: scale(1); }
 }
 
-/* ---------- 静态分页（/essay/page/2/ …） ---------- */
+/* ---------- 静态分页（/memos/page/2/ …） ---------- */
 /* 分页条本体是 _partial/pagination.ejs + css/pagination.css，
    与首页共用同一套圆角页码、上/下页胶囊和「跳到第 N 页」。
-   这里只管它在即刻页里的落位：主列比首页窄，收一下宽度让三个元件聚拢，
+   这里只管它在微语页里的落位：主列比首页窄，收一下宽度让三个元件聚拢，
    别让贴边的上下页按钮离页码太远。 */
-.essay-pager {
+.memos-pager {
   position: relative;
   margin: 20px 0 4px;
 }
 
-.essay-pager #pagination .pagination {
+.memos-pager #pagination .pagination {
   max-width: 560px;
   margin: 0 auto;
   min-height: 40px;
@@ -588,12 +588,12 @@ body.essay #content-inner.layout {
 /* 手机上页码圆点被主题隐藏，只剩左右两个胶囊——而这两个胶囊在窄屏几乎撑满整行，
    中间没有空隙可放字，所以把「第几 / 共几」放到分页条下面单独一行。
    桌面端分页条自己有页码，这句就不出现。 */
-.essay-pager-count {
+.memos-pager-count {
   display: none;
 }
 
 @media screen and (max-width: 767px) {
-  .essay-pager-count {
+  .memos-pager-count {
     display: block;
     margin-top: 8px;
     text-align: center;
@@ -604,12 +604,12 @@ body.essay #content-inner.layout {
 }
 
 /* 分页条和评论区之间的分隔线（原来隔在「加载更多」和评论之间） */
-.essay-pager + .essay-comment-hr {
+.memos-pager + .memos-comment-hr {
   margin-top: 24px;
 }
 
 /* ---------- 空状态 ---------- */
-.essay-empty {
+.memos-empty {
   margin-top: 16px;
   padding: 48px 24px;
   color: var(--heo-secondtext);
@@ -620,17 +620,17 @@ body.essay #content-inner.layout {
   box-shadow: var(--heo-shadow-border);
 }
 
-.essay-empty p {
+.memos-empty p {
   margin: 0 0 8px;
   font-size: 14px;
 }
 
-.essay-empty-tip {
+.memos-empty-tip {
   font-size: 12px !important;
   opacity: .8;
 }
 
-.essay-empty code {
+.memos-empty code {
   padding: 2px 6px;
   font-size: 12px;
   background: var(--heo-secondbg);
@@ -638,7 +638,7 @@ body.essay #content-inner.layout {
 }
 
 /* ---------- 评论分隔 ---------- */
-.essay-comment-hr {
+.memos-comment-hr {
   display: block;
   height: 1px;
   margin: 24px 0;
@@ -648,21 +648,21 @@ body.essay #content-inner.layout {
 
 /* ---------- 响应式 ---------- */
 @media screen and (max-width: 768px) {
-  body.essay #content-inner.layout {
+  body.memos #content-inner.layout {
     padding-left: 12px;
     padding-right: 12px;
   }
 
-  .essay-item {
+  .memos-item {
     padding: 14px 14px 6px;
   }
 
-  .essay-title {
+  .memos-title {
     font-size: 16px;
     margin: 10px 0 6px;
   }
 
-  .essay-text {
+  .memos-text {
     font-size: 14px;
     line-height: 1.8;
     /* 行高变了，两行高度跟着变（1.8 × 2 = 3.6em） */
@@ -671,25 +671,25 @@ body.essay #content-inner.layout {
   }
 
   /* 手机上两图一屏，单张压到 130px，翻页按钮也收小一点 */
-  .essay-gallery .essay-img {
+  .memos-gallery .memos-img {
     height: 130px;
   }
 
-  .essay-gallery-nav {
+  .memos-gallery-nav {
     width: 28px;
     height: 28px;
     margin-top: -14px;
   }
 
-  .essay-gallery-nav--prev {
+  .memos-gallery-nav--prev {
     left: 6px;
   }
 
-  .essay-gallery-nav--next {
+  .memos-gallery-nav--next {
     right: 6px;
   }
 
-  .essay-pill {
+  .memos-pill {
     font-size: 11px;
   }
 }

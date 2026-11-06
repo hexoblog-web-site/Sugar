@@ -1,9 +1,9 @@
-/* essay-page.js —— 即刻短文页（/essay/）的交互
+/* memos-page.js —— 微语页（/memos/）的交互
  *
  * 三件套：
- *   模板  layout/essay.ejs
- *   样式  source/css/essay-page.css
- *   脚本  source/js/partial/essay-page.js   （本文件）
+ *   模板  layout/memos.ejs
+ *   样式  source/css/memos-page.css
+ *   脚本  source/js/partial/memos-page.js   （本文件）
  *
  * 页面本身是静态渲染的（数据来自 source/_data/vignette.yml，构建期就写进 HTML），
  * 分页也在构建期切好（每页 page_size 条，翻页是真跳转），所以这里只做四件小事，
@@ -33,14 +33,14 @@
   }
 
   function fillTime(root) {
-    (root || document).querySelectorAll('.essay-ago').forEach(function (el) {
+    (root || document).querySelectorAll('.memos-ago').forEach(function (el) {
       var txt = relative(el.getAttribute('datetime'));
       if (txt) el.textContent = txt;
     });
   }
 
   /* ---------- 2. 点赞 ---------- */
-  var KEY = 'sugar-essay-likes';
+  var KEY = 'sugar-memos-likes';
 
   function readLikes() {
     try {
@@ -58,7 +58,7 @@
 
   function initLikes() {
     var state = readLikes();
-    document.querySelectorAll('.essay-like').forEach(function (btn) {
+    document.querySelectorAll('.memos-like').forEach(function (btn) {
       var key = btn.getAttribute('data-key');
       if (!key) return;
       if (state[key]) btn.setAttribute('aria-pressed', 'true');
@@ -80,13 +80,13 @@
 
   /* ---------- 3. 图片翻页：一屏两张，首尾相接 ---------- */
   function initGalleries() {
-    document.querySelectorAll('.essay-gallery--multi').forEach(function (g) {
-      var track = g.querySelector('.essay-gallery-track');
+    document.querySelectorAll('.memos-gallery--multi').forEach(function (g) {
+      var track = g.querySelector('.memos-gallery-track');
       if (!track) return;
       var screens = track.children.length;
       if (screens < 2) return;
 
-      var dots = g.querySelectorAll('.essay-gallery-dots i');
+      var dots = g.querySelectorAll('.memos-gallery-dots i');
       var idx = 0;
 
       function go(n) {
@@ -97,13 +97,13 @@
         });
       }
 
-      var prev = g.querySelector('.essay-gallery-nav--prev');
-      var next = g.querySelector('.essay-gallery-nav--next');
+      var prev = g.querySelector('.memos-gallery-nav--prev');
+      var next = g.querySelector('.memos-gallery-nav--next');
       if (prev) prev.addEventListener('click', function () { go(idx - 1); });
       if (next) next.addEventListener('click', function () { go(idx + 1); });
 
       /* 触屏再加一条左右滑，和按钮殊途同归 */
-      var vp = g.querySelector('.essay-gallery-viewport');
+      var vp = g.querySelector('.memos-gallery-viewport');
       var startX = null;
       if (vp) {
         vp.addEventListener('touchstart', function (e) {
@@ -133,7 +133,7 @@
     if (lb) return lb;
 
     lb = document.createElement('div');
-    lb.className = 'essay-lightbox';
+    lb.className = 'memos-lightbox';
     lb.setAttribute('role', 'dialog');
     lb.setAttribute('aria-modal', 'true');
     lb.setAttribute('aria-label', '图片预览');
@@ -210,8 +210,8 @@
   }
 
   function openLightbox(link) {
-    var g = link.closest('.essay-gallery');
-    var nodes = g ? g.querySelectorAll('.essay-img') : [link];
+    var g = link.closest('.memos-gallery');
+    var nodes = g ? g.querySelectorAll('.memos-img') : [link];
     lbList = Array.prototype.map.call(nodes, function (n) {
       return n.getAttribute('href') || (n.querySelector('img') || {}).src || '';
     }).filter(Boolean);
@@ -221,8 +221,8 @@
     renderLightbox();
 
     /* 大图的 alt 用这条说说的标题，读屏和右键另存时都认得出来 */
-    var card = link.closest('.essay-item');
-    var titleEl = card ? card.querySelector('.essay-title') : null;
+    var card = link.closest('.memos-item');
+    var titleEl = card ? card.querySelector('.memos-title') : null;
     lb.querySelector('.elb-img').alt = titleEl ? titleEl.textContent.trim() : '';
 
     lbReturn = link;
@@ -246,7 +246,7 @@
   }
 
   function initLightbox() {
-    document.querySelectorAll('.essay-gallery .essay-img').forEach(function (a) {
+    document.querySelectorAll('.memos-gallery .memos-img').forEach(function (a) {
       a.addEventListener('click', function (e) {
         /* Ctrl / Cmd / Shift 点击仍然开新窗口看原图 */
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
@@ -257,7 +257,7 @@
   }
 
   function init() {
-    if (!document.querySelector('.essay-page')) return;
+    if (!document.querySelector('.memos-page')) return;
     fillTime(document);
     initGalleries();
     initLightbox();
