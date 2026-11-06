@@ -50,6 +50,17 @@ npx hexo server
 
 ### 2026-11-06
 
+- **即刻页改静态分页**：`/essay/` 不再一次性渲染 40 条再靠「加载更多」放出来，改成构建期切页，
+  每页 `page_size`（默认 8）条，第 2 页起是真实地址 `/essay/page/2/ …`，共 5 页。
+  第 1 页仍由 `source/essay/index.md` 出，其余由新增的 `scripts/sugar-essay-pager.js` 生成；
+  分页条复用 `_partial/pagination.ejs`（与首页同一套圆角页码 / 上下页胶囊 / 跳页框）。
+  顺带：卡片点赞 key 换成全局序号，翻页后不会串到别条说说；`<title>` 带「第 N 页」，
+  head 里按页输出 `rel=prev/next`。单页 HTML 从 244 KB 降到 112 KB
+- **修暗色下分页页码看不清**：当前页是主色实心块，数字原来用 `var(--heo-card-bg)`，
+  亮色下卡片白正好，暗色下卡片变 `#1f2024`，数字跟着变深灰压在蓝底上几乎不可读。
+  `css/pagination.css` 改用 `var(--heo-white)`，全站（首页 / 归档 / 即刻）一起修好
+- 即刻页手机端补「第几 / 共几」（`2 / 5`）：窄屏主题会隐藏页码圆点，只剩上/下页两个胶囊，
+  而它们几乎占满整行、中间没缝，所以这句放在分页条下面单独一行
 - **图片悬浮显示正文**：鼠标滑过即刻卡片的任意图片，图片下沿淡入一条渐变文字条，
   内容是这条说说的正文（去 HTML 标签、压成一行、超 56 字截断）。
   主题会把 `display:-webkit-box` 规范成 `flow-root`，`-webkit-line-clamp` 控不住行数
@@ -72,7 +83,7 @@ npx hexo server
 - 即刻短文页 `/essay/` 新建：布局对标 `blog.anheyu.com/essay`（横幅 + 列表 + 评论），
   唯一差别是把目标站的 3 列网格改成**单列列表卡片**；卡片视觉沿用目标卡实测值
   （白底 / 12px 圆角 / 1px `#E3E8F7` 描边 / `0 8px 16px -4px` 阴影），直接吃主题变量，暗色自动跟随
-- 数据来自站点 `source/_data/vignette.yml`（40 条），构建期静态渲染；前端只做相对时间、加载更多、点赞
+- 数据来自站点 `source/_data/vignette.yml`（40 条），构建期静态渲染并切页；前端只做相对时间、点赞、图集翻页与灯箱
 - 横幅文案 / 背景图 / 每屏条数集中到 `_config.yml` 的 `essay.page` 段，字段命名与 `friends_lite` 一致
 - 导航「动态」由 `/memos/` 改指 `/essay/`，首页即刻条的「即刻」与箭头同步跳过去
 - 补齐 `vignette.yml` 里 78 个失效配图的同名占位封面（`source/uploads/allimg/2024/0711/`），

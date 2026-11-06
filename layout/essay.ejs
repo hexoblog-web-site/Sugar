@@ -10,6 +10,10 @@
    *   样式  source/css/essay-page.css
    *   脚本  source/js/partial/essay-page.js
    *
+   * 列表走静态分页：本文件只渲染当前页的 page_size 条，第 2 页起由
+   * scripts/sugar-essay-pager.js 生成的 /essay/page/N/ 承接。翻页是真跳转，
+   * 所以首屏不必背着一整份列表，页码也能被分享和收录。
+   *
    * 文案 / 背景图 / 每屏条数都在主题 _config.yml 的 essay.page 段改，
    * 字段命名与 friends_lite 保持一致（tips / title / bottom_left / bottom_right /
    * bottom_right_link / top_background / overlay），两个页面可以对着改。
@@ -31,6 +35,17 @@
   var epPerPage = parseInt(ep.page_size, 10);
   if (!(epPerPage > 0)) epPerPage = 8;
   var epAvatar = ep.error_img || '/images/avatar.jpg';
+
+  /* 静态分页：第 1 页由 source/essay/index.md 出（没有 essay_pager），
+     第 2..N 页由 scripts/sugar-essay-pager.js 注册的 generator 出。
+     这里统一算出「当前第几页 / 共几页 / 本页从第几条开始」，
+     后面渲染列表和分页条都只认这几个值。 */
+  var epPager = page.essay_pager || null;
+  var epCur = epPager ? epPager.current : 1;
+  var epTotal = epPager ? epPager.total : Math.max(1, Math.ceil(list.length / epPerPage));
+  var epStart = (epCur - 1) * epPerPage;
+  var epList = list.slice(epStart, epStart + epPerPage);
+  var epBase = url_for('/essay').replace(/\/$/, '');
 
   var epBannerStyle = (epImage ? 'background-image:url(\'' + epImage + '\');' : '') + '--fc-overlay:' + epOverlay + ';';
 
@@ -80,15 +95,17 @@
   </div>
   <% } else { %>
   <ul class="essay-list" id="essay-list">
-    <% list.forEach(function (it, i) {
+    <% epList.forEach(function (it, i) {
          var d = epDate(it.date);
          var author = it.author || {};
          var name = author.name || config.author || '';
          var avatar = author.avatar || epAvatar;
          var imgs = (it.images || []).filter(Boolean);
-         var isHidden = i >= epPerPage;
+         /* 全局序号：翻页后点赞的 localStorage key 仍然指向同一条说说，
+            只用本页的 i 会串到上一页/下一页的条目上 */
+         var gi = epStart + i;
     %>
-    <li class="essay-item<%= isHidden ? ' is-hidden' : '' %>" data-index="<%= i %>">
+    <li class="essay-item" data-index="<%= gi %>">
       <div class="essay-head">
         <img class="essay-avatar" src="<%- url_for(avatar) %>" alt="<%= name %>" loading="lazy" width="40" height="40"
              onerror="this.onerror=null;this.src='<%- url_for(epAvatar) %>'">
@@ -171,7 +188,7 @@
           </span>
           <% } %>
         </div>
-        <button type="button" class="essay-like" data-key="essay-<%= i %>" aria-pressed="false" aria-label="点赞">
+        <button type="button" class="essay-like" data-key="essay-<%= gi %>" aria-pressed="false" aria-label="点赞">
           <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18" viewBox="0 0 512 512">
             <path fill="currentColor" d="M241 87.1l15 20.7l15-20.7C296 52.5 336.2 32 378.9 32C452.4 32 512 91.6 512 165.1v2.6c0 17.6-3.4 35.1-9.9 51.3c-16.5 38.5-39.2 74.8-66.6 107.1l-.1 .1c-26.8 31.6-56.7 60.4-89.1 85.3l-.9 .7L284.4 456c-16.2 12.6-38.6 12.6-54.8 0L168.5 411l-.1-.1c-32.1-24.6-61.8-53.1-88.5-84.4c-27.5-32.3-50.2-68.6-66.7-107.2c-6.5-16.2-9.9-33.7-9.9-51.3v-2.6C3.2 91.6 62.8 32 136.3 32c42.7 0 82.9 20.5 104.7 55.1z"/>
           </svg>
@@ -182,14 +199,14 @@
     <% }); %>
   </ul>
 
-  <div class="essay-more-wrap" id="essay-more-wrap"<%= list.length > epPerPage ? '' : ' hidden' %>>
-    <button type="button" class="moments-more-btn" id="essay-more" aria-label="加载更多">
-      <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="18" height="18" viewBox="0 0 448 512">
-        <path fill="currentColor" d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7l137.4-137.3c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/>
-      </svg>
-      <span class="essay-more-text">加载更多</span>
-    </button>
+  <%# ---------- 静态分页：页码就是真实 URL，爬虫和直接分享都能落到第 N 页 ---------- %>
+  <% if (epTotal > 1) { %>
+  <div class="essay-pager">
+    <%- partial('_partial/pagination', { page: { total: epTotal, current: epCur, base: epBase } }) %>
+    <%# 手机上主题把页码圆点藏了（只留上/下页两个胶囊），这里补一句「第几 / 共几」 %>
+    <div class="essay-pager-count"><%= epCur %> / <%= epTotal %></div>
   </div>
+  <% } %>
   <% } %>
 
   <%# ---------- 评论（与文章页同一套 twikoo，未启用则不渲染） ---------- %>
@@ -210,12 +227,6 @@
   <% } %>
 
 </div>
-
-<script>
-  window.ESSAY_CONFIG = {
-    perPage: <%= epPerPage %>
-  };
-</script>
 
 <%# 侧栏：必须放在 .essay-page 外面平级，否则会被挤进内容列里当兄弟节点 %>
 <% if (lb_sidebar_cfg().enable !== false) { %>

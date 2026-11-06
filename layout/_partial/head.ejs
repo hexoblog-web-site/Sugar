@@ -46,6 +46,15 @@
   var shareTitle = page.title || config.title;
 %>
 <link rel="canonical" href="<%- canonicalUrl %>">
+<%# 即刻短文的分页：给第 2 页起的页面补 rel=prev/next，让搜索引擎知道这是一串
+    而不是若干篇撞脸的独立页。第 1 页没有 essay_pager，链接由页面里的分页条给出。 %>
+<% if (page.essay_pager) { var _ep = page.essay_pager;
+     var _epUrl = function (n) {
+       return full_url_for(_ep.base + (n === 1 ? '/' : '/page/' + n + '/'));
+     }; %>
+<link rel="prev" href="<%- _epUrl(_ep.current - 1) %>">
+<% if (_ep.current < _ep.total) { %><link rel="next" href="<%- _epUrl(_ep.current + 1) %>"><% } %>
+<% } %>
 <meta property="og:type" content="<%= is_post() ? 'article' : 'website' %>">
 <meta property="og:title" content="<%= shareTitle %>">
 <meta property="og:url" content="<%- canonicalUrl %>">

@@ -30,7 +30,10 @@
   cursor: pointer;
 }
 #pagination .page-number.current {
-  color: var(--heo-card-bg);
+  /* 当前页是主色实心块，数字必须用固定白色。
+     原来写 var(--heo-card-bg)：亮色下卡片白=白字没问题，但暗色下卡片是 #1f2024，
+     数字跟着变成深灰压在主色蓝上，几乎看不清。 */
+  color: var(--heo-white);
   cursor: default;
   border-radius: 5px;
 }
@@ -53,7 +56,7 @@
   #pagination .page-number.current:hover {
     background: var(--heo-theme);
     box-shadow: var(--heo-shadow-theme);
-    color: var(--heo-card-bg);
+    color: var(--heo-white);
   }
   #pagination .page-number:hover,
   #pagination a.extend.next:hover,

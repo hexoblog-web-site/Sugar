@@ -1,7 +1,7 @@
 /* ==========================================================================
    即刻短文页 —— 布局对标 blog.anheyu.com/essay
    --------------------------------------------------------------------------
-   结构：.essay-page > .fc-banner 横幅 → .essay-list 单列卡片 → 加载更多 → 评论
+   结构：.essay-page > .fc-banner 横幅 → .essay-list 单列卡片 → 静态分页 → 评论
 
    与参考站唯一的差别在这里：参考站是 3 列网格（440px 一张），本页改成单列列表。
    卡片的视觉数值全部照抄参考站实测：
@@ -57,27 +57,6 @@ body.essay #content-inner.layout {
   border-color: #163bf2;
   box-shadow: 0 10px 20px -6px rgba(22, 59, 242, .16);
   transform: translateY(-2px);
-}
-
-.essay-item.is-hidden {
-  display: none;
-}
-
-/* 加载更多时逐条淡入 */
-.essay-item.is-entering {
-  animation: essay-in .38s ease both;
-}
-
-@keyframes essay-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* ---------- 头像 / 作者 ---------- */
@@ -589,39 +568,44 @@ body.essay #content-inner.layout {
   100% { transform: scale(1); }
 }
 
-/* ---------- 加载更多 ---------- */
-.essay-more-wrap {
-  display: flex;
-  justify-content: center;
-  margin-top: 0;
+/* ---------- 静态分页（/essay/page/2/ …） ---------- */
+/* 分页条本体是 _partial/pagination.ejs + css/pagination.css，
+   与首页共用同一套圆角页码、上/下页胶囊和「跳到第 N 页」。
+   这里只管它在即刻页里的落位：主列比首页窄，收一下宽度让三个元件聚拢，
+   别让贴边的上下页按钮离页码太远。 */
+.essay-pager {
+  position: relative;
+  margin: 20px 0 4px;
 }
 
-.essay-more-wrap[hidden] {
+.essay-pager #pagination .pagination {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 40px;
+  align-items: center;
+}
+
+/* 手机上页码圆点被主题隐藏，只剩左右两个胶囊——而这两个胶囊在窄屏几乎撑满整行，
+   中间没有空隙可放字，所以把「第几 / 共几」放到分页条下面单独一行。
+   桌面端分页条自己有页码，这句就不出现。 */
+.essay-pager-count {
   display: none;
 }
 
-/* 按钮外观沿用朋友圈页的 .moments-more-btn，这里补一行文字让它更好认 */
-.essay-more-wrap .moments-more-btn {
-  width: auto;
-  min-width: 200px;
-  padding: 0 24px;
-  gap: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+@media screen and (max-width: 767px) {
+  .essay-pager-count {
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--heo-secondtext);
+  }
 }
 
-.essay-more-text {
-  font-size: 13px;
-  line-height: 30px;
-}
-
-.essay-more-wrap .moments-more-btn.is-loading svg {
-  animation: essay-spin .6s linear infinite;
-}
-
-@keyframes essay-spin {
-  to { transform: rotate(180deg); }
+/* 分页条和评论区之间的分隔线（原来隔在「加载更多」和评论之间） */
+.essay-pager + .essay-comment-hr {
+  margin-top: 24px;
 }
 
 /* ---------- 空状态 ---------- */
