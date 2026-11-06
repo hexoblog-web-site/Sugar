@@ -210,4 +210,9 @@
     perPage: <%= epPerPage %>
   };
 </script>
+
+<%# 侧栏：必须放在 .essay-page 外面平级，否则会被挤进内容列里当兄弟节点 %>
+<% if (lb_sidebar_cfg().enable !== false) { %>
+  <%- partial('_partial/aside') %>
+<% } %>
 <% } %>

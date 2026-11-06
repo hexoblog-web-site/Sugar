@@ -19,11 +19,11 @@ body.essay #content-inner.layout {
 
 #content-inner > .essay-page {
   display: block;
-  flex: 1 1 auto;
-  width: 100% !important;
+  /* 宽度和 flex 一律不写：交给主题的 .layout>div:first-child 规则
+     （width: calc(100% - 300px)），这样主列和侧栏的分配与文章页完全一致。
+     之前写死 width:100% 会把侧栏从 300 压到 244。 */
   min-width: 0;
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   background: none;
   border: 0;
