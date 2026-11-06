@@ -43,11 +43,15 @@
       var bins = new Array(BINS);
       for (var k = 0; k < BINS; k++) bins[k] = 0;
       var px = [];
+      var ar = 0, ag = 0, ab = 0, an = 0, asat = 0;
       for (var i = 0; i < data.length; i += 4) {
         var R = data[i], G = data[i + 1], B = data[i + 2];
         var max = Math.max(R, G, B), min = Math.min(R, G, B);
         var v = max / 255;
         var sat = max === 0 ? 0 : (max - min) / max;
+        /* 全图均值与平均饱和度先记着：一张黑白封面如果只剩一小块彩点，
+           下面按色相分桶会把那块彩点当成「主色」，必须靠这两个值兜住 */
+        ar += R; ag += G; ab += B; asat += sat; an++;
         if (sat < 0.18 || v < 0.1 || v > 0.98) continue;
         var hsl = rgbToHsl(R, G, B);
         var bin = Math.floor(hsl[0] * BINS) % BINS;
@@ -56,7 +60,10 @@
         bins[bin] += w;
         px.push([R, G, B, bin, w]);
       }
-      if (!px.length) return null;
+      var mean = an ? [Math.round(ar / an), Math.round(ag / an), Math.round(ab / an)] : null;
+      /* 平均饱和度太低说明这张图基本是黑白的（时钟、截图之类）。
+         此时直接给全图均值，让上层走中性灰，不要凭空编一个色相出来。 */
+      if (!px.length || !an || asat / an < 0.10) return mean;
       /* 相邻桶一起算，避免主色刚好卡在桶边界被拆成两半 */
       var best = 0, bestW = -1;
       for (var j = 0; j < BINS; j++) {
@@ -112,9 +119,12 @@
   }
 
   /* 把主色收敛到「适合做玻璃染色」的区间：饱和度抬到能看出来的程度，
-     亮度压在 0.46~0.56，避免过灰/过曝/过暗 */
+     亮度压在 0.46~0.56，避免过灰/过曝/过暗。
+     例外：本身就是灰的（黑白图）不要抬饱和度 —— 灰色的 h 是 0，一抬就变红，
+     之前黑白时钟封面底下那圈暗红就是这么来的；这种只压亮度上限。 */
   function tintColor(rgb) {
     var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    if (hsl[1] < 0.12) return hslToRgb(hsl[0], hsl[1], Math.min(hsl[2], 0.56));
     var s = Math.min(Math.max(hsl[1], 0.55), 0.86);
     var l = Math.min(Math.max(hsl[2], 0.46), 0.56);
     return hslToRgb(hsl[0], s, l);
@@ -166,6 +176,17 @@
   /* 对外：文章页封面取色（main.js）复用它，两处过渡参数保持一致 */
   heo.applyPageTint = applyPageTint;
 
+  /* 把这一张的主色写进它自己的 .home-swiper-banner-item：
+     底部渐隐层（.home-swiper-mask）用它上色，所以每张的底色都不一样，
+     不会再出现「橙色封面底下压一条蓝紫带」。
+     deep 是压暗一档的同色，垫在最底下，保证白色标题压得住。 */
+  function setItemTint(item, rgb) {
+    if (!item || !rgb) return;
+    var t = tintColor(rgb);
+    item.style.setProperty('--swiper-tint', t.join(','));
+    item.style.setProperty('--swiper-tint-deep', deepOf(t).join(','));
+  }
+
   /* 轮播切到哪张，就把中控台的环境色换成那张图的主色
      warm=true 时只算不写（预热用），避免把当前这张的颜色覆盖掉 */
   function bannerTint(item, warm) {
@@ -176,19 +197,23 @@
       applyPageTint(rgb);
     };
     var img = item.querySelector('img');
-    if (!img) { if (fallback) apply(fallback); return; }
+    if (!img) { if (fallback) { setItemTint(item, fallback); apply(fallback); } return; }
     if (img.dataset.bannerTint) {
-      apply(img.dataset.bannerTint.split(',').map(Number));
+      var cached = img.dataset.bannerTint.split(',').map(Number);
+      setItemTint(item, cached);
+      apply(cached);
       return;
     }
     var run = function () {
       var rgb = sampleImage(img, 48);
       if (rgb) {
         img.dataset.bannerTint = rgb.join(',');
+        setItemTint(item, rgb);
         apply(rgb);
-      } else if (fallback && !warm && !document.body.style.getPropertyValue('--console-tint')) {
+      } else if (fallback) {
         /* 取不到色时不要退回固定的紫色，否则看起来就像「颜色一直没变」 */
-        apply(fallback);
+        setItemTint(item, fallback);
+        if (!warm && !document.body.style.getPropertyValue('--console-tint')) apply(fallback);
       }
     };
     if (img.complete && img.naturalWidth) run();
@@ -201,7 +226,7 @@
    * 二、轮播
    * ------------------------------------------------------------------ */
 
-  var bannerIdx = 0, bannerTimer = null;
+  var bannerIdx = 0, bannerTimer = null, trackSync = false, trackSeen = -1;
   function banners() { return $$('#home_swiper .home-swiper-banner-item'); }
   function indicators() { return $$('#home_swiper .home-swiper-indicator'); }
 
@@ -224,7 +249,7 @@
     }, 900);
   }
 
-  function applyBanner(i) {
+  function applyBanner(i, fromScroll) {
     var list = banners();
     if (!list.length) return;
     i = (i + list.length) % list.length;
@@ -234,6 +259,17 @@
     list.forEach(function (el, k) { el.classList.toggle('active', k === i); });
     indicators().forEach(function (el, k) { el.classList.toggle('active', k === i); });
     var item = list[i];
+    /* 手机端四张是横向并排的 scroll-snap 条带，.active 不改变可见性，
+       真正决定看哪张的是 scrollLeft。自动播放/点圆点时要把它滚过去，
+       否则会出现「标题换成第 3 篇、画面还停在第 1 张」。
+       桌面端这里 scrollWidth == clientWidth，不会有副作用。 */
+    var track = $('#home_swiper .home-swiper-banner');
+    trackSeen = i;
+    if (!fromScroll && track && track.scrollWidth > track.clientWidth + 4) {
+      trackSync = true;
+      track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+      setTimeout(function () { trackSync = false; }, 800);
+    }
     var titleEl = $('#home_swiper .home-swiper-title > a');
     if (titleEl && item.dataset.title) {
       var link = item.dataset.link || '#';
@@ -290,5 +326,20 @@
     }
     /* 预热每张轮播图的主色：切过去时立刻就有颜色，不会先闪一下默认色 */
     banners().forEach(function (el) { bannerTint(el, true); });
+    /* 手机端（≤767px）幻灯片是横向 scroll-snap，四张并排躺在条带上，
+       手指划到哪张就只露哪张 —— 这条路径不经过自动播放。这里补两件事：
+       1) 划到某张时把它的 data-src 补下载、取色（否则底部退回兜底蓝色）
+       2) 标题 / 圆点 / 页面环境色跟着同步，别和画面脱节
+       桌面端这个容器不滚动，回调不会触发。 */
+    var track = $('#home_swiper .home-swiper-banner');
+    if (track) {
+      track.addEventListener('scroll', function () {
+        if (trackSync) return;          /* 自动播放自己滚的，applyBanner 已经处理过 */
+        var list = banners();
+        var idx = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        if (idx === trackSeen || idx < 0 || idx >= list.length) return;
+        applyBanner(idx, true);
+      }, { passive: true });
+    }
   });
 })();
