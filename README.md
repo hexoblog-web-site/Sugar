@@ -50,6 +50,11 @@ npx hexo server
 
 ### 2026-11-06
 
+- **图片灯箱**：即刻页点任意图片弹出大图，同一条说说的全部图片可左右切换
+  （按钮 / 方向键 / 触屏滑动，首尾相接，计数 + 圆点，Esc 或点空白关闭）。
+  脚本动态创建、挂在 body 下，卡片内翻页仍然独立可用；Ctrl/Cmd 点击依旧开新窗口看原图。
+  遮罩固定深色不随主题变；锁滚动用拦截 wheel / touchmove，不用 `overflow:hidden`，
+  否则打开灯箱会把页面滚回顶部、关掉就丢位置
 - **主题更名为 Sugar**：目录 `themes/Sugar`、站点 `theme: Sugar`；`scripts/sugar-*.js`、
   `source/css/sugar-fix.css`、`package.json` 一并更新。朋友圈接口域名 `quanzi.liublog.cn`
   与站点域名 `www.liublog.cn` 是业务地址，保持原样

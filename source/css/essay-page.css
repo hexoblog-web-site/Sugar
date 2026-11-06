@@ -294,6 +294,171 @@ body.essay #content-inner.layout {
   background: #fff;
 }
 
+/* ---------- 图片灯箱：点图看大图 ---------- */
+/* 挂在 body 下，和卡片列表互不影响；遮罩固定深色，不随主题变 */
+.essay-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 10, 18, .92);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .26s ease, visibility .26s;
+}
+
+.essay-lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.elb-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 56px 84px 72px;
+}
+
+.elb-img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 6px;
+  object-fit: contain;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .55);
+  opacity: 1;
+  transform: scale(.97);
+  transition: opacity .22s ease, transform .32s cubic-bezier(.4, 0, .2, 1);
+}
+
+.essay-lightbox.is-open .elb-img {
+  transform: scale(1);
+}
+
+.elb-btn {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color .2s, transform .2s;
+}
+
+.elb-btn:hover {
+  background: rgba(255, 255, 255, .26);
+  transform: scale(1.05);
+}
+
+.elb-close {
+  top: 18px;
+  right: 18px;
+}
+
+.elb-nav {
+  top: 50%;
+  margin-top: -20px;
+}
+
+.elb-prev {
+  left: 20px;
+}
+
+.elb-next {
+  right: 20px;
+}
+
+/* 只有一张图时不出左右按钮 */
+.essay-lightbox.is-single .elb-nav {
+  display: none;
+}
+
+.elb-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .12);
+  color: rgba(255, 255, 255, .92);
+  font-size: 12px;
+  line-height: 1;
+  transform: translateX(-50%);
+}
+
+.elb-count {
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.elb-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.elb-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .45);
+  transition: width .25s, background-color .25s;
+}
+
+.elb-dots i.is-active {
+  width: 14px;
+  border-radius: 3px;
+  background: #fff;
+}
+
+/* 背景滚动由脚本拦截 wheel / touchmove 锁住，
+   这里不用 overflow:hidden——那会把页面滚回顶部，关掉灯箱就丢了位置 */
+
+@media (max-width: 768px) {
+  .elb-stage {
+    padding: 16px 10px 62px;
+  }
+
+  .elb-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .elb-close {
+    top: 12px;
+    right: 12px;
+  }
+
+  .elb-nav {
+    margin-top: -18px;
+  }
+
+  .elb-prev {
+    left: 8px;
+  }
+
+  .elb-next {
+    right: 8px;
+  }
+
+  .elb-bar {
+    bottom: 14px;
+  }
+}
+
 /* ---------- 分隔线 + 底部信息条 ---------- */
 /* 主题在正文里把 hr 设成了 display:none，这里要显式改回块级，否则上下间距全没 */
 .essay-item .essay-hr {
