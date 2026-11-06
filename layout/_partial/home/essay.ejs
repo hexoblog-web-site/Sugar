@@ -1,5 +1,5 @@
 <%
-  /* 即刻（首页顶部滚动短文条）
+  /* 微语（首页顶部滚动短文条）
    *
    * 三件套：
    *   模板  layout/_partial/home/essay.ejs   （本文件）
@@ -10,15 +10,17 @@
    * 结构与类名沿用安知鱼（#bbTimeList / #bber-talk / .li-style / .bber-logo / .bber-gotobb），
    * 方便以后对照原版；滚动实现换成本主题自己的（不引 Swiper，省一个 40KB 依赖）。
    *
-   * 数据两个来源，站点数据优先：
-   *   1) source/_data/essay.yml —— 安知鱼同款格式，已有就直接读
+   * 数据三级来源，站点数据优先：
+   *   1) source/_data/essay.yml —— 安知鱼同款格式，建了就直接读（想单独给首页配文案时用）
    *        - home_essay: true
    *          essay_list:
    *            - content: 一句话
    *              date: 2026-11-02
    *              image: 可选
-   *   2) 主题 _config.yml → essay.items —— 没建上面的数据文件时用这份
-   * 取最近几条由 essay.count 决定（默认 10，与安知鱼一致）。
+   *   2) source/_data/vignette.yml —— 微语页（/memos/）那份数据，没建 essay.yml 时自动复用，
+   *        按日期倒序取最新的几条，不用两边各写一遍
+   *   3) 主题 _config.yml → essay.items —— 上面两份都没有时的兜底示例
+   * 条数由 essay.count 决定（默认 10，与安知鱼一致）。
    */
   var cfg = theme.essay || {};
   var list = [];
@@ -38,6 +40,20 @@
     if (!group || group.home_essay === false) return;
     (group.essay_list || []).forEach(pushItem);
   });
+
+  /* 没单独配 essay.yml 时，直接吃微语页那份数据（/memos/ 用的是同一个 vignette.yml），
+     省得首页和微语页各维护一份、改了这边忘那边。按日期倒序只取最新的 count 条。 */
+  if (!list.length) {
+    var vignette = (site.data && site.data.vignette) || [];
+    vignette.slice().sort(function (a, b) {
+      var ka = String(a.date || '').replace(/\D/g, '');
+      var kb = String(b.date || '').replace(/\D/g, '');
+      return kb.localeCompare(ka);
+    }).forEach(function (it) {
+      pushItem({ content: it.content, image: (it.images && it.images.length) ? 1 : '' });
+    });
+  }
+
   if (!list.length) {
     (cfg.items || []).forEach(pushItem);
   }
@@ -51,9 +67,9 @@
 <% if (cfg.enable !== false && list.length) { %>
 <div id="bbTimeList" class="bbTimeList" data-interval="<%= interval %>">
   <% if (barLink) { %>
-  <a class="bber-logo" href="<%= barLink %>" title="即刻短文">即刻</a>
+  <a class="bber-logo" href="<%= barLink %>" title="微语">微语</a>
   <% } else { %>
-  <span class="bber-logo" title="即刻短文">即刻</span>
+  <span class="bber-logo" title="微语">微语</span>
   <% } %>
 
   <div id="bbtalk" class="essay-bar">
@@ -70,9 +86,9 @@
   </div>
 
   <% if (barLink) { %>
-  <a class="bber-gotobb heoblogIcon icon-arrow-right-s-line" href="<%= barLink %>" title="查看全部即刻" aria-label="查看全部即刻"></a>
+  <a class="bber-gotobb heoblogIcon icon-arrow-right-s-line" href="<%= barLink %>" title="查看全部微语" aria-label="查看全部微语"></a>
   <% } else { %>
-  <i class="bber-gotobb heoblogIcon icon-arrow-right-s-line" title="即刻短文" aria-hidden="true"></i>
+  <i class="bber-gotobb heoblogIcon icon-arrow-right-s-line" title="微语" aria-hidden="true"></i>
   <% } %>
 </div>
 <% } %>

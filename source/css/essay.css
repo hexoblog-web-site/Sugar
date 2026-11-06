@@ -1,4 +1,4 @@
-/* essay.css —— 首页「即刻」短文条
+/* essay.css —— 首页「微语」短文条
  *
  * 三件套：
  *   模板  layout/_partial/home/essay.ejs
@@ -41,8 +41,8 @@
   box-shadow: var(--heo-shadow-main);
 }
 
-/* ---------- 左侧「即刻」字样 ----------
-   原来用 heoblogIcon 的 \e00c（即刻旧版方标），两个方块并排看着像重复图形，
+/* ---------- 左侧「微语」字样 ----------
+   原来用 heoblogIcon 的 \e00c（微语旧版方标），两个方块并排看着像重复图形，
    换成纯文字：字号跟正文一致、加粗、略宽字距，高度与右侧箭头对齐 */
 #bbTimeList .bber-logo {
   flex: 0 0 auto;
