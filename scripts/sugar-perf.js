@@ -1,5 +1,5 @@
 /* ==========================================================================
- * liublog 性能层
+ * sugar 性能层
  * --------------------------------------------------------------------------
  * 1) 样式合并：把 head.ejs 里原来的 12 个 <link> 合并成 1 个 css/bundle.css
  *    - 顺序与原来完全一致，层叠优先级不变，视觉零差异
@@ -31,7 +31,7 @@ function entryList(dir) {
   try {
     text = fs.readFileSync(entry, 'utf8');
   } catch (e) {
-    hexo.log.error('[liublog] 找不到 source/css/%s，样式清单为空', ENTRY_FILE);
+    hexo.log.error('[sugar] 找不到 source/css/%s，样式清单为空', ENTRY_FILE);
     return [];
   }
 
@@ -108,7 +108,7 @@ function buildBundle() {
   const parts = [];
 
   if (!list.length) {
-    hexo.log.warn('[liublog] source/css/%s 里没有读到任何 @import，页面将没有样式', ENTRY_FILE);
+    hexo.log.warn('[sugar] source/css/%s 里没有读到任何 @import，页面将没有样式', ENTRY_FILE);
   }
 
   list.forEach(function (name) {
@@ -121,7 +121,7 @@ function buildBundle() {
   });
 
   if (missing.length) {
-    hexo.log.warn('[liublog] CSS 合并缺少文件：%s（首页样式可能不完整）', missing.join(', '));
+    hexo.log.warn('[sugar] CSS 合并缺少文件：%s（首页样式可能不完整）', missing.join(', '));
   }
 
   const css = parts.join('\n');
@@ -134,7 +134,7 @@ function buildBundle() {
 }
 
 /* ---------- 生成 css/bundle.css ---------- */
-hexo.extend.generator.register('liublog_css_bundle', function () {
+hexo.extend.generator.register('sugar_css_bundle', function () {
   return {
     path: 'css/bundle.css',
     data: buildBundle().css
@@ -201,7 +201,7 @@ function buildJsBundle() {
     parts.push('/* ===== ' + f.label + ' ===== */\n' + rec.text);
   });
   if (missing.length) {
-    hexo.log.warn('[liublog] JS 合并缺少文件：%s（页面交互可能不完整）', missing.join(', '));
+    hexo.log.warn('[sugar] JS 合并缺少文件：%s（页面交互可能不完整）', missing.join(', '));
   }
   const js = parts.join('\n');
   jsCache = {
@@ -212,7 +212,7 @@ function buildJsBundle() {
   return jsCache;
 }
 
-hexo.extend.generator.register('liublog_js_bundle', function () {
+hexo.extend.generator.register('sugar_js_bundle', function () {
   return {
     path: 'js/bundle.js',
     data: buildJsBundle().js

@@ -1,5 +1,5 @@
 # ==========================================================================
-# liublog —— 由 blog.zhheo.com（Heo / heoblog）视觉风格改写而来的 Hexo 主题
+# Sugar —— 由 blog.zhheo.com（Heo / heoblog）视觉风格改写而来的 Hexo 主题
 # 模板引擎 EJS，修改本文件后执行 hexo clean && hexo g 生效
 #
 # 本文件分节一览（从上到下）：
@@ -106,7 +106,7 @@ navigation_bar_settings:
   # 背景细节：下面每一项都可以留空 —— 留空 = 用皮肤自带的默认值（写在注释里）。
   # 想改哪一项就填哪一项，改完重启 hexo 即可，不用动 css。
   # 带引号是必须的：CSS 值里有逗号、空格、括号，不加引号 yml 会解析错。
-  # 两张装饰图都在 themes/liublog/source/images/ 下，换图放同一目录再写相对路径即可，
+  # 两张装饰图都在 themes/Sugar/source/images/ 下，换图放同一目录再写相对路径即可，
   # 写 `/images/xxx.png` 这种站点绝对路径也可以。
   background:
     # ---------- 底色 / 渐变 / 投影（三者按顺序叠加：底色 → 渐变 → 投影） ----------
@@ -699,7 +699,7 @@ footer_settings:
         message: 博客框架为 Hexo
       - link: /about/
         shields: /images/footer/badge-theme.svg
-        message: 本站使用 liublog 主题
+        message: 本站使用 Sugar 主题
       - link: https://github.com/
         shields: /images/footer/badge-github.svg
         message: 本站项目由 GitHub 托管

@@ -6,7 +6,7 @@
    *   home_top.swiper.items 有内容 → 精品推荐，按 items 顺序显示，写几条显示几条
    *                                 （只写 link 也行，标题 / 简介 / 封面自动从文章补）
    *   items 留空                  → 兜底：自动取带封面的最新文章，条数看 count
-   * 选文规则统一在 scripts/liublog-home-pick.js，右框（新品框架）会避开这里用掉的。
+   * 选文规则统一在 scripts/sugar-home-pick.js，右框（新品框架）会避开这里用掉的。
    */
   var sw = (theme.home.home_top || {}).swiper || {};
   /* 全局懒加载开关（site_settings.lazyload: false 时全部直接 src） */
@@ -47,7 +47,7 @@
     /* 自动模式取哪几张交给 lb_home_pick：它从「不在首页第一页」的文章里按
        时间倒序挑（封面必须有、相同封面只算一张），所以幻灯片和下面的列表
        不会重样；右框再避开幻灯片用掉的这几张，三处都不重。
-       见 scripts/liublog-home-pick.js */
+       见 scripts/sugar-home-pick.js */
     lb_home_pick('swiper').forEach(function (p) {
       banners.push({
         title: p.title,

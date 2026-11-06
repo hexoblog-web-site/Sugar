@@ -1,9 +1,9 @@
 {
-  "name": "hexo-theme-liublog",
+  "name": "hexo-theme-sugar",
   "version": "1.0.0",
   "description": "Hexo 主题，视觉与结构源自 blog.zhheo.com（heoblog）",
   "main": "layout/layout.ejs",
-  "keywords": ["hexo", "hexo-theme", "zhheo", "liublog"],
+  "keywords": ["hexo", "hexo-theme", "zhheo", "sugar"],
   "license": "MIT",
   "engines": {
     "hexo": ">=6.0.0"
@@ -13,8 +13,8 @@
     "lib 目录约定": "第三方库统一放 source/lib/，Hexo 会原样发布成 /lib/xxx.js，模板里用 <script src=\"<%- url_for('/lib/xxx.js') %>\"> 按需引入，不进 bundle；bundle 只装主题自己的脚本",
     "主题自带": {
       "source/lib/qrcode.min.js": "浏览器端二维码库 davidshimjs/qrcodejs（npm qrcodejs@1.0.0，19.9KB）。只在文章页由 scripts.ejs 引入，海报里的二维码由它现场生成",
-      "scripts/liublog-config.js": "模板 helper（导航、侧栏、作者信息等渲染逻辑）",
-      "scripts/liublog-perf.js": "把 source/css、source/js 合并成 bundle.css / bundle.js（主题自身资源管理，不含第三方库）",
+      "scripts/sugar-config.js": "模板 helper（导航、侧栏、作者信息等渲染逻辑）",
+      "scripts/sugar-perf.js": "把 source/css、source/js 合并成 bundle.css / bundle.js（主题自身资源管理，不含第三方库）",
       "source/css · source/js": "前端样式与脚本"
     },
     "站长需自装": {

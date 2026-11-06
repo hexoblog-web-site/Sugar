@@ -11,7 +11,7 @@
  *   source/css/home.css                 51 条
  *   source/css/heoblogmw768.css         18 条
  *   source/css/theme-extra.css          20 条
- *   source/css/liublog-fix.css           5 条
+ *   source/css/sugar-fix.css           5 条
  *
  * 改轮播的外观请只改本文件，不会碰到下面的分类条与文章卡片。
  */
@@ -586,7 +586,7 @@
   }
 }
 
-/* ===== 来自 source/css/liublog-fix.css ===== */
+/* ===== 来自 source/css/sugar-fix.css ===== */
 /* 轮播标题区在无多图时的间距 */
 .home-swiper-title>a {
   display: block;

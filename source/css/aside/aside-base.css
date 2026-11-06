@@ -108,7 +108,7 @@ html.hide-aside #aside-content{display:none}
 }
 .author-info__description_group{display:flex!important;flex-direction:column!important;gap:8px!important;width:100%!important}
 
-/* ---------- 以下从 liublog-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
+/* ---------- 以下从 sugar-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
 /* 单栏 / 隐藏侧栏 */
 body.hide-aside #aside-content{display:none}
 /* 关闭全站 slide-in 位移入场动画（统一处理，避免逐个区块漏掉）

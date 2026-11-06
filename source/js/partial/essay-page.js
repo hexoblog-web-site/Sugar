@@ -77,7 +77,7 @@
   }
 
   /* ---------- 3. 点赞 ---------- */
-  var KEY = 'liublog-essay-likes';
+  var KEY = 'sugar-essay-likes';
 
   function readLikes() {
     try {

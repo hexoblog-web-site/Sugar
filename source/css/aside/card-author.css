@@ -40,7 +40,7 @@
 #aside-content .card-info .card-info-social-icons .social-icon:active i{transform:scale(.8)}
 }
 
-/* ---------- 以下从 liublog-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
+/* ---------- 以下从 sugar-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
 /* ===== 作者卡：1:1 复刻 anzhiyu card_author =====
    结构：sayhi 胶囊 → 118px 圆头像（居中，上下 45px 外边距）→ 简介（绝对定位，默认 opacity:0）
         → 底部信息行（名字 + 副标题 / 社交图标）

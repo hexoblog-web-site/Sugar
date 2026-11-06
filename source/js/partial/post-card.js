@@ -51,7 +51,7 @@
   }
 
   function readedList() {
-    try { return JSON.parse(localStorage.getItem('liublog-readed') || '[]'); } catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem('sugar-readed') || '[]'); } catch (e) { return []; }
   }
 
   function trackRead() {
@@ -60,7 +60,7 @@
     var list = readedList();
     if (list.indexOf(path) === -1) {
       list.push(path);
-      try { localStorage.setItem('liublog-readed', JSON.stringify(list.slice(-500))); } catch (e) {}
+      try { localStorage.setItem('sugar-readed', JSON.stringify(list.slice(-500))); } catch (e) {}
     }
   }
 

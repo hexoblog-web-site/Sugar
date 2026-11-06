@@ -4,7 +4,7 @@
  * 只放「多个页面都要用」的东西：滚动工具、复制链接、toast、问候语、明暗切换、
  * 文章页封面取色、建站时间解析。板块自己的逻辑都不在这里。
  *
- * 加载方式：scripts/liublog-perf.js 按 main.js → partial/*.js → aside/*.js
+ * 加载方式：scripts/sugar-perf.js 按 main.js → partial/*.js → aside/*.js
  * 拼成 /js/bundle.js，浏览器一个请求拿完。顺序不能反：本文件先建好 window.heo。
  *
  * 板块地图（一个板块 = 同名 ejs / css / js 三件套，改哪块只看这三行）：
@@ -248,8 +248,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     /* /search/ 落地页跳回首页时带了标记，这里自动把搜索弹层打开 */
     try {
-      if (sessionStorage.getItem('liublog-open-search') === '1') {
-        sessionStorage.removeItem('liublog-open-search');
+      if (sessionStorage.getItem('sugar-open-search') === '1') {
+        sessionStorage.removeItem('sugar-open-search');
         setTimeout(function () { heo.openSearch(); }, 260);
       }
     } catch (e) {}

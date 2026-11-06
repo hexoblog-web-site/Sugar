@@ -268,7 +268,7 @@ body:not(.homePage) #page-header.not-top-img:not(.post-bg) #nav .menus_item:hove
    "后者胜"的方向反转，文章页头被染成 --heo-background 的浅蓝色。
    这里按原顺序再声明一次，把文章页头还原成透明。
    首页（只有 not-top-img）仍是 transparent，结果不变；
-   归档/分类/标签页的白色底由 liublog-fix.css 里特异性更高的
+   归档/分类/标签页的白色底由 sugar-fix.css 里特异性更高的
    body:not(.homePage) ...:not(.post-bg) 规则接管，不受这条影响。 */
 #page-header.not-top-img{background:0 center}
 

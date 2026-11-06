@@ -62,7 +62,7 @@
 <link rel="alternate" href="<%- url_for('/atom.xml') %>" title="<%= config.title %>" type="application/atom+xml">
 
 <%#
-  样式只有一个请求：scripts/liublog-perf.js 读 source/css/style.css 的 @import 清单，
+  样式只有一个请求：scripts/sugar-perf.js 读 source/css/style.css 的 @import 清单，
   按那里的顺序拼成 /css/bundle.css。想知道「有哪些样式、什么顺序」只看那个文件，
   这里不要列文件清单（列了就会和 style.css 对不上）。
   版本号取拼接结果的 md5：样式没改动时 URL 不变，访客继续用本地缓存。

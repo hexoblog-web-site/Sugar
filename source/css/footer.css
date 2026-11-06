@@ -6,7 +6,7 @@
  *   source/css/heoblogmain.css          75 条
  *   source/css/home.css                 11 条
  *   source/css/heoblogmw768.css         11 条
- *   source/css/liublog-fix.css          19 条
+ *   source/css/sugar-fix.css          19 条
  *
  * 改这个板块的样式请只改本文件；对应模板 layout/_partial/footer.ejs。
  */
@@ -531,7 +531,7 @@ img.beian-icon {
   }
 }
 
-/* ===== 来自 source/css/liublog-fix.css ===== */
+/* ===== 来自 source/css/sugar-fix.css ===== */
 /* 页脚 logo 用站点图标 */
 #heo-footer-bar .footer-logo-img {
   width: 34px;

@@ -1,4 +1,4 @@
-# hexo-theme-liublog
+# hexo-theme-sugar
 
 一个 Hexo 博客主题。视觉与结构对标 [blog.zhheo.com](https://blog.zhheo.com/) 与 [blog.anheyu.com](https://blog.anheyu.com/)，
 从安知鱼主题的样式体系改造而来，改用 EJS 模板重写。
@@ -23,14 +23,14 @@ source/css/        样式，按页面拆分；style.css 里 @import 汇总
 source/js/         脚本，partial/ 下按页面拆
 source/images/     主题图片
 scripts/           Hexo 脚本
-  liublog-config.js  模板 helper（导航、侧栏、作者信息）
-  liublog-perf.js    把 css/js 打包成 bundle.css / bundle.js
+  sugar-config.js  模板 helper（导航、侧栏、作者信息）
+  sugar-perf.js    把 css/js 打包成 bundle.css / bundle.js
 _config.yml        主题配置（含 friends_lite 朋友圈段、essay.page 即刻短文段）
 ```
 
 ## 使用
 
-把本目录放到站点 `themes/liublog`，站点 `_config.yml` 里写 `theme: liublog`，然后：
+把本目录放到站点 `themes/Sugar`，站点 `_config.yml` 里写 `theme: Sugar`，然后：
 
 ```bash
 npx hexo server

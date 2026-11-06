@@ -6,7 +6,7 @@
  *   source/css/heoblogmain.css          10 条
  *   source/css/home.css                 59 条
  *   source/css/heoblogmw768.css         22 条
- *   source/css/liublog-fix.css           1 条
+ *   source/css/sugar-fix.css           1 条
  *
  * 改这个板块的样式请只改本文件；对应模板 layout/_partial/home/category-bar.ejs。
  */
@@ -567,7 +567,7 @@
   }
 }
 
-/* ===== 来自 source/css/liublog-fix.css ===== */
+/* ===== 来自 source/css/sugar-fix.css ===== */
 /* 首页/列表页：关闭文章区 translateY(20px) 入场动画
    原因：slide-in 的 from 是 translateY(20px)+opacity:0，配合 backwards 延迟，
    加载时整块会先下沉 20px 再滑上来，视觉上像"内容自己向下跳一下" */

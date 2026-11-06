@@ -17,7 +17,7 @@
   而是从「不在首页第一页、也没被左边幻灯片用掉」的文章里按时间倒序取，
   同一封面只上一次（new_frame.cover_dedupe，默认开）；
   配了 new_frame.items 就按 items 来。
-  规则写在 scripts/liublog-home-pick.js（两块的选文都归它管，免得各算一套）。
+  规则写在 scripts/sugar-home-pick.js（两块的选文都归它管，免得各算一套）。
 
   模板 home/home-top.ejs · 样式 css/home-top.css · 脚本 js/partial/home-top.js
   配置 theme.home.home_top.new_frame
@@ -35,7 +35,7 @@
   /* ---------- 挑文章：有封面的优先，没封面的补位 ----------
      不再取「首页第一页」—— 那样和下面的列表是同一批，滚下去等于什么都没翻新。
      交给 lb_home_pick：池子 = 全部文章 － 首页第一页 － 幻灯片已用掉的，
-     所以右上框和下面列表、左边幻灯片都不重样。见 scripts/liublog-home-pick.js */
+     所以右上框和下面列表、左边幻灯片都不重样。见 scripts/sugar-home-pick.js */
   var picks = lb_home_pick('frame', nfCount) || [];
 
   var nfName = nf.name || '新品框架';

@@ -6,7 +6,7 @@
  *   source/css/heoblogmain.css          74 条
  *   source/css/home.css                107 条
  *   source/css/heoblogmw768.css         33 条
- *   source/css/liublog-fix.css          10 条
+ *   source/css/sugar-fix.css          10 条
  *
  * 改这个板块的样式请只改本文件；对应模板 layout/_partial/home/post-card.ejs。
  */
@@ -1139,7 +1139,7 @@ span.recent-post-top-text {
   }
 }
 
-/* ===== 来自 source/css/liublog-fix.css ===== */
+/* ===== 来自 source/css/sugar-fix.css ===== */
 /* 文章页：标签块 / 版权卡 / 底部工具 / 相关推荐 / toast */
 .post-tags-block {
   margin: 18px 0;

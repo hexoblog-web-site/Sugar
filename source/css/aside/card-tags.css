@@ -34,7 +34,7 @@
 .console-card.tags .card-tag-cloud a:hover{background:var(--heo-lighttext);color:var(--heo-card-bg)!important;box-shadow:var(--heo-shadow-main)}
 }
 
-/* ---------- 以下从 liublog-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
+/* ---------- 以下从 sugar-fix.css 迁入（覆盖层，写在基础样式之后即可生效） ---------- */
 /* 侧栏标签云：# 与标签名之间补一点间距（inline-flex 下空格会被折叠） */
 #aside-content .card-home-tags .card-tag-cloud a .tags-punctuation{margin-right:2px;line-height:1}
 #aside-content .card-home-tags .card-tag-cloud a{line-height:1.6;white-space:nowrap}

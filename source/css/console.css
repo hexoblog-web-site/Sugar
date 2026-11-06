@@ -664,7 +664,7 @@ body.console-open { overflow: hidden; }
 }
 
 /* ===== 4. 覆盖层 ===== */
-/* ===== 来自 source/css/liublog-fix.css ===== */
+/* ===== 来自 source/css/sugar-fix.css ===== */
 /* 中控台回到最初的纯玻璃态 */
 html.no-banner-tint #console {
   background-color: transparent;
