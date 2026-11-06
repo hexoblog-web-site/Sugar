@@ -1,6 +1,6 @@
 # hexo-theme-sugar
 
-一个 Hexo 博客主题。视觉与结构对标 [blog.zhheo.com](https://blog.zhheo.com/) 与 [blog.anheyu.com](https://blog.anheyu.com/)，
+一个 Hexo 博客主题。视觉与结构对标 [blog.anheyu.com](https://blog.anheyu.com/)，
 从安知鱼主题的样式体系改造而来，改用 EJS 模板重写。
 
 ## 目录结构
