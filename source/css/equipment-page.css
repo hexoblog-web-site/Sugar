@@ -1,0 +1,324 @@
+/* ==========================================================================
+   装备页 —— 1:1 复刻 blog.anheyu.com/equipment
+   --------------------------------------------------------------------------
+   结构：.equipment-page > .eq-banner 横幅 → .eq-group 分组（标题 + 网格卡片）→ 评论
+
+   所有数值都是目标站在 1440 视口下的实测值，改之前请先在参考页量一遍：
+     容器   max-width 1400 · 左右 24（<640 → 16）· 上下 32
+     横幅   300 高 · radius 12 · cover · 内边距 32 · 遮罩 rgba(0,0,0,.4)
+     tips   12px / 白 80% / 字重 500 / 距标题 8
+     标题   36px / 行高 43.2 / 700 / 距说明 16
+     说明   14px / 行高 21 / 白 90%
+     组头   h2 24px/32 · 700 · 副标题 14px 距 6px · 整块下边距 20 · 组间 40
+     网格   4 列 × 320 · gap 24 · 断点 1024/768/640
+     卡片   最小高 400 · radius 12 · 1px #E3E8F7 · 0 8px 16px -4px #2C2D300C
+     图片区 200 高 · #F1F3F8 · 1px 下边框 · 图 260×160 contain
+     名称   18px/18 · 700 · 距下 8；型号 12px/16 · 距下 6；点评 14px/20 高 60
+     操作条 贴底 12 · 左右 16 · 按钮 6×12 / radius 8 / 12px
+
+   卡片配色（白底、描边、阴影、正文色）与目标站完全一致，正好就是主题变量，
+   所以直接吃 --heo-card-bg / --heo-card-border / --heo-shadow-border /
+   --heo-fontcolor / --heo-secondtext，暗色自动跟随。
+   ========================================================================== */
+
+/* ---------- 页面容器 ---------- */
+/* 装备页是整宽页（目标站没有侧栏），主列撑满，内边距交给 .equipment-page 自己管 */
+body.equipment #content-inner.layout {
+  padding: 0;
+  width: 100%;
+}
+
+#content-inner > .equipment-page {
+  /* 主题给 .layout > div:first-child 设了 display:flex + gap:10px，
+     这里必须显式 block：否则横幅和分组的 margin 之外还会各多出 10px 的 gap，
+     实测节奏会从 32/40 变成 42/50 */
+  display: block;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: none;
+}
+
+@media screen and (max-width: 639px) {
+  #content-inner > .equipment-page {
+    padding: 32px 16px;
+  }
+}
+
+/* ---------- 横幅 ---------- */
+.eq-banner {
+  position: relative;
+  height: 300px;
+  border-radius: 12px;
+  overflow: hidden;
+  /* 没配背景图时用主色渐变兜底，与朋友圈/即刻页一致 */
+  background: linear-gradient(-45deg, var(--heo-theme), #0f4667 120%, #67044d);
+}
+
+.eq-banner-inner {
+  position: relative;
+  height: 100%;
+  background-position: left 37%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* 压一层黑罩，否则白字在亮图上看不清 —— 目标站是 rgba(0,0,0,.4) */
+.eq-banner-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .4);
+  pointer-events: none;
+}
+
+/* 文案层用 inset 撑出 32 的内边距，而不是给 .eq-banner-inner 加 padding：
+   background-origin 默认是 padding-box，一旦内层有 padding，cover 就会按
+   缩小后的区域缩放，图会莫名放大一圈（横幅看起来像换了个特写）。 */
+.eq-banner-content {
+  position: absolute;
+  inset: 32px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.eq-banner-tips {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: normal;
+  color: #fff;
+  opacity: .8;
+  margin-bottom: 8px;
+}
+
+.eq-banner-title {
+  display: block;
+  margin: 0 0 16px;
+  font-size: 36px;
+  line-height: 43.2px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.eq-banner-desc {
+  font-size: 14px;
+  line-height: 21px;
+  color: #fff;
+  opacity: .9;
+}
+
+/* ---------- 分组 ---------- */
+/* 组与组之间 40；横幅与第一组之间是 32（目标站实测，两者不一样） */
+.eq-group {
+  margin-top: 40px;
+}
+
+.eq-banner + .eq-group {
+  margin-top: 32px;
+}
+
+.eq-group-head {
+  margin-bottom: 20px;
+}
+
+.eq-group-title {
+  margin: 0;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+}
+
+.eq-group-desc {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--heo-secondtext);
+}
+
+/* ---------- 网格：4 / 3 / 2 / 1 列 ---------- */
+.eq-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media screen and (min-width: 640px) {
+  .eq-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .eq-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .eq-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- 卡片 ---------- */
+.eq-card {
+  position: relative;
+  display: block;
+  min-height: 400px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--heo-card-border);
+  background: var(--heo-card-bg);
+  box-shadow: var(--heo-shadow-border);
+}
+
+.eq-card-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: #f1f3f8;
+  border-bottom: 1px solid var(--heo-card-border);
+}
+
+html[data-theme='dark'] .eq-card-media {
+  background: #21232a;
+}
+
+.eq-card-media img {
+  width: 260px;
+  height: 160px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.eq-card-body {
+  margin-top: 12px;
+  padding: 0 16px 64px;
+}
+
+.eq-card-name {
+  margin-bottom: 8px;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 18px;
+  line-height: 18px;
+  font-weight: 700;
+  color: var(--heo-fontcolor);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.eq-card-name:hover {
+  color: var(--heo-theme);
+}
+
+.eq-card-spec {
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--heo-secondtext);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 点评固定 3 行高（14×20×3 = 60），超了裁掉。
+   不依赖 -webkit-line-clamp：主题会把 display:-webkit-box 规范成 flow-root，它就不生效了 */
+.eq-card-desc {
+  height: 60px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--heo-secondtext);
+  overflow: hidden;
+}
+
+/* ---------- 底部操作条 ---------- */
+.eq-card-actions {
+  position: absolute;
+  left: 0;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.eq-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  line-height: 16px;
+  border-radius: 8px;
+  border: 0;
+  background: rgba(153, 153, 153, .17);
+  color: var(--heo-fontcolor);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .3s, color .3s;
+}
+
+.eq-btn:hover {
+  background: var(--heo-theme);
+  color: #fff;
+}
+
+/* 图标按钮比「详情」略窄（目标站是 px-3 py-1.5 + 14px 图标） */
+.eq-btn-icon {
+  padding: 6px 12px;
+  line-height: 0;
+}
+
+.eq-btn.is-disabled {
+  opacity: .6;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* 没有评论区时的轻提示：按钮闪一下，告诉点到了但没地方引用 */
+.eq-btn-icon.is-flash {
+  animation: eq-flash .6s ease;
+}
+
+@keyframes eq-flash {
+  0%, 100% { background: rgba(153, 153, 153, .17); }
+  50% { background: var(--heo-theme); color: #fff; }
+}
+
+/* ---------- 空状态 ---------- */
+.eq-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--heo-secondtext);
+  background: var(--heo-card-bg);
+  border: 1px solid var(--heo-card-border);
+  border-radius: 12px;
+}
+
+.eq-empty-tip {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+/* ---------- 评论分隔线 ---------- */
+.eq-comment-hr {
+  display: block;
+  height: 1px;
+  margin: 24px 0;
+  border: 0;
+  background: var(--heo-card-border);
+}

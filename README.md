@@ -50,6 +50,19 @@ npx hexo server
 
 ### 2026-11-06
 
+- **新增装备页 `/equipment/`**：1:1 复刻 `blog.anheyu.com/equipment`，内容取自该页并落到
+  `source/_data/equipment.yml`（1 个板块 / 2 个分组 / 8 件装备），配图本地化到
+  `source/uploads/equipment/`。实测值全部照抄：容器 `max-width 1400` + 上下 32 / 左右 24，
+  横幅 300 高 · 12 圆角 · `left 37%` cover · 32 内边距 · `rgba(0,0,0,.4)` 遮罩，
+  分组标题 24/32·700、副标题 14、组间距 40（横幅到首组 32），
+  网格 4/3/2/1 列 + 24 间距，卡片最小高 400 · 图片区 200 · `#F1F3F8` 底 · 图 260×160 contain。
+  两个坑：① 主列 `.layout > div:first-child` 带 `display:flex; gap:10px`，
+  不显式 `display:block` 会让 32/40 的间距变成 42/50；② 横幅内边距不能加在背景层上，
+  `background-origin` 默认 padding-box，加了会让 cover 按缩小后的区域缩放、图无故放大一圈，
+  所以文案层改用 `inset:32px` 定位
+- 装备页卡片右下角的图标按钮在原站是「把这条点评引用到评论框」，本站评论未启用，
+  改为滚动到评论区（无评论区时按钮闪一下作反馈）；卡片配色直接吃主题变量，暗色自动跟随
+
 - **即刻页改静态分页**：`/essay/` 不再一次性渲染 40 条再靠「加载更多」放出来，改成构建期切页，
   每页 `page_size`（默认 8）条，第 2 页起是真实地址 `/essay/page/2/ …`，共 5 页。
   第 1 页仍由 `source/essay/index.md` 出，其余由新增的 `scripts/sugar-essay-pager.js` 生成；

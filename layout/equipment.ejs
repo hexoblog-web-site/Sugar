@@ -1,0 +1,148 @@
+<%
+  /* 装备页（/equipment/）—— 1:1 对标 blog.anheyu.com/equipment
+   *
+   * 三件套：
+   *   模板  layout/equipment.ejs          （本文件）
+   *   样式  source/css/equipment-page.css
+   *   脚本  无（页面静态，图标按钮的引用行为见文末说明）
+   *
+   * 数据源：source/_data/equipment.yml
+   *   一条 = 一个板块（横幅 + 若干分组），本站只用了一条。
+   *
+   * 目标站的实测值（1440 视口）全部照抄，别凭感觉调：
+   *   容器     max-width 1400，左右 padding 24（<640 时 16），上下 32
+   *   横幅     高 300 / 圆角 12 / 背景 cover / 内边距 32 / 压一层 rgba(0,0,0,.4)
+   *            tips 12px·80%·500，标题 36px/43.2·700，说明 14px/21·90%
+   *   分组头   h2 24px/32·700，副标题 14px·距标题 6px，整块下边距 20
+   *   网格     4 列 320 / gap 24；≥768 三列、≥640 两列、其余单列
+   *   卡片     最小高 400 / 圆角 12 / 1px #E3E8F7 / 0 8px 16px -4px #2C2D300C
+   *            图片区 200 高 · 底色 #F1F3F8 · 1px 下边框，图 260×160 contain
+   *            名称 18px/18·700，型号 12px/16，点评 14px/20 截 3 行
+   *            底部操作条贴底 12、左右 16，按钮 6×12 / 圆角 8 / 12px
+   */
+  var eqList = (site.data && site.data.equipment) || [];
+%>
+<div class="equipment-page">
+
+  <% if (!eqList.length) { %>
+  <div class="eq-empty">
+    <p>还没有装备清单。</p>
+    <p class="eq-empty-tip">在 <code>source/_data/equipment.yml</code> 里按格式加一条就会出现在这里。</p>
+  </div>
+  <% } %>
+
+  <% eqList.forEach(function (cls) {
+       var banner = cls.top_background || '';
+       var groups = cls.good_things || [];
+  %>
+
+  <%# ---------- 横幅 ---------- %>
+  <% if (banner || cls.class_name) { %>
+  <div class="eq-banner">
+    <div class="eq-banner-inner"<% if (banner) { %> style="background-image:url('<%- url_for(banner) %>')"<% } %>>
+      <div class="eq-banner-content">
+        <div class="eq-banner-head">
+          <% if (cls.tip) { %><div class="eq-banner-tips"><%= cls.tip %></div><% } %>
+          <%# 目标站这里是 span，视觉一样；用 h1 是为了让整页有个正经主标题 %>
+          <h1 class="eq-banner-title"><%= cls.class_name || '' %></h1>
+        </div>
+        <% if (cls.description) { %>
+        <div class="eq-banner-bottom">
+          <div class="eq-banner-desc"><%= cls.description %></div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <%# ---------- 分组 ---------- %>
+  <% groups.forEach(function (g) { %>
+  <section class="eq-group">
+    <div class="eq-group-head">
+      <h2 class="eq-group-title"><%= g.title %></h2>
+      <% if (g.description) { %><p class="eq-group-desc"><%= g.description %></p><% } %>
+    </div>
+
+    <div class="eq-grid">
+      <% (g.equipment_list || []).forEach(function (it) {
+           var name = it.name || '';
+           var img = it.image || '';
+           var link = it.link || '';
+      %>
+      <article class="eq-card">
+        <div class="eq-card-media">
+          <% if (img) { %>
+          <img src="<%- url_for(img) %>" alt="<%= name %>" loading="lazy" width="260" height="160">
+          <% } %>
+        </div>
+
+        <div class="eq-card-body">
+          <div class="eq-card-name" title="<%= name %>"><%= name %></div>
+          <% if (it.specification) { %>
+          <div class="eq-card-spec"><%= it.specification %></div>
+          <% } %>
+          <% if (it.description) { %>
+          <div class="eq-card-desc"><%= it.description %></div>
+          <% } %>
+        </div>
+
+        <div class="eq-card-actions">
+          <% if (link) { %>
+          <a class="eq-btn" href="<%- url_for(link) %>" target="_blank" rel="external nofollow noreferrer">详情</a>
+          <% } else { %>
+          <span class="eq-btn is-disabled">详情</span>
+          <% } %>
+          <%#
+            目标站这个按钮是「把这个装备的点评引用到评论区」：点击后页面滚到评论框，
+            并在上方插入一条「正在引用 + 这句话」的引文。
+            本站评论系统未开启时不渲染评论区，所以点击只做滚动，不产生引用块。
+          %>
+          <button class="eq-btn eq-btn-icon" type="button" aria-label="引用到评论"
+                  data-eq-quote="<%= name %>">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M10 3H14C18.4183 3 22 6.58172 22 11C22 15.4183 18.4183 19 14 19V22.5C9 20.5 2 17.5 2 11C2 6.58172 5.58172 3 10 3Z"/>
+            </svg>
+          </button>
+        </div>
+      </article>
+      <% }); %>
+    </div>
+  </section>
+  <% }); %>
+
+  <% }); %>
+
+  <%# ---------- 评论（与文章页同一套 twikoo） ---------- %>
+  <% if (theme.comments && theme.comments.enable) { %>
+  <hr class="eq-comment-hr">
+  <div id="post-comment">
+    <div class="comment-head">
+      <div class="comment-headline"><i class="heoblogIcon icon-chat-1-fill"></i><span> 评论</span></div>
+    </div>
+    <div class="comment-wrap">
+      <% if (theme.comments.use === 'twikoo' && theme.comments.twikoo.envId) { %>
+      <div id="twikoo-container"></div>
+      <% } else { %>
+      <div class="comments-placeholder">请在主题 <code>_config.yml</code> 中填写评论系统的 <code>envId</code>。</div>
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+
+</div>
+
+<script>
+  /* 引用按钮：滚到评论框。评论区没渲染时给个轻提示，别让人以为按钮坏了 */
+  document.querySelectorAll('.eq-btn-icon').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = document.getElementById('twikoo-container') || document.getElementById('post-comment');
+      if (box) {
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        btn.classList.add('is-flash');
+        setTimeout(function () { btn.classList.remove('is-flash'); }, 600);
+      }
+    });
+  });
+</script>
