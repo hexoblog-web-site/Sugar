@@ -108,6 +108,11 @@
 
       <% if (imgs.length) { %>
       <%
+        /* 鼠标滑过图片时在图片下方浮出的文字：取这条说说的正文，去掉标签压成一行。
+           两行的容量约 55 字，超了截断加省略号（目前最长 40 字，远没到） */
+        var capText = String(it.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        if (capText.length > 56) capText = capText.slice(0, 56) + '…';
+
         /* 两图一屏：一屏放 2 张，多出来的收进下一页，用左右按钮翻。
            4 张 = 2 屏；3 张 = 2 屏（末屏 1 张，留在左格，与首页第一张对齐）；
            2 张 = 1 屏，不出按钮；1 张 = 单图撑满整行。 */
@@ -125,6 +130,7 @@
               <% imgs.slice(sc * perScreen, sc * perScreen + perScreen).forEach(function (src) { %>
               <a class="essay-img" href="<%- url_for(src) %>" target="_blank" rel="noopener">
                 <img src="<%- url_for(src) %>" alt="" loading="lazy">
+                <% if (capText) { %><span class="essay-img-cap"><%= capText %></span><% } %>
               </a>
               <% }); %>
             </div>
