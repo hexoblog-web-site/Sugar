@@ -249,9 +249,28 @@
   animation: nf-hello-draw 2.4s cubic-bezier(.302, .14, .665, 1) both;
 }
 
+/* 文字版（new_frame.hello 写了一段字）：没有笔画可以描，就换成「从左往右
+   擦出来」—— clip-path 的右边界从 100% 收到 0，字一个个被笔尖带出来。
+   渐变本来就铺在整行上，擦的过程里字母依次露出青、黄、橙、粉、蓝，
+   天然就有「一笔写下来、边写边换色」的味道，不用再叠别动效。
+   时长比手写短一点：五个字母的笔画量本来就少于 hello 那五个字母的连笔。 */
+@keyframes nf-hello-write {
+  from { clip-path: inset(-15% 100% -15% -2%); }
+  to   { clip-path: inset(-15% -2% -15% -2%); }
+}
+
+#new_frame_card .new-frame-hello-text.is-writing {
+  /* 曲线要「起笔就动」：用 (.32,.06,.12,1) 的话头 250ms 只推进 3%，
+     看着像没反应；这一档前三分之一就能走掉一半，收尾再慢慢蹭到边上。 */
+  animation: nf-hello-write 1.6s cubic-bezier(.2, .75, .25, 1) both;
+}
+
 /* 不想看动效的，直接停在完整那一帧 */
 @media (prefers-reduced-motion: reduce) {
   #new_frame_card .new-frame-hello.is-writing .new-frame-hello-line {
+    animation: none;
+  }
+  #new_frame_card .new-frame-hello-text.is-writing {
     animation: none;
   }
 }

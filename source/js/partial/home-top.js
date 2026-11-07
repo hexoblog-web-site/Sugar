@@ -82,7 +82,10 @@
     if (hello) {
       /* 播完摘掉类：动画停在 dashoffset 0，和基态一致，摘掉不会跳一下 */
       hello.addEventListener('animationend', function (e) {
-        if (e.animationName === 'nf-hello-draw') hello.classList.remove('is-writing');
+        /* 文字版（new_frame.hello 写了字）走的是擦出动画，名字不同 */
+        if (e.animationName === 'nf-hello-draw' || e.animationName === 'nf-hello-write') {
+          hello.classList.remove('is-writing');
+        }
       });
 
       /* 第一次滚到这块的时候写一遍 */
