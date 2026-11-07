@@ -348,11 +348,14 @@ home:
       name: 新品框架                        # 封面左下角那行小字（安知鱼原版就是这个）
       title: Theme-AnZhiYu                  # 封面左下角的大标题，留空就只显示小字
       button: 更多推荐                      # 封面右下角按钮文案
-      link: /archives/                      # 按钮点去哪（外链会新窗口打开）；留空则退化成「展开」按钮
-      count: 6                              # 封面下面放几篇（6 = 3×2 刚好铺满，多了会被裁掉）
+      link: /archives/                      # 按钮点去哪（外链会新窗口打开）；
+                                            # 留空则不跳转，按钮变成「展开 / 收起」，点一下手动掀开封面
+      count: 6                              # 封面下面放几篇：最多 6（3 列 × 2 行），写大了也只取 6；
+                                            # 写小了第二行会空着，所以一般不用改
       cover_dedupe: true                    # 同一张封面只上一次（本站 manim.jpg 一张图被 69 篇复用）
       # 手动模式：想指定哪几篇就写几条，title / cover 不写就自动用文章自己的；
-      # target 不写就按链接判断（站内当前窗口，站外新窗口）
+      # target 不写就按链接判断（站内当前窗口，站外新窗口）。
+      # 条数多于 count 只显示前 count 条；链接写错、又没手写 title 的条目会被跳过
       items: []
       # items:
       #   - link: /articles/xxxx.html
@@ -379,9 +382,10 @@ home:
       # 旧写法仍然兼容（会被自动认成上面三种之一，不用特意迁移）：
       #   hello: true / hello: false / hello: 一段文字，以及顶层的 hello_lottie: 路径
       hello:
-        mode: lottie
+        # ★ 想换成自己的字，第一步是把下面这行改成 text（改成 text 才会去读下面的 text:）
+        mode: lottie                        # lottie = 手写 hello；text = 自己的字；off = 不显示
         replay: true                        # 遮罩盖回来、或重新滚回这块时，是否重播一遍
-        fallback: hello                     # 播放器没加载下来时兜底显示的静态字
+        fallback: hello                     # 只在 mode: lottie 时生效：播放器没加载下来（断网 / 路径写错）就静态显示这个字
 
         # ---- mode: lottie ----
         lottie:
@@ -398,7 +402,7 @@ home:
           lazy: true                        # 这块隐藏时（≤1200px）连播放器都不下载
 
         # ---- mode: text ----
-        text: Sugar                         # 要显示的字；mode 不是 text 时忽略
+        text: Sugar                         # 要显示的字；上面 mode 改成 text 才会用这一行，否则忽略
         text_style:
           # 留空或删掉某项 = 用主题默认值（现在这版就是默认值）
           font_size: "clamp(2rem, 4vw, 3.6rem)"     # 字太大就往小调，也可以直接写 64px

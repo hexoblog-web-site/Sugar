@@ -181,15 +181,31 @@
   align-items: center;
   justify-content: center;
   /* 底色照原站那张卡：左边浅绿，右边浅粉。
-     配了 new_frame.mask.cover_bg 就整段换成配置里的背景（CSS 变量），
-     没配时用逗号后面这串默认值。 */
-  background: var(--nf-cover-bg, linear-gradient(90deg, #e0f5f0, #fff5f7));
+     原站这层渐变是 alpha 0.85，底下还垫一层纯色（浅色时白、暗色时 #1d1e22）：
+     所以浅色下看着就是实色，切到暗色卡片自己会变灰，不会亮得扎眼。
+     衬底色用 background-color、渐变用 background-image，两者叠在同一元素上，
+     半透明那层自然透出下面这层。
+     配了 new_frame.mask.cover_bg 就整段换成配置里的背景（CSS 变量）。 */
+  background-color: var(--nf-cover-under, #fff);
+  background-image: var(--nf-cover-bg, linear-gradient(90deg,
+    rgba(224, 245, 240, .85) 0%, rgba(226, 245, 242, .85) 5%, rgba(228, 245, 244, .85) 10%,
+    rgba(230, 245, 246, .85) 15%, rgba(232, 245, 248, .85) 20%, rgba(234, 245, 250, .85) 25%,
+    rgba(236, 245, 252, .85) 30%, rgba(238, 245, 254, .85) 35%, rgba(240, 245, 255, .85) 40%,
+    rgba(242, 245, 255, .85) 45%, rgba(244, 245, 255, .85) 50%, rgba(246, 245, 255, .85) 55%,
+    rgba(248, 245, 255, .85) 60%, rgba(250, 245, 255, .85) 65%, rgba(252, 245, 255, .85) 70%,
+    rgba(254, 245, 255, .85) 75%, rgba(255, 245, 255, .85) 80%, rgba(255, 245, 253, .85) 85%,
+    rgba(255, 245, 251, .85) 90%, rgba(255, 245, 249, .85) 95%, rgba(255, 245, 247, .85) 100%));
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
   cursor: pointer;
   /* 两个时长都来自配置 new_frame.mask（由模板写成 --nf-mask-out / --nf-mask-in）：
      这里管「盖回来」，掀开那一侧在下面的 :hover 规则里；逗号后面是没配时的默认值。 */
   transition: opacity var(--nf-mask-in, 1.6s) cubic-bezier(.25, .1, .25, 1);
+}
+/* 暗色下把上面那层衬底换深色（原站 todayCard 就是这个色），
+   0.85 的浅绿→浅粉渐变叠上去正好变成中性浅灰，和原站暗色的观感一致。 */
+html[data-theme=dark] #new_frame_card {
+  --nf-cover-under: #1d1e22;
 }
 
 /* 遮罩上的 hello：内联 SVG，viewBox 已经收在字的外框上，
