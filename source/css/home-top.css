@@ -98,13 +98,10 @@
   background: var(--heo-card-bg);
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
-  /* 遮罩还盖着的时候，这六张卡往下沉 8px、缩一丁点。
-     掀开时它们才落位 —— 否则遮罩一没，六张卡就「啪」地全亮。
-     只动位置、不动透明度：卡片本来就被遮罩盖着，再压暗只会在淡出的
-     那一瞬间跟半透明的字糊成一片灰。 */
-  transform: translateY(8px) scale(.985);
+  /* 六张卡的位置固定不动：遮罩是慢慢化开（5s），卡片若同时做位移，
+     掀开的四秒多里会一直看到「六篇文章缓缓往上爬」，注意力全被这个
+     动作抢走。掀开时只让遮罩退场，卡片原地等着露出来更干净。 */
   transition:
-    transform 1.4s cubic-bezier(.4, 0, .2, 1),
     border-color .3s,
     box-shadow .3s;
 }
@@ -282,37 +279,9 @@
   opacity: 0;
 }
 
-/* 六张卡跟着遮罩一起落位，比遮罩晚 .3s 起步、用 4.6s 走完：
-   先看到遮罩化开，再看到内容缓缓归位，两个动作错开就不会糊成一团。
-   delay 只写在「露出来」这一侧 —— 鼠标移开时立刻退回，不拖泥带水。 */
-@media (hover: hover) {
-  #new_frame_group:hover:not(.hold) .new-frame-item {
-    transform: translateY(0) scale(1);
-    /* 三个值对应上面的 transform / border-color / box-shadow：
-       只把位移拉长到 4.6s，再晚 .3s 起步，整段刚好收在 5s 上 */
-    transition-duration: 4.6s, .3s, .3s;
-    transition-delay: .3s, 0s, 0s;
-  }
-}
-
-#new_frame_group.is-open .new-frame-item,
-.new-frame-grid:focus-within .new-frame-item {
-  transform: translateY(0) scale(1);
-  transition-duration: 4.6s, .3s, .3s;
-  transition-delay: .3s, 0s, 0s;
-}
-
-/* 不想看动效的：省掉位移和延迟，别在原地慢慢蹭 */
-@media (prefers-reduced-motion: reduce) {
-  .new-frame-item {
-    transform: none;
-  }
-  #new_frame_group:hover:not(.hold) .new-frame-item,
-  #new_frame_group.is-open .new-frame-item,
-  .new-frame-grid:focus-within .new-frame-item {
-    transition-delay: 0s;
-  }
-}
+/* 六张卡不再参与「落位」：掀开只让遮罩淡出，卡片保持原位。
+   （曾经是 translateY(8px) 沉下去、悬停后 4.6s 缓缓归位，掀开的
+   那几秒里整块内容都在往上爬，比遮罩本身还抢眼，所以去掉了。） */
 
 /* 左下角文字块。右边留出按钮的位置，标题到边就省略，不去压按钮。 */
 #new_frame_card .new-frame-card-info {
