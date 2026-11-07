@@ -98,40 +98,25 @@
     <%# 遮罩：盖在 6 张卡上面。悬停 / 展开时淡出，让下面的卡露出来 %>
     <div id="new_frame_card" class="new-frame-card">
       <%# 遮罩中间那行字，三种写法（配置项 new_frame.hello）：
-           true / 不写  安知鱼原版的手写 hello —— 是把那张卡的 lottie 动画
-                        （/static/hello.lottie，1853 字节，一个形状图层：22 顶点
-                        单笔路径 + 17 色标渐变描边）拆成的内联 SVG，靠
-                        stroke-dashoffset 复刻书写动画，不引播放器。
-           一段文字     换成自己的字，用同一条彩虹渐变填充（手写笔迹只属于 hello
-                        这五个字母，换成中文就没法沿用那套路径）
+           true / 不写  安知鱼原版的手写 hello。用的是原站那张卡的同一个动画文件：
+                        从 /static/hello.lottie（1853 字节的 dotLottie 容器）里解出的
+                        a/Main Scene.json —— 4929 字节，500×500、100fps、0~300 帧
+                        （3 秒）、一个形状图层，内容是 22 顶点单笔路径 + 17 色标
+                        渐变描边。播放器用 lottie-web 的 light 构建（只带 SVG
+                        渲染器，45KB gzip），引擎和文件都跟原站一致。
+                        想换成自己的手写字：LottieFiles 上改稿导出 json，替换
+                        source/lib/hello.json；或者把 new_frame.hello_lottie
+                        指到别的文件，换字不用碰模板。
+           一段文字     换成自己的字，用同一条彩虹渐变填充 + 从左往右擦出
+                        （手写笔迹只属于 hello 这五个字母，中文没法沿用那套路径）
            false        不显示，遮罩上只留左下文字块和右下按钮 %>
       <% var nfHello = nf.hello === undefined ? true : nf.hello; %>
       <% if (nfHello === true) { %>
-      <svg class="new-frame-hello" viewBox="1 170 494 159" role="img" aria-label="hello" xmlns="http://www.w3.org/2000/svg" fill="none">
-        <defs>
-          <linearGradient id="nf_hello_grad" gradientUnits="userSpaceOnUse" x1="27.46" y1="278.52" x2="479.41" y2="241.63">
-            <stop offset="0.000" stop-color="#009196"/>
-            <stop offset="0.055" stop-color="#2f9dad"/>
-            <stop offset="0.110" stop-color="#5ea9c5"/>
-            <stop offset="0.171" stop-color="#8ecd82"/>
-            <stop offset="0.233" stop-color="#bdf13f"/>
-            <stop offset="0.299" stop-color="#dee328"/>
-            <stop offset="0.365" stop-color="#ffd510"/>
-            <stop offset="0.422" stop-color="#ffc51c"/>
-            <stop offset="0.480" stop-color="#ffb628"/>
-            <stop offset="0.543" stop-color="#ff8825"/>
-            <stop offset="0.605" stop-color="#ff5b22"/>
-            <stop offset="0.671" stop-color="#ff4481"/>
-            <stop offset="0.738" stop-color="#ff2ddf"/>
-            <stop offset="0.806" stop-color="#a473e9"/>
-            <stop offset="0.875" stop-color="#49b9f3"/>
-            <stop offset="0.938" stop-color="#39bdf7"/>
-            <stop offset="1.000" stop-color="#28c1fa"/>
-          </linearGradient>
-        </defs>
-        <%# pathLength=100 把路径长度归一化，dasharray/dashoffset 直接按百分比写，不用去量 %>
-        <path class="new-frame-hello-line" d="M9.58,320.02 C9.58,320.02 109.45,263.87 116.59,202.79 C120.66,167.94 88.55,172.64 83.76,208.07 C79.85,237.01 70.06,314.68 70.06,314.68 C70.06,314.68 79.48,246.60 109.88,249.60 C143.28,253.51 99.61,313.82 138.14,314.25 C172.40,314.63 207.50,284.71 208.79,265.01 C210.27,242.30 179.46,238.47 169.97,266.73 C161.24,292.71 180.76,321.96 214.38,314.71 C266.16,303.55 291.56,228.50 293.99,202.93 C296.56,175.95 276.87,173.39 264.88,197.36 C253.68,219.76 235.00,308.85 275.58,316.39 C323.97,325.39 361.65,236.76 366.36,206.78 C370.91,177.79 352.22,169.60 338.10,195.22 C322.89,222.81 300.55,320.58 354.37,315.96 C399.33,312.11 382.84,250.46 426.41,246.58 C445.97,244.84 454.06,263.30 452.63,281.93 C451.13,301.41 432.72,317.89 414.53,315.32 C397.91,312.98 389.42,290.22 393.76,275.29 C399.11,256.88 415.96,246.86 426.41,246.58 C441.29,246.17 448.78,255.59 462.05,255.38 C473.84,255.19 485.73,241.76 485.73,241.76" pathLength="100" stroke="url(#nf_hello_grad)" stroke-width="15.09" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="100 100" stroke-dashoffset="0"/>
-      </svg>
+      <% var nfLottie = nf.hello_lottie || '/lib/hello.json'; %>
+      <div class="new-frame-hello new-frame-hello-lottie" id="new_frame_hello"
+           role="img" aria-label="hello"
+           data-src="<%- url_for(nfLottie) %>?v=<%= lb_asset_ver(nfLottie) %>"
+           data-lib="<%- url_for('/lib/lottie_light.min.js') %>?v=<%= lb_asset_ver('/lib/lottie_light.min.js') %>"></div>
       <% } else if (nfHello) { %>
       <%# 自定义文字：跟手写版共用 .new-frame-hello 这个类，所以淡出/放大那套
            过渡不用重写；渐变是照 SVG 那 17 个色标挑出来的近似值 %>

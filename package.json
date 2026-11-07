@@ -13,6 +13,8 @@
     "lib 目录约定": "第三方库统一放 source/lib/，Hexo 会原样发布成 /lib/xxx.js，模板里用 <script src=\"<%- url_for('/lib/xxx.js') %>\"> 按需引入，不进 bundle；bundle 只装主题自己的脚本",
     "主题自带": {
       "source/lib/qrcode.min.js": "浏览器端二维码库 davidshimjs/qrcodejs（npm qrcodejs@1.0.0，19.9KB）。只在文章页由 scripts.ejs 引入，海报里的二维码由它现场生成",
+      "source/lib/lottie_light.min.js": "lottie-web 5.12.2 的 light 构建（164KB / gzip 45KB，只含 SVG 渲染器）。首页新品框架那行手写 hello 用它播放；由 home-top.js 在元素可见时动态注入，不进 bundle，≤1200px 整块隐藏时连加载都不发生",
+      "source/lib/hello.json": "手写 hello 的动画数据（4929 字节）。从参考站 /static/hello.lottie 这个 dotLottie 容器里解出的 a/Main Scene.json：500×500、100fps、0~300 帧（3s）、单形状图层（22 顶点路径 + 17 色标渐变描边）。换笔迹只需替换此文件",
       "scripts/sugar-config.js": "模板 helper（导航、侧栏、作者信息等渲染逻辑）",
       "scripts/sugar-perf.js": "把 source/css、source/js 合并成 bundle.css / bundle.js（主题自身资源管理，不含第三方库）",
       "source/css · source/js": "前端样式与脚本"

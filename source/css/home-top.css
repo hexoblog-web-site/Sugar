@@ -207,6 +207,49 @@
     opacity .55s ease-out;
 }
 
+/* lottie 版 hello（new_frame.hello: true，默认）：
+   照原站的摆法 —— 播放器容器绝对定位铺满整张卡（inset 1px，卡片自带 1px 边框），
+   画布 500×500 用 preserveAspectRatio="xMidYMid meet" 等比装进来，
+   所以字的实际大小由卡片高度决定（500 的 159/500 高、494/500 宽），水平居中。
+   原站卡片 672×340 时字宽约 334；这里卡片 600×340，同样约 334，字号一致。 */
+#new_frame_card .new-frame-hello-lottie {
+  position: absolute;
+  /* 原站是 inset:1px（那张卡没有边框）。这里的卡片自带 1px border，
+     inset 是从 padding box 算的，写 1px 会变成 2px 缩进，字跟着小一圈；
+     写 0 才是跟原站一样的 1px 边距，字迹尺寸一致（310×93）。 */
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  pointer-events: none;
+}
+
+#new_frame_card .new-frame-hello-lottie svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 库没加载下来时的兜底：跟文字版同一套彩虹渐变，静态停着 */
+#new_frame_card .new-frame-hello-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: .01em;
+  background-image: linear-gradient(90deg,
+    #009196 0%, #8ecd82 17%, #bdf13f 23%, #ffd510 34%,
+    #ffb628 48%, #ff5b22 60%, #ff4481 67%, #ff2ddf 74%,
+    #a473e9 81%, #49b9f3 94%, #28c1fa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
 /* 自定义文字版（new_frame.hello 里写了一段文字时才会出现）：
    跟手写版共用 .new-frame-hello，所以上面那条过渡、下面的放大规则都照用，
    这里只补文字自己的尺寸和上色。
@@ -232,23 +275,6 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* 书写动画：dashoffset 100 → 0。pathLength="100" 让这两个数字直接就是百分比，
-   不用去量路径真实长度。
-   默认没有动画 —— 页面一打开先给一个完整的 hello，不玩「先空白再写」。
-   .is-writing 由脚本挂上（进入视口时、遮罩重新盖回来时各写一遍）。 */
-@keyframes nf-hello-draw {
-  from { stroke-dashoffset: 100; }
-  to { stroke-dashoffset: 0; }
-}
-
-#new_frame_card .new-frame-hello-line {
-  stroke-dashoffset: 0;
-}
-
-#new_frame_card .new-frame-hello.is-writing .new-frame-hello-line {
-  animation: nf-hello-draw 2.4s cubic-bezier(.302, .14, .665, 1) both;
-}
-
 /* 文字版（new_frame.hello 写了一段字）：没有笔画可以描，就换成「从左往右
    擦出来」—— clip-path 的右边界从 100% 收到 0，字一个个被笔尖带出来。
    渐变本来就铺在整行上，擦的过程里字母依次露出青、黄、橙、粉、蓝，
@@ -267,9 +293,6 @@
 
 /* 不想看动效的，直接停在完整那一帧 */
 @media (prefers-reduced-motion: reduce) {
-  #new_frame_card .new-frame-hello.is-writing .new-frame-hello-line {
-    animation: none;
-  }
   #new_frame_card .new-frame-hello-text.is-writing {
     animation: none;
   }

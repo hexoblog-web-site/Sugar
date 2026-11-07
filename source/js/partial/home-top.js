@@ -64,12 +64,27 @@
     }
 
     /* ---------- 2. 遮罩上的 hello：进视口写一遍，盖回来再写一遍 ----------
-     * 动画本身是纯 CSS（@keyframes nf-hello-draw）。CSS 判断不了
-     * 「遮罩刚刚重新盖回来」这件事，所以由这里挂 .is-writing 触发。
-     * 平时没有这个类 —— 也就没有动画，字是完整显示的，不会空着。 */
-    var hello = card.querySelector('.new-frame-hello');
+     * 两种载体，触发时机完全一样，只是「写」的动作不同：
+     *   .new-frame-hello-lottie  原版手写动画。从原站 hello.lottie 里解出的
+     *                            json，交给 lottie-web 的 light 构建播放（库
+     *                            按需注入，不进 bundle，只有首页会用到）
+     *   .new-frame-hello         自己填的文字：靠 CSS 挂 .is-writing 触发擦出
+     * CSS 判断不了「遮罩刚刚重新盖回来」这件事，所以由这里统一触发。 */
+    var helloLottie = card.querySelector('.new-frame-hello-lottie');
+    var hello = card.querySelector('.new-frame-hello:not(.new-frame-hello-lottie)');
+    var helloAnim = null;
+    var helloPending = false;
+
+    /* 库还在路上就被要求播：先记下，加载完立刻补播，别让第一次动画丢掉 */
+    function playLottie() {
+      if (!helloAnim) { helloPending = true; return; }
+      helloPending = false;
+      /* 从头再来一遍：第二参数 true 表示连同一帧上的其它动画一起重置 */
+      helloAnim.goToAndPlay(0, true);
+    }
 
     function writeHello() {
+      if (helloLottie) return playLottie();
       if (!hello) return;
       /* 已经在写的时候又被触发，得先摘掉类并强制回流，动画才会从头来一遍 */
       if (hello.classList.contains('is-writing')) {
@@ -79,15 +94,69 @@
       hello.classList.add('is-writing');
     }
 
-    if (hello) {
-      /* 播完摘掉类：动画停在 dashoffset 0，和基态一致，摘掉不会跳一下 */
-      hello.addEventListener('animationend', function (e) {
-        /* 文字版（new_frame.hello 写了字）走的是擦出动画，名字不同 */
-        if (e.animationName === 'nf-hello-draw' || e.animationName === 'nf-hello-write') {
-          hello.classList.remove('is-writing');
-        }
-      });
+    if (helloLottie) {
+      var bootLottie = function () {
+        var lottie = window.lottie || window.bodymovin;
+        if (!lottie) return;
+        helloAnim = lottie.loadAnimation({
+          container: helloLottie,
+          renderer: 'svg',            /* 跟原站同一个渲染器，出来是内联 SVG */
+          loop: false,                /* 原动画 3s 一遍，写完就停 */
+          /* 不自动播，统一由「进入视口 / 遮罩盖回来」那条路径触发：
+             autoplay 再叠一个 IntersectionObserver，会出现刚播两帧又被打回 0 */
+          autoplay: false,
+          path: helloLottie.dataset.src,
+          rendererSettings: {
+            /* 原站的写法：画布 500×500 等比装进容器，字自然居中 */
+            preserveAspectRatio: 'xMidYMid meet',
+            progressiveLoad: true
+          }
+        });
+        /* 库加载期间就有人要求播（首屏通常如此）：这里补上。
+           浏览器没有 IntersectionObserver 时没人会来触发，直接播。 */
+        if (helloPending || !('IntersectionObserver' in window)) playLottie();
+      };
 
+      /* 这块在 ≤1200px 整块 display:none（跟安知鱼同一个断点），
+         那种情况下没人看得见，就别为它拉 45KB 的播放器。
+         窗口拖宽了再补上 —— resize 里试，加载过就不再重复。 */
+      var lottieAsked = false;
+      var startLottie = function () {
+        if (lottieAsked) return true;
+        if (helloLottie.offsetParent === null) return false;
+        lottieAsked = true;
+        if (window.lottie || window.bodymovin) {
+          bootLottie();
+        } else {
+          var lib = document.createElement('script');
+          lib.src = helloLottie.dataset.lib;
+          lib.async = true;
+          lib.onload = bootLottie;
+          lib.onerror = function () {
+            /* 库挂了就退回纯渐变文字，别让遮罩中间空一块 */
+            helloLottie.innerHTML =
+              '<span class="new-frame-hello-fallback">hello</span>';
+          };
+          (document.head || document.documentElement).appendChild(lib);
+        }
+        return true;
+      };
+
+      if (!startLottie()) {
+        window.addEventListener('resize', startLottie, { passive: true });
+      }
+    }
+
+    if (hello) {
+      /* 播完摘掉类：动画停在终态，和基态一致，摘掉不会跳一下。
+         目前只有文字版（new_frame.hello 写了字）走 CSS 动画，名字是 nf-hello-write；
+         手写版是 lottie，播完由播放器自己停在最后一帧，不需要收尾。 */
+      hello.addEventListener('animationend', function (e) {
+        if (e.animationName === 'nf-hello-write') hello.classList.remove('is-writing');
+      });
+    }
+
+    if (hello || helloLottie) {
       /* 第一次滚到这块的时候写一遍 */
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
