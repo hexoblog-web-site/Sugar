@@ -74,6 +74,8 @@
     var hello = card.querySelector('.new-frame-hello:not(.new-frame-hello-lottie)');
     var helloAnim = null;
     var helloPending = false;
+    /* 遮罩盖回来 / 重新滚回这块时要不要再演一遍，配置 new_frame.hello.replay */
+    var replayOn = group.getAttribute('data-hello-replay') !== '0';
 
     /* 库还在路上就被要求播：先记下，加载完立刻补播，别让第一次动画丢掉 */
     function playLottie() {
@@ -95,35 +97,46 @@
     }
 
     if (helloLottie) {
+      /* 播放参数全部来自配置（模板写在 data-* 上）：
+         renderer / preserve_aspect_ratio / loop / speed / lazy / fallback */
+      var hRenderer = helloLottie.getAttribute('data-renderer') || 'svg';
+      var hPar = helloLottie.getAttribute('data-par') || 'xMidYMid meet';
+      var hLoop = helloLottie.getAttribute('data-loop') === '1';
+      var hSpeed = parseFloat(helloLottie.getAttribute('data-speed'));
+      if (!(hSpeed > 0)) hSpeed = 1;
+      var hLazy = helloLottie.getAttribute('data-lazy') !== '0';
+      var hFallback = helloLottie.getAttribute('data-fallback') || 'hello';
+
       var bootLottie = function () {
         var lottie = window.lottie || window.bodymovin;
         if (!lottie) return;
         helloAnim = lottie.loadAnimation({
           container: helloLottie,
-          renderer: 'svg',            /* 跟原站同一个渲染器，出来是内联 SVG */
-          loop: false,                /* 原动画 3s 一遍，写完就停 */
+          renderer: hRenderer,        /* 跟原站同一个渲染器，出来的就是内联 SVG */
+          loop: hLoop,                /* 原动画 3s 一遍，默认写完就停 */
           /* 不自动播，统一由「进入视口 / 遮罩盖回来」那条路径触发：
              autoplay 再叠一个 IntersectionObserver，会出现刚播两帧又被打回 0 */
           autoplay: false,
           path: helloLottie.dataset.src,
           rendererSettings: {
             /* 原站的写法：画布 500×500 等比装进容器，字自然居中 */
-            preserveAspectRatio: 'xMidYMid meet',
+            preserveAspectRatio: hPar,
             progressiveLoad: true
           }
         });
+        if (hSpeed !== 1) helloAnim.setSpeed(hSpeed);
         /* 库加载期间就有人要求播（首屏通常如此）：这里补上。
            浏览器没有 IntersectionObserver 时没人会来触发，直接播。 */
         if (helloPending || !('IntersectionObserver' in window)) playLottie();
       };
 
       /* 这块在 ≤1200px 整块 display:none（跟安知鱼同一个断点），
-         那种情况下没人看得见，就别为它拉 45KB 的播放器。
+         那种情况下没人看得见，就别为它拉 45KB 的播放器（lazy: false 可关掉这个判断）。
          窗口拖宽了再补上 —— resize 里试，加载过就不再重复。 */
       var lottieAsked = false;
       var startLottie = function () {
         if (lottieAsked) return true;
-        if (helloLottie.offsetParent === null) return false;
+        if (hLazy && helloLottie.offsetParent === null) return false;
         lottieAsked = true;
         if (window.lottie || window.bodymovin) {
           bootLottie();
@@ -133,9 +146,12 @@
           lib.async = true;
           lib.onload = bootLottie;
           lib.onerror = function () {
-            /* 库挂了就退回纯渐变文字，别让遮罩中间空一块 */
-            helloLottie.innerHTML =
-              '<span class="new-frame-hello-fallback">hello</span>';
+            /* 库挂了就退回静态渐变文字，别让遮罩中间空一块 */
+            var span = document.createElement('span');
+            span.className = 'new-frame-hello-fallback';
+            span.textContent = hFallback;
+            helloLottie.innerHTML = '';
+            helloLottie.appendChild(span);
           };
           (document.head || document.documentElement).appendChild(lib);
         }
@@ -176,7 +192,7 @@
        触屏上 pointerleave 是手指抬起，那种情况归下面的 setOpen 管，这里跳过。 */
     group.addEventListener('pointerleave', function () {
       if (group.classList.contains('is-open')) return;
-      writeHello();
+      if (replayOn) writeHello();
     });
 
     function setOpen(open) {
@@ -184,7 +200,7 @@
       if (btn && btn.tagName === 'BUTTON') {
         btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       }
-      if (!open) writeHello();
+      if (!open && replayOn) writeHello();
     }
 
     if (btn && btn.tagName === 'BUTTON') {

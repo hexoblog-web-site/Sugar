@@ -334,11 +334,9 @@ home:
     # ---- 右：新品框架 ----
     # 一张封面把下面 6 张文章卡整个盖住：鼠标滑过封面淡出、露出文章，移开盖回来；
     # 只有滑到右下角按钮上时封面不动，按钮才点得着。
-    # 封面底色是模板里的浅绿→浅粉渐变，中间那行手写 hello 是 lottie 动画
-    # （原站 hello.lottie 里解出的 json，播放器为 lottie-web light 构建），
-    # 都不读配置文件里的图片，所以这里没有 image 项 —— 想换底色得改模板
-    # home/home-top.ejs；想换手写笔迹只换 source/lib/hello.json 就行。
-    # 封面下面那几篇显示什么，两种来源，不需要额外开关：
+    # 这一块的全部可调项都在下面，从上到下：内容 → 遮罩 → 中间那行字。
+    # 封面底色是模板里的浅绿→浅粉渐变，不读配置里的图片 —— 想换底色改模板
+    # home/home-top.ejs。封面下面那几篇显示什么，两种来源，不需要额外开关：
     #   items 有内容 → 按 items 显示（只写 link 就行，标题和封面自动从文章里取）
     #   items 留空   → 自动取：从「不在首页第一页、也没被左边幻灯片用掉」的文章里
     #                  按时间倒序挑（有封面的排前面），条数看 count
@@ -349,23 +347,11 @@ home:
       enable: true
       name: 新品框架                        # 封面左下角那行小字（安知鱼原版就是这个）
       title: Theme-AnZhiYu                  # 封面左下角的大标题，留空就只显示小字
-      # 封面中间那行字，三种写法：
-      #   hello: true   或不写   安知鱼原版的手写 hello（lottie 动画，播的是原站
-      #                         那个文件本身，不是复刻）
-      #   hello: 你好           换成自己的字，彩虹渐变 + 从左往右擦出
-      #   hello: false          不显示，遮罩上只留左下文字块和右下按钮
-      hello: true
-      # 手写动画的数据文件，只在 hello: true 时生效。
-      # 想换一套手写笔迹：LottieFiles 上改好导出 json，丢进主题 source/lib/，
-      # 把这里指过去即可，不用碰模板；也可以直接覆盖 source/lib/hello.json。
-      hello_lottie: /lib/hello.json
-      count: 6                              # 封面下面放几篇（6 = 3×2 刚好铺满，多了会被裁掉）
-      # 封面去重：同一张封面只上一次（本站 manim.jpg 一张图被 69 篇复用，
-      # 不去重会六格同图）。关掉就是单纯按时间取最新几篇，允许重复封面。
-      cover_dedupe: true
       button: 更多推荐                      # 封面右下角按钮文案
-      link: /archives/                      # 按钮点去哪（填外链就新窗口打开）；留空则退化成「展开」按钮
-      # 手动模式：想指定哪几篇就写几条，title / image 不写就自动用文章自己的；
+      link: /archives/                      # 按钮点去哪（外链会新窗口打开）；留空则退化成「展开」按钮
+      count: 6                              # 封面下面放几篇（6 = 3×2 刚好铺满，多了会被裁掉）
+      cover_dedupe: true                    # 同一张封面只上一次（本站 manim.jpg 一张图被 69 篇复用）
+      # 手动模式：想指定哪几篇就写几条，title / cover 不写就自动用文章自己的；
       # target 不写就按链接判断（站内当前窗口，站外新窗口）
       items: []
       # items:
@@ -373,6 +359,70 @@ home:
       #   - link: /articles/yyyy.html
       #     title: 换个标题显示
       #     cover: /medias/other.jpg
+
+      # ---------- 遮罩：盖住六张卡的那层 ----------
+      # 两个时长都按秒写。改这里只影响淡出快慢，不影响六张卡的位置
+      # （卡片全程静止，不做任何出入场动画）。
+      mask:
+        fade_out: 5                         # 掀开（悬停 / 点开）用多久；越小越快
+        fade_in: 1.6                        # 鼠标移开、遮罩盖回来用多久
+        # 封面底色。留空 = 照原站的左浅绿→右浅粉；想换就写任意 CSS 背景，
+        # 例如 "linear-gradient(90deg, #e8f3ff, #f6f0ff)" 或纯色 "#f7f7f8"
+        cover_bg: ""
+
+      # ---------- 遮罩中间那行字 ----------
+      # mode 三选一：
+      #   lottie  原版手写 hello（默认）。播的就是参考站那张卡用的动画文件本身，
+      #           不是复刻；换笔迹只换 lottie.src 指向的 json
+      #   text    换成自己的字：彩虹渐变 + 从左往右擦出，中英文都行
+      #   off     不显示，遮罩上只留左下文字块和右下按钮
+      # 旧写法仍然兼容（会被自动认成上面三种之一，不用特意迁移）：
+      #   hello: true / hello: false / hello: 一段文字，以及顶层的 hello_lottie: 路径
+      hello:
+        mode: lottie
+        replay: true                        # 遮罩盖回来、或重新滚回这块时，是否重播一遍
+        fallback: hello                     # 播放器没加载下来时兜底显示的静态字
+
+        # ---- mode: lottie ----
+        lottie:
+          # 动画数据。换笔迹：LottieFiles 上改稿导出 json，丢进主题 source/lib/，
+          # 把这里指过去即可，模板一行都不用改；也可以直接覆盖 source/lib/hello.json。
+          # 现用这份是从参考站 /static/hello.lottie 这个 dotLottie 容器里解出来的：
+          # 500×500、100fps、0~300 帧（3 秒）、单形状图层（22 顶点路径 + 17 色标渐变）
+          src: /lib/hello.json
+          lib: /lib/lottie_light.min.js     # 播放器：lottie-web 5.12.2 light 构建（gzip 45KB）
+          renderer: svg                     # svg / canvas / html；跟参考站一样用 svg（出来是内联 SVG）
+          preserve_aspect_ratio: xMidYMid meet   # 500×500 画布等比装进卡片，字自然居中
+          loop: false                       # 写完就停；true = 一直循环播放
+          speed: 1                          # 播放倍速，2 = 快一倍，.5 = 慢一半
+          lazy: true                        # 这块隐藏时（≤1200px）连播放器都不下载
+
+        # ---- mode: text ----
+        text: Sugar                         # 要显示的字；mode 不是 text 时忽略
+        text_style:
+          # 留空或删掉某项 = 用主题默认值（现在这版就是默认值）
+          font_size: "clamp(2rem, 4vw, 3.6rem)"     # 字太大就往小调，也可以直接写 64px
+          font_weight: 800
+          letter_spacing: ".01em"
+          line_height: 1.15
+          max_width: 76%                    # 最宽占卡片多少，超了自动换行
+          write_duration: 1.6               # 擦出动画时长（秒）
+          write_easing: "cubic-bezier(.2, .75, .25, 1)"   # 擦出曲线；要匀速就写 linear
+          # 渐变：从左到右排，每行「位置 颜色」，位置可以省略（省了就按顺序均分）。
+          # 也可以直接写一整段 CSS 渐变，会原样透传（例如 linear-gradient(90deg,#000,#fff)）。
+          # 默认这 11 个色标是从原版 SVG 的 17 个色标压出来的近似值。
+          gradient:
+            - "0% #009196"
+            - "17% #8ecd82"
+            - "23% #bdf13f"
+            - "34% #ffd510"
+            - "48% #ffb628"
+            - "60% #ff5b22"
+            - "67% #ff4481"
+            - "74% #ff2ddf"
+            - "81% #a473e9"
+            - "94% #49b9f3"
+            - "100% #28c1fa"
 
 # ---------- 微语（首页顶部滚动短文条） ----------
 # 位置固定：导航栏下方、幻灯片上方，整条通栏。对应三件套 home/essay.ejs + essay.css + essay.js

@@ -8,10 +8,13 @@
     悬停按钮  封面不动（脚本加 .hold）—— 否则按钮跟着封面一起消失，点不到
     触屏   点封面展开 / 收回，点右下角按钮去「更多」页面（配了 link 的话）
 
-  封面上那行手写 hello 是内联 SVG：把安知鱼那张卡的 lottie 动画
-  （/static/hello.lottie）拆出来重画的，渐变和笔画都照搬，动画用
-  stroke-dashoffset 复刻，不引播放器。默认完整显示，进视口时写一遍，
-  封面重新盖回来时再写一遍 —— 见 css/home-top.css 的 nf-hello-draw。
+  遮罩中间那行字由 new_frame.hello 决定，三种模式：
+    lottie  原版手写 hello（默认）。播放器 lottie-web 按需注入，播的是参考站
+            那张卡用的动画文件本身 —— 换笔迹只换 new_frame.hello.lottie.src
+    text    换成自己的字：CSS 变量控制的尺寸 + 彩虹渐变 + 从左往右擦出
+    off     不显示
+  尺寸 / 渐变 / 时长都从配置写成内联 CSS 变量，样式表里用 var(名字, 默认值) 接，
+  所以不配就是主题默认的样子。详见 css/home-top.css 里 .new-frame-hello-text 段。
 
   遮罩下面放哪几篇：不是「最新那几篇」（那样和下面的列表一字不差地重），
   而是从「不在首页第一页、也没被左边幻灯片用掉」的文章里按时间倒序取，
@@ -53,6 +56,79 @@
      原来的 theme.error_img.post_page 在本主题配置里根本不存在，
      一旦真的走到兜底就整页 500 —— 这里换掉。 */
   function coverOf(p) { return p.cover || p.top_img || p.thumbnail || theme.post.default_cover || ''; }
+
+  /* ---------- 遮罩中间那行字：把配置归一成 h ----------
+     新写法是 new_frame.hello 这个对象（mode: lottie / text / off）；
+     旧写法 hello: true / hello: false / hello: 一段文字，以及顶层的
+     hello_lottie 都还认，两种在这里合流，下面模板只认 h.mode。
+     配置项说明全在 themes/Sugar/_config.yml 的 new_frame 段。 */
+  var hRaw = nf.hello;
+  var h = {};
+  if (hRaw === false || hRaw === null) h.mode = 'off';
+  else if (hRaw === true || hRaw === undefined) h.mode = 'lottie';
+  else if (typeof hRaw === 'object') { for (var hk in hRaw) { if (hk) h[hk] = hRaw[hk]; } }
+  else { h.mode = 'text'; h.text = String(hRaw); }
+  if (!h.mode) h.mode = h.text ? 'text' : 'lottie';
+  h.mode = String(h.mode).toLowerCase();
+  if (h.mode !== 'lottie' && h.mode !== 'text') h.mode = 'off';
+
+  var hText = (h.text === undefined || h.text === null) ? '' : String(h.text);
+  if (h.mode === 'text' && !hText) h.mode = 'off';   /* text 但没写字 = 不显示 */
+  var hFallback = (h.fallback === undefined || h.fallback === null) ? 'hello' : String(h.fallback);
+  var hReplay = h.replay !== false;
+
+  /* 文字版的所有可调项都写成 CSS 变量：样式表里用 var(名字, 默认值) 接，
+     不配就是主题现在的样子，配了只覆盖改到的那几项。 */
+  var hs = h.text_style || {};
+  var hVars = [];
+  function nfVar(name, val) {
+    if (val === undefined || val === null || val === '') return;
+    hVars.push(name + ':' + val);
+  }
+  nfVar('--nf-hello-fs', hs.font_size);
+  nfVar('--nf-hello-fw', hs.font_weight);
+  nfVar('--nf-hello-ls', hs.letter_spacing);
+  nfVar('--nf-hello-lh', hs.line_height);
+  nfVar('--nf-hello-maxw', hs.max_width);
+  nfVar('--nf-hello-ease', hs.write_easing);
+  var hDur = parseFloat(hs.write_duration);
+  if (hDur > 0) hVars.push('--nf-hello-dur:' + hDur + 's');
+
+  /* gradient：数组里每项「位置 颜色」或「颜色 位置」，也允许只写颜色
+     （只写颜色时按顺序均分）。也可以整段写成一个 CSS 渐变字符串，原样透传。 */
+  var hGrad = '';
+  var nfIsColor = function (t) { return /^(#|rgb|hsl|var\()/i.test(t); };
+  if (typeof hs.gradient === 'string') {
+    hGrad = hs.gradient;
+  } else if (hs.gradient && hs.gradient.length) {
+    var gStops = [];
+    var gLen = hs.gradient.length;
+    for (var gi = 0; gi < gLen; gi++) {
+      var gItem = String(hs.gradient[gi]).trim();
+      if (!gItem) continue;
+      var gParts = gItem.split(/\s+/);
+      var gColor = gParts[0];
+      var gPos = gParts[1] || '';
+      /* 写成「20% #fff」的也认：位置和颜色换个顺序而已 */
+      if (gPos && !nfIsColor(gColor) && nfIsColor(gPos)) {
+        gColor = gParts[1];
+        gPos = gParts[0];
+      }
+      if (!gPos) gPos = gLen > 1 ? Math.round(gi * 100 / (gLen - 1)) + '%' : '0%';
+      gStops.push(gColor + ' ' + gPos);
+    }
+    if (gStops.length) hGrad = 'linear-gradient(90deg, ' + gStops.join(', ') + ')';
+  }
+  if (hGrad) hVars.push('--nf-hello-grad:' + hGrad);
+  var hStyle = hVars.length ? ' style="' + hVars.join(';') + '"' : '';
+
+  /* ---------- 遮罩进出时长 → CSS 变量 ---------- */
+  var nfMask = nf.mask || {};
+  var mOut = parseFloat(nfMask.fade_out); if (!(mOut >= 0)) mOut = 5;
+  var mIn = parseFloat(nfMask.fade_in); if (!(mIn >= 0)) mIn = 1.6;
+  var nfMaskStyle = '--nf-mask-out:' + mOut + 's;--nf-mask-in:' + mIn + 's';
+  /* 封面底色留空就用样式表里的默认渐变（原站那张卡的浅绿→浅粉） */
+  if (nfMask.cover_bg) nfMaskStyle += ';--nf-cover-bg:' + nfMask.cover_bg;
 %>
 <%
   /* 两块各自开关：谁开谁上；两个都关就整条通栏不渲染（首页直接从「即刻」开始） */
@@ -73,7 +149,9 @@
   <% } %>
 
   <% if (nfOn) { %>
-  <div id="new_frame_group" class="new-frame-group">
+  <div id="new_frame_group" class="new-frame-group"
+       style="<%- nfMaskStyle %>"
+       data-hello-replay="<%= hReplay ? 1 : 0 %>">
     <div class="new-frame-grid">
       <% picks.forEach(function (p) { %>
       <%# 手动条目可能写外链：外链原样输出，站内的才走 url_for；
@@ -97,30 +175,35 @@
 
     <%# 遮罩：盖在 6 张卡上面。悬停 / 展开时淡出，让下面的卡露出来 %>
     <div id="new_frame_card" class="new-frame-card">
-      <%# 遮罩中间那行字，三种写法（配置项 new_frame.hello）：
-           true / 不写  安知鱼原版的手写 hello。用的是原站那张卡的同一个动画文件：
-                        从 /static/hello.lottie（1853 字节的 dotLottie 容器）里解出的
-                        a/Main Scene.json —— 4929 字节，500×500、100fps、0~300 帧
-                        （3 秒）、一个形状图层，内容是 22 顶点单笔路径 + 17 色标
-                        渐变描边。播放器用 lottie-web 的 light 构建（只带 SVG
-                        渲染器，45KB gzip），引擎和文件都跟原站一致。
-                        想换成自己的手写字：LottieFiles 上改稿导出 json，替换
-                        source/lib/hello.json；或者把 new_frame.hello_lottie
-                        指到别的文件，换字不用碰模板。
-           一段文字     换成自己的字，用同一条彩虹渐变填充 + 从左往右擦出
-                        （手写笔迹只属于 hello 这五个字母，中文没法沿用那套路径）
-           false        不显示，遮罩上只留左下文字块和右下按钮 %>
-      <% var nfHello = nf.hello === undefined ? true : nf.hello; %>
-      <% if (nfHello === true) { %>
-      <% var nfLottie = nf.hello_lottie || '/lib/hello.json'; %>
+      <%# 遮罩中间那行字。三种模式由 new_frame.hello.mode 决定（见文件头的配置说明）：
+           lottie  原版手写 hello：播放器按需注入，播的是参考站那个动画文件本身
+           text    自己的字：彩虹渐变 + 从左往右擦出
+           off     不渲染，遮罩上只留左下文字块和右下按钮
+           具体情况在文件上半部分解析，这里只按 h.mode 出结构 %>
+      <% if (h.mode === 'lottie') { %>
+      <%
+        var hl = h.lottie || {};
+        /* 旧写法 new_frame.hello_lottie 还在的话当兜底 */
+        var hSrc = hl.src || nf.hello_lottie || '/lib/hello.json';
+        var hLib = hl.lib || '/lib/lottie_light.min.js';
+        var hLoop = hl.loop === true;
+        var hSpeed = parseFloat(hl.speed); if (!(hSpeed > 0)) hSpeed = 1;
+        var hLazy = hl.lazy !== false;
+      %>
       <div class="new-frame-hello new-frame-hello-lottie" id="new_frame_hello"
            role="img" aria-label="hello"
-           data-src="<%- url_for(nfLottie) %>?v=<%= lb_asset_ver(nfLottie) %>"
-           data-lib="<%- url_for('/lib/lottie_light.min.js') %>?v=<%= lb_asset_ver('/lib/lottie_light.min.js') %>"></div>
-      <% } else if (nfHello) { %>
+           data-src="<%- url_for(hSrc) %>?v=<%= lb_asset_ver(hSrc) %>"
+           data-lib="<%- url_for(hLib) %>?v=<%= lb_asset_ver(hLib) %>"
+           data-renderer="<%= hl.renderer || 'svg' %>"
+           data-par="<%= hl.preserve_aspect_ratio || 'xMidYMid meet' %>"
+           data-loop="<%= hLoop ? 1 : 0 %>"
+           data-speed="<%= hSpeed %>"
+           data-lazy="<%= hLazy ? 1 : 0 %>"
+           data-fallback="<%= hFallback %>"></div>
+      <% } else if (h.mode === 'text') { %>
       <%# 自定义文字：跟手写版共用 .new-frame-hello 这个类，所以淡出/放大那套
-           过渡不用重写；渐变是照 SVG 那 17 个色标挑出来的近似值 %>
-      <div class="new-frame-hello new-frame-hello-text"><%= nfHello %></div>
+           过渡不用重写；尺寸、渐变、擦出时长全部来自上面算好的 CSS 变量 %>
+      <div class="new-frame-hello new-frame-hello-text"<%- hStyle %>><%= hText %></div>
       <% } %>
       <div class="new-frame-card-info">
         <div class="new-frame-card-tips"><%= nfName %></div>
