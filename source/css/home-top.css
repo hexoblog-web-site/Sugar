@@ -98,28 +98,14 @@
   background: var(--heo-card-bg);
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
-  /* 遮罩还盖着的时候，这六张卡比落位低 6px。遮罩不透明，平时看不见；
-     掀开时这一点位移就是「落定」的手感。
-     关键在幅度与时长的比值：原来 8px 走 4.6s（≈1.7px/s）肉眼就是「缓缓往上爬」；
-     现在 6px 走 .32s（≈19px/s），是「啪一下到位」，不会被读成一个动作。
-     只动位置、不动透明度：卡片本来就被遮罩盖着，再压暗只会在淡出那一瞬间
-     跟半透明的字糊成一片灰。 */
-  transform: translateY(6px);
+  /* 六张卡全程不动：位置固定，掀开时只有遮罩在化开。
+     卡片夹在遮罩下面，遮罩要走 4s 才褪干净，这期间任何位移都会被看见；
+     与其让整块内容跟着漂几下，不如让它稳稳停在格子里 —— 封面慢慢变淡，
+     底下的文章一点点显出来，注意力留在内容上而不是动效上。 */
   transition:
-    transform .32s cubic-bezier(.2, .8, .3, 1),
     border-color .3s,
     box-shadow .3s;
 }
-
-/* 出场顺序：左上 → 右下，每张比前一张晚 30ms（第六张 150ms）。
-   六张同时归位是一整块在动；错开之后是依次落定，视线会跟着走一遍。
-   总时长仍收在 .5s 内，所以只是节奏，不是拖沓。 */
-.new-frame-item:nth-child(1) { --nf-i: 0; }
-.new-frame-item:nth-child(2) { --nf-i: 1; }
-.new-frame-item:nth-child(3) { --nf-i: 2; }
-.new-frame-item:nth-child(4) { --nf-i: 3; }
-.new-frame-item:nth-child(5) { --nf-i: 4; }
-.new-frame-item:nth-child(6) { --nf-i: 5; }
 
 .new-frame-item:hover {
   border: var(--style-border-hover);
@@ -199,8 +185,9 @@
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
   cursor: pointer;
-  /* 遮罩「盖回来」的时长。比掀开（.5s）略快：鼠标一走别还挂着半透明的底。 */
-  transition: opacity .3s cubic-bezier(.4, 0, .2, 1);
+  /* 遮罩「盖回来」的时长。掀开是 4s（见下面 :hover 那条），收回 1.6s：
+     鼠标一走就快点盖回来，别让半透明的底在那儿挂半天。 */
+  transition: opacity 1.6s cubic-bezier(.25, .1, .25, 1);
 }
 
 /* 遮罩上的 hello：内联 SVG，viewBox 已经收在字的外框上，
@@ -212,11 +199,12 @@
   height: auto;
   /* 往上提一点，给左下角的文字让位（字底大约落在卡片 60% 的高度） */
   margin-bottom: 3.3rem;
-  /* 掀开时字跟着底色放大漂出去，但自己的透明度只花 .22s 先撤掉：
-     字要是陪底色漂满全程，就一直有半透明的字压在下面卡片的标题上。 */
+  /* 掀开时字跟着底色放大漂出去（和底色同一条 4s 曲线），但自己的透明度
+     只花 .55s 先撤掉：字要是陪底色漂满全程，就一直有半透明的字压在
+     下面卡片的标题上。 */
   transition:
-    transform .5s cubic-bezier(.4, 0, .2, 1),
-    opacity .22s ease-out;
+    transform 4s cubic-bezier(.4, 0, .2, 1),
+    opacity .55s ease-out;
 }
 
 /* 书写动画：dashoffset 100 → 0。pathLength="100" 让这两个数字直接就是百分比，
@@ -248,17 +236,19 @@
    :not(.hold) 是关键：指针压在右下角「更多推荐」上时（脚本加 .hold），
    遮罩保持不动 —— 否则按钮跟着遮罩一起淡掉，点下去只会点到下面的文章卡。
 
-   节奏（整段 ~0.5s，鼠标扫过去也来得及看清六张卡）：
-     0s      先撤 hello 和左下角文字（.22s 内退完，比底色「看穿」早）
-     0-.5s   浅色底化开
-     0-.47s  六张卡依次落定（每张晚 30ms）
-   原来是 5s 淡出 + 4.6s 位移：鼠标停三秒都看不清下面是什么，
-   中间还有半透明的字压在卡片标题上，所以那会儿又慢又乱。 */
+   节奏（整段 4s，只有遮罩在动）：
+     0s      先撤 hello 和左下角文字（.55s 内退完，比底色「看穿」早）
+     0-4s    浅色底慢慢化开
+     全程    六张卡定住不动，位置从一开始就是最终位置
+   卡片不做任何出入场：遮罩要淡 4 秒，这几秒里只要有位移就会被盯着看，
+   反而抢戏；让它停在格子里，视线自然落在逐渐显出来的文章上。 */
 @media (hover: hover) {
   #new_frame_group:hover:not(.hold) #new_frame_card {
     opacity: 0;
     pointer-events: none;
-    transition: opacity .5s cubic-bezier(.4, 0, .2, 1);
+    /* 4s 掀开。曲线起手就得动：用 (.4,0,.2,1) 的话头一秒几乎没变化，
+       看着像卡住了；这一档是「一直在慢慢褪」，只是越往后越慢。 */
+    transition: opacity 4s cubic-bezier(.3, .1, .3, 1);
   }
   #new_frame_group:hover:not(.hold) #new_frame_card .new-frame-hello {
     transform: scale(1.06);
@@ -274,7 +264,7 @@
 .new-frame-grid:focus-within ~ #new_frame_card {
   opacity: 0;
   pointer-events: none;
-  transition: opacity .5s cubic-bezier(.4, 0, .2, 1);
+  transition: opacity 4s cubic-bezier(.3, .1, .3, 1);
 }
 
 #new_frame_group.is-open #new_frame_card .new-frame-hello,
@@ -290,33 +280,6 @@
   opacity: 0;
 }
 
-/* 六张卡依次落定：底线归零，出场顺序由 --nf-i（见上面 nth-child）决定。
-   收回那一侧不写 delay —— 鼠标一走就立刻往回沉，不排队。 */
-@media (hover: hover) {
-  #new_frame_group:hover:not(.hold) .new-frame-item {
-    transform: none;
-    transition-delay: calc(var(--nf-i, 0) * 30ms), 0s, 0s;
-  }
-}
-
-#new_frame_group.is-open .new-frame-item,
-.new-frame-grid:focus-within .new-frame-item {
-  transform: none;
-  transition-delay: calc(var(--nf-i, 0) * 30ms), 0s, 0s;
-}
-
-/* 不想看动效的：省掉位移和错峰，遮罩照样淡出 */
-@media (prefers-reduced-motion: reduce) {
-  .new-frame-item {
-    transform: none;
-  }
-  #new_frame_group:hover:not(.hold) .new-frame-item,
-  #new_frame_group.is-open .new-frame-item,
-  .new-frame-grid:focus-within .new-frame-item {
-    transition-delay: 0s;
-  }
-}
-
 /* 左下角文字块。右边留出按钮的位置，标题到边就省略，不去压按钮。 */
 #new_frame_card .new-frame-card-info {
   position: absolute;
@@ -326,7 +289,7 @@
   z-index: 2;
   pointer-events: none;
   /* 和字一样先撤；否则遮罩底色褪到一半时，这行字还悬在文章卡上 */
-  transition: opacity .22s ease-out;
+  transition: opacity .55s ease-out;
 }
 
 /* 字色是照着这张浅底图定的（深青 + 中灰），深浅色模式下都不用改：
@@ -353,7 +316,7 @@
   right: 1.5rem;
   bottom: 2rem;
   z-index: 3;
-  transition: opacity .22s ease-out;
+  transition: opacity .55s ease-out;
 }
 
 #new_frame_card .banner-button {
