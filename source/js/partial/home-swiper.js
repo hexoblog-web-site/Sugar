@@ -61,9 +61,12 @@
         px.push([R, G, B, bin, w]);
       }
       var mean = an ? [Math.round(ar / an), Math.round(ag / an), Math.round(ab / an)] : null;
+      /* 全图整体亮度：黑底封面（one.jpg 那种夜景）必须让上层知道它有多暗，
+         否则「按色相提亮」会把 88% 是黑的图渲染成一条亮蓝带。 */
+      var meanL = mean ? rgbToHsl(mean[0], mean[1], mean[2])[2] : 0;
       /* 平均饱和度太低说明这张图基本是黑白的（时钟、截图之类）。
          此时直接给全图均值，让上层走中性灰，不要凭空编一个色相出来。 */
-      if (!px.length || !an || asat / an < 0.10) return mean;
+      if (!px.length || !an || asat / an < 0.10) { if (mean) mean.lum = meanL; return mean; }
       /* 相邻桶一起算，避免主色刚好卡在桶边界被拆成两半 */
       var best = 0, bestW = -1;
       for (var j = 0; j < BINS; j++) {
@@ -78,7 +81,9 @@
         n += px[p][4];
       }
       if (!n) return null;
-      return [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+      var out = [Math.round(r / n), Math.round(g / n), Math.round(b / n)];
+      out.lum = meanL;
+      return out;
     } catch (e) { return null; }
   }
 
@@ -120,10 +125,17 @@
 
   /* 把主色收敛到「适合做玻璃染色」的区间：饱和度抬到能看出来的程度，
      亮度压在 0.46~0.56，避免过灰/过曝/过暗。
-     例外：本身就是灰的（黑白图）不要抬饱和度 —— 灰色的 h 是 0，一抬就变红，
-     之前黑白时钟封面底下那圈暗红就是这么来的；这种只压亮度上限。 */
-  function tintColor(rgb) {
+     例外一：本身就是灰的（黑白图）不要抬饱和度 —— 灰色的 h 是 0，一抬就变红，
+     之前黑白时钟封面底下那圈暗红就是这么来的；这种只压亮度上限。
+     例外二：暗图（lum 传进来且很低）。这时色相只能保留一点点，亮度必须
+     跟着原图走 —— 一张 88% 是黑的封面，若按上面的规则把亮度抬到 0.46、
+     饱和度抬到 0.6，底部渐变就成了一条亮蓝带，正是 one.jpg 那圈蓝的来源。 */
+  function tintColor(rgb, lum) {
     var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    var base = (typeof lum === 'number' && isFinite(lum)) ? lum : hsl[2];
+    if (base < 0.20) {
+      return hslToRgb(hsl[0], Math.min(hsl[1] * 0.5, 0.42), Math.max(base * 1.6, 0.09));
+    }
     if (hsl[1] < 0.12) return hslToRgb(hsl[0], hsl[1], Math.min(hsl[2], 0.56));
     var s = Math.min(Math.max(hsl[1], 0.55), 0.86);
     var l = Math.min(Math.max(hsl[2], 0.46), 0.56);
@@ -139,16 +151,32 @@
     b.setProperty('--banner-tint-deep', deep.join(','));
   }
 
+  /* 压暗一档，垫在渐变最底部，保证白色标题压得住。
+     下限取 0.06 而不是 0.2：暗图本身 l 就在 0.1 附近，硬抬到 0.2 会让
+     「更暗的一档」反而比主色更亮。 */
   function deepOf(rgb) {
     var hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
-    return hslToRgb(hsl[0], Math.min(hsl[1] + 0.06, 0.95), Math.max(hsl[2] - 0.16, 0.2));
+    return hslToRgb(hsl[0], Math.min(hsl[1] + 0.06, 0.95), Math.max(hsl[2] - 0.16, 0.06));
+  }
+
+  /* 页面级染色（作者卡渐变、横幅柔光、首页背景晕染）不能跟着暗图一起黑掉：
+     一张黑色封面会把作者卡染成纯黑卡片，亮色主题下像多出一块墓碑。
+     这里给亮度加一个软下限 —— 越暗的图兜底抬得越多，但仍是同色调的深色；
+     幻灯片底部那条渐变不用这个值（见 setItemTint），所以图片还是贴得住的。 */
+  function liftL(l) {
+    return Math.max(l, 0.30 - l * 0.3);
+  }
+  function pageTint(rgb, lum) {
+    var t = tintColor(rgb, lum);
+    var hsl = rgbToHsl(t[0], t[1], t[2]);
+    return hslToRgb(hsl[0], hsl[1], liftL(hsl[2]));
   }
 
   /* 颜色渐变过渡：CSS 变量驱动的渐变（background-image）本身没法 transition，
      所以在这里逐帧插值，换图时背景是「渐变过去」而不是硬切 */
-  function applyPageTint(rgb) {
+  function applyPageTint(rgb, lum) {
     if (!TINT_ON || !rgb) return;
-    var end = tintColor(rgb);
+    var end = pageTint(rgb, lum);
     var endDeep = deepOf(end);
     var raw = (getComputedStyle(document.body).getPropertyValue('--banner-tint') || '').trim();
     var start = raw ? raw.split(',').map(Number) : null;
@@ -180,9 +208,9 @@
      底部渐隐层（.home-swiper-mask）用它上色，所以每张的底色都不一样，
      不会再出现「橙色封面底下压一条蓝紫带」。
      deep 是压暗一档的同色，垫在最底下，保证白色标题压得住。 */
-  function setItemTint(item, rgb) {
+  function setItemTint(item, rgb, lum) {
     if (!item || !rgb) return;
-    var t = tintColor(rgb);
+    var t = tintColor(rgb, lum);
     item.style.setProperty('--swiper-tint', t.join(','));
     item.style.setProperty('--swiper-tint-deep', deepOf(t).join(','));
   }
@@ -192,24 +220,27 @@
   function bannerTint(item, warm) {
     if (!TINT_ON || !item) return;
     var fallback = hexToRgb(item.dataset.bannerColor || '');
-    var apply = function (rgb) {
+    var apply = function (rgb, lum) {
       if (!rgb || warm) return;
-      applyPageTint(rgb);
+      applyPageTint(rgb, lum);
     };
     var img = item.querySelector('img');
     if (!img) { if (fallback) { setItemTint(item, fallback); apply(fallback); } return; }
-    if (img.dataset.bannerTint) {
-      var cached = img.dataset.bannerTint.split(',').map(Number);
-      setItemTint(item, cached);
-      apply(cached);
+    if (img.dataset.bannerTint2) {
+      /* 缓存里同时存亮度（rgb|lum），否则只靠取到的纯色反推不出原图多暗 */
+      var parts = String(img.dataset.bannerTint2).split('|');
+      var cached = parts[0].split(',').map(Number);
+      var cachedLum = parts[1] !== undefined && parts[1] !== '' ? +parts[1] : undefined;
+      setItemTint(item, cached, cachedLum);
+      apply(cached, cachedLum);
       return;
     }
     var run = function () {
       var rgb = sampleImage(img, 48);
       if (rgb) {
-        img.dataset.bannerTint = rgb.join(',');
-        setItemTint(item, rgb);
-        apply(rgb);
+        img.dataset.bannerTint2 = rgb.join(',') + '|' + (rgb.lum != null ? rgb.lum : '');
+        setItemTint(item, rgb, rgb.lum);
+        apply(rgb, rgb.lum);
       } else if (fallback) {
         /* 取不到色时不要退回固定的紫色，否则看起来就像「颜色一直没变」 */
         setItemTint(item, fallback);

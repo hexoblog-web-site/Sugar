@@ -602,7 +602,9 @@
   display: block;
 }
 /* ===== 首页横幅环境柔光：当前幻灯片的主色在横幅四周晕开 =====
-   --banner-tint 由 main.js 在每次切换轮播时写入 body，换图时颜色跟着变 */
+   --banner-tint 由 main.js 在每次切换轮播时写入 body，换图时颜色跟着变。
+   用 -deep 那一档而不是主色：暗色封面上，柔光若用提亮过的主色，
+   横幅四边会浮出一圈明显的蓝青光晕（底部尤其显眼）。 */
 #home_swiper {
   position: relative;
 }
@@ -615,7 +617,7 @@
   bottom: -18px;
   z-index: 0;
   border-radius: 36px;
-  background-color: rgba(var(--banner-tint,66,90,239),.46);
+  background-color: rgba(var(--banner-tint-deep,45,62,175),.46);
   filter: blur(36px);
   pointer-events: none;
 }
