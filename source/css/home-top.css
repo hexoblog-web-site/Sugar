@@ -99,7 +99,7 @@
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
   /* 六张卡全程不动：位置固定，掀开时只有遮罩在化开。
-     卡片夹在遮罩下面，遮罩要走 4s 才褪干净，这期间任何位移都会被看见；
+     卡片夹在遮罩下面，遮罩要走 5s 才褪干净，这期间任何位移都会被看见；
      与其让整块内容跟着漂几下，不如让它稳稳停在格子里 —— 封面慢慢变淡，
      底下的文章一点点显出来，注意力留在内容上而不是动效上。 */
   transition:
@@ -185,7 +185,7 @@
   border: var(--style-border-always);
   box-shadow: var(--heo-shadow-border);
   cursor: pointer;
-  /* 遮罩「盖回来」的时长。掀开是 4s（见下面 :hover 那条），收回 1.6s：
+  /* 遮罩「盖回来」的时长。掀开是 5s（见下面 :hover 那条），收回 1.6s：
      鼠标一走就快点盖回来，别让半透明的底在那儿挂半天。 */
   transition: opacity 1.6s cubic-bezier(.25, .1, .25, 1);
 }
@@ -199,11 +199,11 @@
   height: auto;
   /* 往上提一点，给左下角的文字让位（字底大约落在卡片 60% 的高度） */
   margin-bottom: 3.3rem;
-  /* 掀开时字跟着底色放大漂出去（和底色同一条 4s 曲线），但自己的透明度
+  /* 掀开时字跟着底色放大漂出去（和底色同一条 5s 曲线），但自己的透明度
      只花 .55s 先撤掉：字要是陪底色漂满全程，就一直有半透明的字压在
      下面卡片的标题上。 */
   transition:
-    transform 4s cubic-bezier(.4, 0, .2, 1),
+    transform 5s cubic-bezier(.4, 0, .2, 1),
     opacity .55s ease-out;
 }
 
@@ -236,19 +236,19 @@
    :not(.hold) 是关键：指针压在右下角「更多推荐」上时（脚本加 .hold），
    遮罩保持不动 —— 否则按钮跟着遮罩一起淡掉，点下去只会点到下面的文章卡。
 
-   节奏（整段 4s，只有遮罩在动）：
+   节奏（整段 5s，只有遮罩在动）：
      0s      先撤 hello 和左下角文字（.55s 内退完，比底色「看穿」早）
-     0-4s    浅色底慢慢化开
+     0-5s    浅色底慢慢化开
      全程    六张卡定住不动，位置从一开始就是最终位置
-   卡片不做任何出入场：遮罩要淡 4 秒，这几秒里只要有位移就会被盯着看，
+   卡片不做任何出入场：遮罩要淡 5 秒，这几秒里只要有位移就会被盯着看，
    反而抢戏；让它停在格子里，视线自然落在逐渐显出来的文章上。 */
 @media (hover: hover) {
   #new_frame_group:hover:not(.hold) #new_frame_card {
     opacity: 0;
     pointer-events: none;
-    /* 4s 掀开。曲线起手就得动：用 (.4,0,.2,1) 的话头一秒几乎没变化，
+    /* 5s 掀开。曲线起手就得动：用 (.4,0,.2,1) 的话头一秒几乎没变化，
        看着像卡住了；这一档是「一直在慢慢褪」，只是越往后越慢。 */
-    transition: opacity 4s cubic-bezier(.3, .1, .3, 1);
+    transition: opacity 5s cubic-bezier(.3, .1, .3, 1);
   }
   #new_frame_group:hover:not(.hold) #new_frame_card .new-frame-hello {
     transform: scale(1.06);
@@ -264,7 +264,7 @@
 .new-frame-grid:focus-within ~ #new_frame_card {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 4s cubic-bezier(.3, .1, .3, 1);
+  transition: opacity 5s cubic-bezier(.3, .1, .3, 1);
 }
 
 #new_frame_group.is-open #new_frame_card .new-frame-hello,
